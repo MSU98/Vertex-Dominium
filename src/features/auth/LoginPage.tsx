@@ -3,6 +3,7 @@ import type { FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { auth, firebaseReady, missingFirebaseKeys } from '../../lib/firebase'
+import { routes } from '../../routes/paths'
 
 const LoginPage = () => {
   const [email, setEmail] = useState('')
@@ -36,7 +37,7 @@ const LoginPage = () => {
     setError(null)
     try {
       await signInWithEmailAndPassword(auth, email, password)
-      navigate('/dashboard', { replace: true })
+      navigate(routes.appHome, { replace: true })
     } catch (err) {
       setError('Could not sign in. Check credentials or try again.')
       console.error(err)

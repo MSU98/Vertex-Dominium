@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { auth, db, firebaseReady, missingFirebaseKeys } from '../../lib/firebase'
+import { routes } from '../../routes/paths'
 import type { UserProfile } from '../../types/User'
 
 const RegisterPage = () => {
@@ -51,7 +52,7 @@ const RegisterPage = () => {
       }
 
       await setDoc(doc(db, 'users', credentials.user.uid), baseProfile)
-      navigate('/dashboard', { replace: true })
+      navigate(routes.appHome, { replace: true })
     } catch (err) {
       setError('Could not create account. Please try again.')
       console.error(err)

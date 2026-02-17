@@ -34,6 +34,34 @@ a {
   text-decoration: none;
 }
 
+.public-nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(12, 15, 23, 0.92);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+}
+
+.public-nav-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.public-nav-links {
+  display: flex;
+  gap: 8px;
+}
+
+.public-content {
+  padding: 24px 20px 40px;
+}
+
 .app-shell {
   display: grid;
   grid-template-columns: 240px 1fr;
@@ -144,6 +172,21 @@ a {
   border-color: var(--accent);
 }
 
+.field textarea {
+  background: var(--panel-muted);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.field textarea:focus {
+  outline: 1px solid var(--accent);
+  border-color: var(--accent);
+}
+
 .btn {
   border: none;
   border-radius: 10px;
@@ -207,7 +250,32 @@ h2 {
   color: var(--muted);
 }
 
+.toast {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+}
+
+.toast-error {
+  border-color: rgba(255, 123, 123, 0.45);
+  color: var(--danger);
+}
+
 @media (max-width: 960px) {
+  .public-nav-inner {
+    flex-wrap: wrap;
+  }
+
+  .public-nav-links {
+    width: 100%;
+    order: 3;
+  }
+
   .app-shell {
     grid-template-columns: 1fr;
   }

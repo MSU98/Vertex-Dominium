@@ -17,6 +17,7 @@ const MembershipPage = () => {
   const navigate = useNavigate()
   const [submitting, setSubmitting] = useState<MembershipPlan | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [toast, setToast] = useState<string | null>(null)
 
   if (!db || !profile) {
     return (
@@ -34,6 +35,7 @@ const MembershipPage = () => {
     if (!profile?.uid) return
     setSubmitting(plan)
     setError(null)
+    setToast(null)
     try {
       await updateDoc(doc(db, 'users', profile.uid), {
         membershipPlan: plan,
@@ -53,6 +55,7 @@ const MembershipPage = () => {
     } catch (err) {
       console.error(err)
       setError('Could not set membership. Try again.')
+      setToast('Failed to save membership selection.')
     } finally {
       setSubmitting(null)
     }
@@ -80,6 +83,7 @@ const MembershipPage = () => {
         </div>
         {error && <p className="error">{error}</p>}
       </div>
+      {toast && <div className="toast toast-error">{toast}</div>}
     </div>
   )
 }

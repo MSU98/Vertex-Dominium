@@ -1,155 +1,52 @@
 # Vertex Dominium
 
-Vertex Dominium is a premium membership platform built as a modern MVP.
-
-The project is developed using React + TypeScript + Vite and integrates Firebase for Authentication, Firestore, Storage, and Hosting. The platform uses role-based access control (RBAC) to manage permissions and protected routes.
-
-The purpose of this project is to deliver a working MVP that demonstrates core functionality, technical competence, secure configuration handling, and a clear development workflow.
-
----
-
-## Tech Stack
-
-- React
-- TypeScript
-- Vite
-- Firebase (Authentication, Firestore, Storage, Hosting)
-- Git & GitHub
-
----
+Vite + React + TypeScript + Firebase MVP for a public marketing site and a paywalled member portal.
 
 ## Setup
 
-1) Install dependencies
+1. Install dependencies:
 
+```bash
 npm install
+```
 
-2) Environment variables (required)
+2. Create `.env` from `.env.example` and fill all `VITE_FIREBASE_*` values.
+3. Start dev server:
 
-This project requires Firebase environment variables to run.
-
-- Copy .env.example to .env
-- Fill in all VITE_FIREBASE_* values from:
-  Firebase Console → Project settings → General → SDK setup
-- The .env file must never be committed (it is ignored via .gitignore)
-
-If any required environment variable is missing, the application will display a "Connect Firebase" screen instead of loading authentication.
-
-Windows (PowerShell):
-Copy-Item .env.example .env
-
-macOS / Linux:
-cp .env.example .env
-
-3) Run development server
-
+```bash
 npm run dev
+```
 
-4) Build & lint
+## Route Map
 
-npm run build
-npm run lint
+### Public Routes
+- `/` - Landing page (Hero, what it is, tiers, CTA, contact)
+- `/about` - About page
+- `/contact` - Contact page
+- `/login` - Login
+- `/register` - Register
 
----
+### Auth Routes
+- `/membership` - Membership selection
+- `/onboarding/initium` - Initium onboarding
+- `/onboarding/ascensio` - Ascensio onboarding
+- `/onboarding/dominus` - Dominus onboarding
+- `/application-pending` - Dominus pending state
 
-## Firebase Setup (Console)
+### Member Portal Routes (`/app/*`)
+- `/app/home` - Member home
+- `/app/dashboard` - Dashboard module
+- `/app/courses` - Courses module
+- `/app/feed` - Feed module
+- `/app/forum` - Forum module
+- `/app/profile` - Profile module
+- `/app/dominus` - Dominus-only placeholder module
+- `/app/admin/dn-applications` - Admin applications panel (admin only)
 
-Authentication:
-- Enable Email/Password under Authentication → Sign-in method
+## Access
 
-Firestore:
-- Create a Firestore database (test or production mode)
-
-Storage (optional):
-- Enable Storage if file uploads will be used later
-
----
-
-## Firestore User Model
-
-User profiles are stored in:
-
-users/{uid}
-
-Recommended fields:
-- uid
-- email
-- role
-- membershipPlan
-- membershipStatus
-- onboardingComplete
-- createdAt
-
----
-
-## Deploy (Firebase Hosting)
-
-Install Firebase CLI:
-npm install -g firebase-tools
-firebase login
-
-Initialize hosting (first time only):
-firebase init hosting
-
-Configuration during setup:
-- Public directory: dist
-- Configure as Single Page Application (SPA): Yes
-
-Build & deploy:
-npm run build
-firebase deploy --only hosting
-
----
-
-## Project Structure
-
-src/
-├── app/          Application entry and layout
-├── auth/         Authentication context and route guards
-├── components    Shared UI components
-├── features      Pages (dashboard, courses, feed, forum, auth, home)
-├── lib           Firebase client and helpers
-├── routes        Route constants
-├── styles        Global styles and theme
-└── types         Shared TypeScript types
-
----
-
-## Roles & Access Control
-
-Default roles:
-- Initium
-- Ascensio
-- Dominus
-- Admin
-- Official
-- Curated
-
-The AuthContext hydrates the user profile from Firestore and exposes role and membershipStatus.
-Protected routes are wrapped using RequireAuth and RequireRole.
-
----
-
-## MVP Scope
-
-Included:
-- Firebase Authentication (Email/Password)
-- Firestore user profiles
-- Role-based access control
-- Protected routes
-- Firebase Hosting deployment
-
-Not included in MVP:
-- BankID (placeholder only)
-- Payment systems (Klarna / Swish)
-- Full course, forum, or marketplace functionality
-
----
-
-## Project Goal
-
-Build a working MVP for Vertex Dominium that demonstrates:
-- core platform functionality
-- technical understanding
-- secure handling of environment variables
-- a clear and structured development workflow
+- Unauthenticated users can access only public routes.
+- Authenticated users always land on `/app/home` after login/register.
+- Module access uses `membershipPlan + membershipStatus`.
+- Locked module routes redirect to `/membership`.
+- Admin route uses role guard.
