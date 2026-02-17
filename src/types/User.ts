@@ -1,22 +1,26 @@
 import { Timestamp } from 'firebase/firestore'
 
-export type UserRole =
-  | 'Initium'
-  | 'Ascensio'
-  | 'Dominus'
-  | 'Admin'
-  | 'Official'
-  | 'Curated'
-
-export type MembershipStatus = 'active' | 'inactive' | 'trial' | 'canceled' | 'pending'
+export type UserRole = 'initium' | 'ascensio' | 'dominus' | 'admin'
+export type MembershipPlan = 'initium' | 'ascensio' | 'dominus' | null
+export type MembershipStatus = 'pending' | 'active' | 'rejected' | 'inactive'
 
 export interface UserProfile {
   uid: string
   email: string
   role: UserRole
-  membershipPlan?: string
+  membershipPlan: MembershipPlan
   membershipStatus: MembershipStatus
   onboardingComplete: boolean
-  createdAt?: Timestamp
+  createdAt: Timestamp
+  updatedAt: Timestamp
+  fullName?: string
+  city?: string
+  title?: string
+  interests?: string[]
+  phone?: string
+  company?: string
+  orgNumber?: string
+  linkedin?: string
+  professionalDescription?: string
 }
 

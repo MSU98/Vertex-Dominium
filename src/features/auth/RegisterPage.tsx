@@ -42,15 +42,16 @@ const RegisterPage = () => {
       const baseProfile: UserProfile = {
         uid: credentials.user.uid,
         email,
-        role: 'Initium',
+        role: 'initium',
         membershipStatus: 'pending',
-        membershipPlan: '',
+        membershipPlan: null,
         onboardingComplete: false,
         createdAt: serverTimestamp() as unknown as UserProfile['createdAt'],
+        updatedAt: serverTimestamp() as unknown as UserProfile['updatedAt'],
       }
 
       await setDoc(doc(db, 'users', credentials.user.uid), baseProfile)
-      navigate('/dashboard')
+      navigate('/dashboard', { replace: true })
     } catch (err) {
       setError('Could not create account. Please try again.')
       console.error(err)
@@ -87,7 +88,7 @@ const RegisterPage = () => {
         </label>
         {error && <p className="error">{error}</p>}
         <button className="btn primary" type="submit" disabled={submitting}>
-          {submitting ? 'Creating…' : 'Create account'}
+          {submitting ? 'Creating...' : 'Create account'}
         </button>
         <p className="muted">
           Already a member? <Link to="/login">Sign in</Link>

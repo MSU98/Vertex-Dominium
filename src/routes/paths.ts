@@ -2,9 +2,16 @@ export const routes = {
   home: '/',
   login: '/login',
   register: '/register',
+  membership: '/membership',
+  onboardingInitium: '/onboarding/initium',
+  onboardingAscensio: '/onboarding/ascensio',
+  onboardingDominus: '/onboarding/dominus',
+  applicationPending: '/application-pending',
   dashboard: '/dashboard',
   courses: '/courses',
   feed: '/feed',
   forum: '/forum',
+  profile: '/profile',
+  adminDnApplications: '/admin/dn-applications',
 }
 

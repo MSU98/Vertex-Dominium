@@ -10,10 +10,14 @@ import DashboardPage from '../features/dashboard/DashboardPage'
 import CoursesPage from '../features/courses/CoursesPage'
 import FeedPage from '../features/feed/FeedPage'
 import ForumPage from '../features/forum/ForumPage'
+import MembershipPage from '../features/membership/MembershipPage'
+import InitiumOnboardingPage from '../features/onboarding/InitiumOnboardingPage'
+import AscensioOnboardingPage from '../features/onboarding/AscensioOnboardingPage'
+import DominusOnboardingPage from '../features/onboarding/DominusOnboardingPage'
+import ApplicationPendingPage from '../features/application/ApplicationPendingPage'
+import AdminDnApplicationsPage from '../features/admin/AdminDnApplicationsPage'
+import ProfilePage from '../features/profile/ProfilePage'
 import { routes } from '../routes/paths'
-import type { UserRole } from '../types/User'
-
-const memberRoles: UserRole[] = ['Initium', 'Ascensio', 'Dominus', 'Admin', 'Official', 'Curated']
 
 const App = () => (
   <AuthProvider>
@@ -24,12 +28,22 @@ const App = () => (
         <Route path={routes.register} element={<RegisterPage />} />
 
         <Route element={<RequireAuth />}>
-          <Route element={<RequireRole allowedRoles={memberRoles} />}>
-            <Route element={<DashboardLayout />}>
-              <Route path={routes.dashboard} element={<DashboardPage />} />
-              <Route path={routes.courses} element={<CoursesPage />} />
-              <Route path={routes.feed} element={<FeedPage />} />
-              <Route path={routes.forum} element={<ForumPage />} />
+          <Route element={<DashboardLayout />}>
+            <Route path={routes.dashboard} element={<DashboardPage />} />
+            <Route path={routes.membership} element={<MembershipPage />} />
+            <Route path={routes.onboardingInitium} element={<InitiumOnboardingPage />} />
+            <Route path={routes.onboardingAscensio} element={<AscensioOnboardingPage />} />
+            <Route path={routes.onboardingDominus} element={<DominusOnboardingPage />} />
+            <Route path={routes.applicationPending} element={<ApplicationPendingPage />} />
+            <Route path={routes.courses} element={<CoursesPage />} />
+            <Route path={routes.feed} element={<FeedPage />} />
+            <Route path={routes.forum} element={<ForumPage />} />
+            <Route path={routes.profile} element={<ProfilePage />} />
+            <Route
+              path={routes.adminDnApplications}
+              element={<RequireRole allowedRoles={['admin']} />}
+            >
+              <Route index element={<AdminDnApplicationsPage />} />
             </Route>
           </Route>
         </Route>

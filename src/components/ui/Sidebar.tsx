@@ -2,15 +2,18 @@ import { NavLink } from 'react-router-dom'
 import useAuth from '../../hooks/useAuth'
 import { routes } from '../../routes/paths'
 
-const navItems = [
+const baseNav = [
   { label: 'Dashboard', to: routes.dashboard },
+  { label: 'Membership', to: routes.membership },
   { label: 'Courses', to: routes.courses },
   { label: 'Feed', to: routes.feed },
   { label: 'Forum', to: routes.forum },
+  { label: 'Profile', to: routes.profile },
 ]
 
 const Sidebar = () => {
   const { profile } = useAuth()
+  const isAdmin = profile?.role === 'admin'
 
   return (
     <aside className="sidebar">
@@ -23,7 +26,7 @@ const Sidebar = () => {
       </div>
 
       <nav className="nav">
-        {navItems.map((item) => (
+        {baseNav.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
@@ -32,6 +35,14 @@ const Sidebar = () => {
             {item.label}
           </NavLink>
         ))}
+        {isAdmin && (
+          <NavLink
+            to={routes.adminDnApplications}
+            className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+          >
+            Admin panel
+          </NavLink>
+        )}
       </nav>
 
       <div className="sidebar-footer">
