@@ -18,8 +18,9 @@ const AscensioOnboardingPage = () => {
   )
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const dbClient = db
 
-  if (!db || !profile) {
+  if (!dbClient || !profile) {
     return (
       <div className="page page-centered">
         <div className="card">
@@ -37,7 +38,7 @@ const AscensioOnboardingPage = () => {
     setError(null)
 
     try {
-      await updateDoc(doc(db, 'users', profile.uid), {
+      await updateDoc(doc(dbClient, 'users', profile.uid), {
         fullName,
         phone,
         company,

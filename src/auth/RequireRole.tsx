@@ -16,7 +16,7 @@ const RequireRole = ({ allowedRoles }: RequireRoleProps) => {
   }
 
   if (!role || !allowedRoles.includes(role)) {
-    return <Navigate to={currentUser ? routes.appHome : routes.login} replace />
+    return <Navigate to={currentUser ? routes.home : routes.login} replace />
   }
 
   return <Outlet />

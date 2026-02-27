@@ -30,8 +30,9 @@ const MembershipPage = () => {
   const [submitting, setSubmitting] = useState<MembershipPlan | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [toast, setToast] = useState<string | null>(null)
+  const dbClient = db
 
-  if (!db || !profile) {
+  if (!dbClient || !profile) {
     return (
       <div className="page page-centered">
         <div className="card">
@@ -48,7 +49,7 @@ const MembershipPage = () => {
     setError(null)
     setToast(null)
     try {
-      await updateDoc(doc(db, 'users', profile.uid), {
+      await updateDoc(doc(dbClient, 'users', profile.uid), {
         membershipPlan: plan,
         membershipStatus: 'pending',
         onboardingComplete: false,

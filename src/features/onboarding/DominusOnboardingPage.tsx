@@ -18,8 +18,9 @@ const DominusOnboardingPage = () => {
   const [motivation, setMotivation] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const dbClient = db
 
-  if (!db || !profile) {
+  if (!dbClient || !profile) {
     return (
       <div className="page page-centered">
         <div className="card">
@@ -37,7 +38,7 @@ const DominusOnboardingPage = () => {
     setError(null)
 
     try {
-      await addDoc(collection(db, 'dnApplications'), {
+      await addDoc(collection(dbClient, 'dnApplications'), {
         uid: profile.uid,
         fullName,
         companyName,
@@ -51,7 +52,7 @@ const DominusOnboardingPage = () => {
         createdAt: serverTimestamp(),
       })
 
-      await updateDoc(doc(db, 'users', profile.uid), {
+      await updateDoc(doc(dbClient, 'users', profile.uid), {
         fullName,
         company: companyName,
         orgNumber,

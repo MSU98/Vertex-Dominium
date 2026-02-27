@@ -4,7 +4,7 @@ import { routes } from '../../routes/paths'
 const PublicNavbar = () => (
   <header className="public-nav">
     <div className="public-nav-inner">
-      <Link to={routes.landing} className="brand">
+      <Link to={routes.home} className="brand">
         <span className="dot" />
         <div>
           <p className="eyebrow">Vertex</p>
@@ -13,7 +13,7 @@ const PublicNavbar = () => (
       </Link>
 
       <nav className="public-nav-links">
-        <NavLink to={routes.landing} className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+        <NavLink to={routes.home} className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
           Home
         </NavLink>
         <NavLink to={routes.about} className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>

@@ -28,13 +28,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!firebaseReady || !auth || !db) {
+    const authClient = auth
+    const dbClient = db
+
+    if (!firebaseReady || !authClient || !dbClient) {
       setLoading(false)
       return
     }
 
     // Listen for auth changes and hydrate Firestore profile.
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(authClient, async (user) => {
       setCurrentUser(user)
 
       if (!user) {
@@ -44,7 +47,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       try {
-        const userDoc = await getDoc(doc(db, 'users', user.uid))
+        const userDoc = await getDoc(doc(dbClient, 'users', user.uid))
         if (userDoc.exists()) {
           const data = userDoc.data() as UserProfile
           setProfile({ ...data, uid: user.uid })
