@@ -1,15 +1,27 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { doc, serverTimestamp, updateDoc } from 'firebase/firestore'
 import useAuth from '../../hooks/useAuth'
 import { db } from '../../lib/firebase'
 import { routes } from '../../routes/paths'
 import type { MembershipPlan } from '../../types/User'
 
-const plans: { id: MembershipPlan; label: string; description: string }[] = [
-  { id: 'initium', label: 'Initium', description: 'Core community access.' },
-  { id: 'ascensio', label: 'Ascensio', description: 'Growth tier with profile and community perks.' },
-  { id: 'dominus', label: 'Dominus Negotium', description: 'Application-only business tier.' },
+const plans: { id: MembershipPlan; title: string; copy: string }[] = [
+  {
+    id: 'initium',
+    title: 'INITIUM',
+    copy: 'Basniva for medlemmar med tillgang till kurser, forum och grundprofil.',
+  },
+  {
+    id: 'ascensio',
+    title: 'ASCENSIO',
+    copy: 'Utokad niva med fler profilfunktioner, badge och starkare synlighet i portalen.',
+  },
+  {
+    id: 'dominus',
+    title: 'DOMINIUS NEGOTIUM',
+    copy: 'Exklusiv niva for medlemmar som ansoker om premiumyta och strategiska mojligheter.',
+  },
 ]
 
 const MembershipPage = () => {
@@ -25,14 +37,13 @@ const MembershipPage = () => {
         <div className="card">
           <p className="eyebrow">Membership</p>
           <h2>Loading...</h2>
-          <p className="muted">Please sign in and ensure Firebase is configured.</p>
         </div>
       </div>
     )
   }
 
   const handleSelect = async (plan: MembershipPlan) => {
-    if (!profile?.uid) return
+    if (!profile.uid) return
     setSubmitting(plan)
     setError(null)
     setToast(null)
@@ -54,35 +65,52 @@ const MembershipPage = () => {
       navigate(target)
     } catch (err) {
       console.error(err)
-      setError('Could not set membership. Try again.')
-      setToast('Failed to save membership selection.')
+      setError('Kunde inte spara val av medlemskap. Forsok igen.')
+      setToast('Kunde inte spara medlemsvalet.')
     } finally {
       setSubmitting(null)
     }
   }
 
   return (
-    <div className="page page-centered">
-      <div className="card" style={{ maxWidth: '640px' }}>
-        <p className="eyebrow">Choose membership</p>
-        <h2>Select your plan</h2>
-        <div className="page" style={{ gap: '12px' }}>
-          {plans.map((plan) => (
-            <div key={plan.id} className="card" style={{ padding: '16px' }}>
-              <h3>{plan.label}</h3>
-              <p className="muted">{plan.description}</p>
-              <button
-                className="btn primary"
-                onClick={() => handleSelect(plan.id)}
-                disabled={Boolean(submitting)}
-              >
-                {submitting === plan.id ? 'Saving...' : 'Select'}
-              </button>
-            </div>
-          ))}
+    <div className="membership-hero">
+      <header className="landing-nav membership-nav">
+        <div className="landing-nav-left">MENY</div>
+        <div className="landing-nav-logo">
+          <img src="/vertex-logo.png" alt="Vertex Dominium" />
         </div>
-        {error && <p className="error">{error}</p>}
-      </div>
+        <nav className="landing-nav-right membership-top-links">
+          <Link to={routes.dashboard}>DASHBOARD</Link>
+          <Link to={routes.membership}>MEMBERSHIP</Link>
+          <Link to={routes.courses}>COURSES</Link>
+          <Link to={routes.feed}>FEED</Link>
+          <Link to={routes.forum}>FORUM</Link>
+          <Link to={routes.profile}>PROFILE</Link>
+        </nav>
+      </header>
+
+      <section className="membership-intro">
+        <h1>VERTEX DOMINIUM</h1>
+        <h2>VARA MEDLEMSNIVAER</h2>
+      </section>
+
+      <section className="membership-grid">
+        {plans.map((plan) => (
+          <article key={plan.id} className="membership-tier">
+            <h3>{plan.title}</h3>
+            <p>{plan.copy}</p>
+            <button
+              className="membership-select"
+              onClick={() => handleSelect(plan.id)}
+              disabled={Boolean(submitting)}
+            >
+              {submitting === plan.id ? 'SPARAR...' : 'VALJ NIVAN'}
+            </button>
+          </article>
+        ))}
+      </section>
+
+      {error && <p className="membership-error">{error}</p>}
       {toast && <div className="toast toast-error">{toast}</div>}
     </div>
   )

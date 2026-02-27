@@ -37,7 +37,7 @@ const LoginPage = () => {
     setError(null)
     try {
       await signInWithEmailAndPassword(auth, email, password)
-      navigate(routes.appHome, { replace: true })
+      navigate(routes.home, { replace: true })
     } catch (err) {
       setError('Could not sign in. Check credentials or try again.')
       console.error(err)
