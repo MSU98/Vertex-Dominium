@@ -52,7 +52,7 @@ const RegisterPage = () => {
       }
 
       await setDoc(doc(db, 'users', credentials.user.uid), baseProfile)
-      navigate(routes.appHome, { replace: true })
+      navigate(routes.home, { replace: true })
     } catch (err) {
       setError('Could not create account. Please try again.')
       console.error(err)

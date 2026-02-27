@@ -32,9 +32,10 @@ const App = () => (
         <Route path={routes.register} element={<RegisterPage />} />
 
         <Route element={<RequireAuth />}>
+          <Route path={routes.membership} element={<MembershipPage />} />
+
           <Route element={<DashboardLayout />}>
             <Route path={routes.dashboard} element={<DashboardPage />} />
-            <Route path={routes.membership} element={<MembershipPage />} />
             <Route path={routes.onboardingInitium} element={<InitiumOnboardingPage />} />
             <Route path={routes.onboardingAscensio} element={<AscensioOnboardingPage />} />
             <Route path={routes.onboardingDominus} element={<DominusOnboardingPage />} />
