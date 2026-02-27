@@ -11,8 +11,9 @@ const LoginPage = () => {
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const navigate = useNavigate()
+  const authClient = auth
 
-  if (!firebaseReady || !auth) {
+  if (!firebaseReady || !authClient) {
     return (
       <div className="page page-centered">
         <div className="card">
@@ -36,7 +37,7 @@ const LoginPage = () => {
     setSubmitting(true)
     setError(null)
     try {
-      await signInWithEmailAndPassword(auth, email, password)
+      await signInWithEmailAndPassword(authClient, email, password)
       navigate(routes.home, { replace: true })
     } catch (err) {
       setError('Could not sign in. Check credentials or try again.')

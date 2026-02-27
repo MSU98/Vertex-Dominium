@@ -14,8 +14,9 @@ const InitiumOnboardingPage = () => {
   const [interests, setInterests] = useState((profile?.interests ?? []).join(', '))
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const dbClient = db
 
-  if (!db || !profile) {
+  if (!dbClient || !profile) {
     return (
       <div className="page page-centered">
         <div className="card">
@@ -39,7 +40,7 @@ const InitiumOnboardingPage = () => {
       .slice(0, 3)
 
     try {
-      await updateDoc(doc(db, 'users', profile.uid), {
+      await updateDoc(doc(dbClient, 'users', profile.uid), {
         fullName,
         city,
         title,

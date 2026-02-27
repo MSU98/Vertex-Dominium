@@ -13,8 +13,10 @@ const RegisterPage = () => {
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const navigate = useNavigate()
+  const authClient = auth
+  const dbClient = db
 
-  if (!firebaseReady || !auth || !db) {
+  if (!firebaseReady || !authClient || !dbClient) {
     return (
       <div className="page page-centered">
         <div className="card">
@@ -39,7 +41,7 @@ const RegisterPage = () => {
     setError(null)
 
     try {
-      const credentials = await createUserWithEmailAndPassword(auth, email, password)
+      const credentials = await createUserWithEmailAndPassword(authClient, email, password)
       const baseProfile: UserProfile = {
         uid: credentials.user.uid,
         email,
@@ -51,7 +53,7 @@ const RegisterPage = () => {
         updatedAt: serverTimestamp() as unknown as UserProfile['updatedAt'],
       }
 
-      await setDoc(doc(db, 'users', credentials.user.uid), baseProfile)
+      await setDoc(doc(dbClient, 'users', credentials.user.uid), baseProfile)
       navigate(routes.home, { replace: true })
     } catch (err) {
       setError('Could not create account. Please try again.')
