@@ -4,6 +4,8 @@ import RequireRole from '../auth/RequireRole'
 import { AuthProvider } from '../auth/AuthContext'
 import DashboardLayout from './DashboardLayout'
 import HomePage from '../features/home/HomePage'
+import AboutPage from '../features/public/AboutPage'
+import ContactPage from '../features/public/ContactPage'
 import LoginPage from '../features/auth/LoginPage'
 import RegisterPage from '../features/auth/RegisterPage'
 import DashboardPage from '../features/dashboard/DashboardPage'
@@ -24,6 +26,8 @@ const App = () => (
     <BrowserRouter>
       <Routes>
         <Route path={routes.home} element={<HomePage />} />
+        <Route path={routes.about} element={<AboutPage />} />
+        <Route path={routes.contact} element={<ContactPage />} />
         <Route path={routes.login} element={<LoginPage />} />
         <Route path={routes.register} element={<RegisterPage />} />
 
