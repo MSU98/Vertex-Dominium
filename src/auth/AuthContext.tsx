@@ -9,7 +9,7 @@ import {
 import { onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth'
 import { doc, getDoc } from 'firebase/firestore'
 import { auth, db, firebaseReady } from '../lib/firebase'
-import type { MembershipStatus, UserProfile, UserRole } from '../types/User'
+import type { MembershipPlan, MembershipStatus, UserProfile, UserRole } from '../types/User'
 
 type AuthContextValue = {
   currentUser: FirebaseUser | null
@@ -17,6 +17,7 @@ type AuthContextValue = {
   loading: boolean
   role: UserRole | null
   membershipStatus: MembershipStatus | null
+  membershipPlan: MembershipPlan
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
@@ -68,6 +69,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       loading,
       role: profile?.role ?? null,
       membershipStatus: profile?.membershipStatus ?? null,
+      membershipPlan: profile?.membershipPlan ?? null,
     }),
     [currentUser, profile, loading],
   )

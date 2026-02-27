@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { Link, useLocation, useNavigate, type Location } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { auth, firebaseReady, missingFirebaseKeys } from '../../lib/firebase'
+import { routes } from '../../routes/paths'
 
 const LoginPage = () => {
   const [email, setEmail] = useState('')
@@ -10,8 +11,6 @@ const LoginPage = () => {
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const navigate = useNavigate()
-  const location = useLocation()
-  const from = (location.state as { from?: Location })?.from?.pathname ?? '/dashboard'
 
   if (!firebaseReady || !auth) {
     return (
@@ -38,7 +37,7 @@ const LoginPage = () => {
     setError(null)
     try {
       await signInWithEmailAndPassword(auth, email, password)
-      navigate(from, { replace: true })
+      navigate(routes.appHome, { replace: true })
     } catch (err) {
       setError('Could not sign in. Check credentials or try again.')
       console.error(err)
@@ -74,7 +73,7 @@ const LoginPage = () => {
         </label>
         {error && <p className="error">{error}</p>}
         <button className="btn primary" type="submit" disabled={submitting}>
-          {submitting ? 'Signing in…' : 'Sign in'}
+          {submitting ? 'Signing in...' : 'Sign in'}
         </button>
         <p className="muted">
           No account? <Link to="/register">Create one</Link>

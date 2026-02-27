@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { auth, db, firebaseReady, missingFirebaseKeys } from '../../lib/firebase'
+import { routes } from '../../routes/paths'
 import type { UserProfile } from '../../types/User'
 
 const RegisterPage = () => {
@@ -42,15 +43,16 @@ const RegisterPage = () => {
       const baseProfile: UserProfile = {
         uid: credentials.user.uid,
         email,
-        role: 'Initium',
+        role: 'initium',
         membershipStatus: 'pending',
-        membershipPlan: '',
+        membershipPlan: null,
         onboardingComplete: false,
         createdAt: serverTimestamp() as unknown as UserProfile['createdAt'],
+        updatedAt: serverTimestamp() as unknown as UserProfile['updatedAt'],
       }
 
       await setDoc(doc(db, 'users', credentials.user.uid), baseProfile)
-      navigate('/dashboard')
+      navigate(routes.appHome, { replace: true })
     } catch (err) {
       setError('Could not create account. Please try again.')
       console.error(err)
@@ -87,7 +89,7 @@ const RegisterPage = () => {
         </label>
         {error && <p className="error">{error}</p>}
         <button className="btn primary" type="submit" disabled={submitting}>
-          {submitting ? 'Creating…' : 'Create account'}
+          {submitting ? 'Creating...' : 'Create account'}
         </button>
         <p className="muted">
           Already a member? <Link to="/login">Sign in</Link>

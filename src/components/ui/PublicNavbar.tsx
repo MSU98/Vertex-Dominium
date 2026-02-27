@@ -1,0 +1,39 @@
+import { Link, NavLink } from 'react-router-dom'
+import { routes } from '../../routes/paths'
+
+const PublicNavbar = () => (
+  <header className="public-nav">
+    <div className="public-nav-inner">
+      <Link to={routes.landing} className="brand">
+        <span className="dot" />
+        <div>
+          <p className="eyebrow">Vertex</p>
+          <strong>Dominium</strong>
+        </div>
+      </Link>
+
+      <nav className="public-nav-links">
+        <NavLink to={routes.landing} className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+          Home
+        </NavLink>
+        <NavLink to={routes.about} className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+          About
+        </NavLink>
+        <NavLink to={routes.contact} className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+          Contact
+        </NavLink>
+      </nav>
+
+      <div className="actions" style={{ marginTop: 0 }}>
+        <Link className="btn ghost" to={routes.login}>
+          Log in
+        </Link>
+        <Link className="btn primary" to={routes.register}>
+          Become a member
+        </Link>
+      </div>
+    </div>
+  </header>
+)
+
+export default PublicNavbar
