@@ -80,6 +80,7 @@ const MembershipPage = () => {
           <img src="/vertex-logo.png" alt="Vertex Dominium" />
         </div>
         <nav className="landing-nav-right membership-top-links">
+          <Link to={routes.hem}>HEM</Link>
           <Link to={routes.dashboard}>DASHBOARD</Link>
           <Link to={routes.membership}>MEMBERSHIP</Link>
           <Link to={routes.courses}>COURSES</Link>

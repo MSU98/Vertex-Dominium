@@ -10,6 +10,7 @@ const HomePage = () => (
           <img src="/vertex-logo.png" alt="Vertex Dominium" />
         </div>
         <nav className="landing-nav-right">
+          <Link to={routes.hem}>HEM</Link>
           <Link to={routes.about}>OM OSS</Link>
           <Link to={routes.membership}>MEDLEMSPORTAL</Link>
           <Link to={routes.contact}>KONTAKT</Link>
