@@ -34,32 +34,122 @@ a {
   text-decoration: none;
 }
 
-.public-nav {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: rgba(12, 15, 23, 0.92);
-  border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(8px);
+.landing {
+  min-height: 100vh;
+  background: linear-gradient(rgba(0, 0, 0, 0.52), rgba(0, 0, 0, 0.58)), url('/boardroom-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
-.public-nav-inner {
+.landing-hero {
+  min-height: 64vh;
+  padding: 24px 40px;
+}
+
+.landing-nav {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: start;
+  gap: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+  padding-bottom: 12px;
+}
+
+.landing-nav-left {
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  color: #e7e2d4;
+}
+
+.landing-nav-logo {
+  justify-self: center;
+}
+
+.landing-nav-logo img {
+  width: 92px;
+  height: auto;
+  display: block;
+}
+
+.landing-nav-right {
+  justify-self: end;
+  display: flex;
+  gap: 18px;
+}
+
+.landing-nav-right a {
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  color: #f8f8f8;
+}
+
+.landing-title-wrap {
   max-width: 1080px;
+  margin: 90px auto 0;
+}
+
+.landing-kicker {
+  margin: 0 0 16px;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.landing-title {
+  margin: 0;
+  font-size: clamp(2.2rem, 7vw, 4.4rem);
+  letter-spacing: 0.12em;
+  color: #f5f5f5;
+  font-weight: 500;
+}
+
+.landing-content {
+  background: #efefef;
+  color: #121212;
+  padding: 56px 36px;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 14px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
 }
 
-.public-nav-links {
-  display: flex;
-  gap: 8px;
+.landing-content h2 {
+  margin: 0 0 20px;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+  text-align: center;
 }
 
-.public-content {
-  padding: 24px 20px 40px;
+.landing-content p {
+  margin: 0 0 12px;
+  line-height: 1.45;
+}
+
+.landing-bottom-grid {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 60px 0 90px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+.landing-bottom-grid article {
+  background: rgba(0, 0, 0, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  padding: 26px;
+}
+
+.landing-bottom-grid h3 {
+  margin: 0 0 16px;
+  letter-spacing: 0.08em;
+  font-size: 2rem;
+  font-weight: 500;
+}
+
+.landing-bottom-grid p {
+  margin: 0;
+  color: #d7d7d7;
+  line-height: 1.5;
 }
 
 .app-shell {
@@ -172,21 +262,6 @@ a {
   border-color: var(--accent);
 }
 
-.field textarea {
-  background: var(--panel-muted);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 10px 12px;
-  color: var(--text);
-  font-size: 1rem;
-  font-family: inherit;
-}
-
-.field textarea:focus {
-  outline: 1px solid var(--accent);
-  border-color: var(--accent);
-}
-
 .btn {
   border: none;
   border-radius: 10px;
@@ -250,30 +325,39 @@ h2 {
   color: var(--muted);
 }
 
-.toast {
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--panel);
-  color: var(--text);
-}
-
-.toast-error {
-  border-color: rgba(255, 123, 123, 0.45);
-  color: var(--danger);
-}
-
 @media (max-width: 960px) {
-  .public-nav-inner {
-    flex-wrap: wrap;
+  .landing-hero {
+    padding: 18px 18px 12px;
   }
 
-  .public-nav-links {
-    width: 100%;
-    order: 3;
+  .landing-nav {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .landing-nav-logo,
+  .landing-nav-right,
+  .landing-nav-left {
+    justify-self: start;
+  }
+
+  .landing-nav-right {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .landing-title-wrap {
+    margin-top: 52px;
+  }
+
+  .landing-content {
+    padding: 34px 18px;
+  }
+
+  .landing-bottom-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 30px 18px 46px;
   }
 
   .app-shell {

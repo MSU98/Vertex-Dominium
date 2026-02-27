@@ -1,5 +1,5 @@
 export const routes = {
-  landing: '/',
+  home: '/',
   about: '/about',
   contact: '/contact',
   login: '/login',
@@ -9,13 +9,11 @@ export const routes = {
   onboardingAscensio: '/onboarding/ascensio',
   onboardingDominus: '/onboarding/dominus',
   applicationPending: '/application-pending',
-  appHome: '/app/home',
-  dashboard: '/app/dashboard',
-  courses: '/app/courses',
-  feed: '/app/feed',
-  forum: '/app/forum',
-  profile: '/app/profile',
-  dominusArea: '/app/dominus',
-  adminDnApplications: '/app/admin/dn-applications',
+  dashboard: '/dashboard',
+  courses: '/courses',
+  feed: '/feed',
+  forum: '/forum',
+  profile: '/profile',
+  adminDnApplications: '/admin/dn-applications',
 }
 
