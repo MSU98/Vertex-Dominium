@@ -34,8 +34,8 @@ const MembershipPage = () => {
 
   if (!dbClient || !profile) {
     return (
-      <div className="page page-centered">
-        <div className="card">
+      <div className="membership-hero page-centered">
+        <div className="card" style={{ width: 'min(480px, 92vw)' }}>
           <p className="eyebrow">Membership</p>
           <h2>Loading...</h2>
         </div>
