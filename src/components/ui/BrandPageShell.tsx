@@ -11,8 +11,9 @@ type BrandPageShellProps = {
 }
 
 const BrandPageShell = ({ title, subtitle, memberNav = false, children }: BrandPageShellProps) => {
-  const { profile } = useAuth()
+  const { currentUser, profile } = useAuth()
   const isAdmin = profile?.role === 'admin'
+  const showMemberNav = memberNav || Boolean(currentUser)
 
   return (
     <div className="brand-page">
@@ -22,7 +23,7 @@ const BrandPageShell = ({ title, subtitle, memberNav = false, children }: BrandP
           <img src="/vertex-logo.png" alt="Vertex Dominium" />
         </div>
         <nav className="landing-nav-right membership-top-links">
-          {memberNav ? (
+          {showMemberNav ? (
             <>
               <Link to={routes.hem}>HEM</Link>
               <Link to={routes.dashboard}>DASHBOARD</Link>

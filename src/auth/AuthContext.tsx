@@ -1,6 +1,4 @@
 import {
-  createContext,
-  useContext,
   useEffect,
   useMemo,
   useState,
@@ -9,18 +7,8 @@ import {
 import { onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth'
 import { doc, getDoc } from 'firebase/firestore'
 import { auth, db, firebaseReady } from '../lib/firebase'
-import type { MembershipPlan, MembershipStatus, UserProfile, UserRole } from '../types/User'
-
-type AuthContextValue = {
-  currentUser: FirebaseUser | null
-  profile: UserProfile | null
-  loading: boolean
-  role: UserRole | null
-  membershipStatus: MembershipStatus | null
-  membershipPlan: MembershipPlan
-}
-
-const AuthContext = createContext<AuthContextValue | undefined>(undefined)
+import type { UserProfile } from '../types/User'
+import { AuthContext } from './auth-context'
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null)
@@ -78,12 +66,4 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-}
-
-export const useAuthContext = () => {
-  const ctx = useContext(AuthContext)
-  if (!ctx) {
-    throw new Error('useAuthContext must be used within an AuthProvider')
-  }
-  return ctx
 }

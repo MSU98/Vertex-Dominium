@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from 'react-router-dom'
-import { useAuthContext } from './AuthContext'
+import { useAuthContext } from './auth-context'
 import { routes } from '../routes/paths'
 import type { UserRole } from '../types/User'
 

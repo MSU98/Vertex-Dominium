@@ -26,8 +26,9 @@ const AdminDnApplicationsPage = () => {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!db) return
-    const q = query(collection(db, 'dnApplications'), orderBy('createdAt', 'desc'))
+    const dbClient = db
+    if (!dbClient) return
+    const q = query(collection(dbClient, 'dnApplications'), orderBy('createdAt', 'desc'))
     const unsub = onSnapshot(
       q,
       (snapshot) => {
@@ -46,7 +47,7 @@ const AdminDnApplicationsPage = () => {
     )
 
     return () => unsub()
-  }, [db])
+  }, [])
 
   const handleDecision = async (application: DnApplication, status: ApplicationStatus) => {
     if (!db) return
