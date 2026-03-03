@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { collection, doc, onSnapshot, orderBy, query, serverTimestamp, updateDoc } from 'firebase/firestore'
 import { db } from '../../lib/firebase'
+import BrandPageShell from '../../components/ui/BrandPageShell'
 
 type ApplicationStatus = 'pending' | 'approved' | 'rejected'
 
@@ -83,27 +84,24 @@ const AdminDnApplicationsPage = () => {
 
   if (!db) {
     return (
-      <section className="page">
-        <div className="card">
-          <p className="eyebrow">Admin</p>
-          <h2>Firebase not configured</h2>
-          <p className="muted">Add Firebase env keys to use the admin panel.</p>
-        </div>
-      </section>
+      <BrandPageShell title="ADMIN PANEL" subtitle="Granska Dominus-ansokningar." memberNav>
+        <article className="brand-panel">
+          <h3>Firebase not configured</h3>
+          <p>Add Firebase env keys to use the admin panel.</p>
+        </article>
+      </BrandPageShell>
     )
   }
 
   return (
-    <section className="page">
-      <div className="card">
-        <p className="eyebrow">Admin</p>
-        <h2>Dominus applications</h2>
+    <BrandPageShell title="ADMIN PANEL" subtitle="Dominus applications" memberNav>
+      <article className="brand-panel">
         {loading && <p className="muted">Loading...</p>}
         {error && <p className="error">{error}</p>}
         {!loading && applications.length === 0 && <p className="muted">No applications.</p>}
-        <div className="page" style={{ gap: '12px' }}>
+        <div className="brand-panel-grid">
           {applications.map((app) => (
-            <div key={app.id} className="card" style={{ padding: '16px' }}>
+            <div key={app.id} className="brand-panel-sub">
               <h3>{app.fullName}</h3>
               <p className="muted">
                 {app.title} @ {app.companyName}
@@ -133,8 +131,8 @@ const AdminDnApplicationsPage = () => {
             </div>
           ))}
         </div>
-      </div>
-    </section>
+      </article>
+    </BrandPageShell>
   )
 }
 

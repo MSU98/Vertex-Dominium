@@ -4,6 +4,7 @@ import { doc, serverTimestamp, updateDoc } from 'firebase/firestore'
 import useAuth from '../../hooks/useAuth'
 import { db } from '../../lib/firebase'
 import { routes } from '../../routes/paths'
+import BrandPageShell from '../../components/ui/BrandPageShell'
 
 const AscensioOnboardingPage = () => {
   const { profile } = useAuth()
@@ -22,13 +23,11 @@ const AscensioOnboardingPage = () => {
 
   if (!dbClient || !profile) {
     return (
-      <div className="page page-centered">
-        <div className="card">
-          <p className="eyebrow">Onboarding</p>
-          <h2>Ascensio</h2>
-          <p className="muted">Please sign in and ensure Firebase is configured.</p>
-        </div>
-      </div>
+      <BrandPageShell title="ASCENSIO ONBOARDING" memberNav>
+        <article className="brand-panel">
+          <p>Please sign in and ensure Firebase is configured.</p>
+        </article>
+      </BrandPageShell>
     )
   }
 
@@ -61,10 +60,8 @@ const AscensioOnboardingPage = () => {
   }
 
   return (
-    <div className="page page-centered">
-      <form className="card form" onSubmit={handleSubmit}>
-        <p className="eyebrow">Onboarding</p>
-        <h2>Ascensio</h2>
+    <BrandPageShell title="ASCENSIO ONBOARDING" memberNav>
+      <form className="brand-form" onSubmit={handleSubmit}>
         <label className="field">
           <span>Full name</span>
           <input value={fullName} onChange={(e) => setFullName(e.target.value)} required />
@@ -87,19 +84,14 @@ const AscensioOnboardingPage = () => {
         </label>
         <label className="field">
           <span>Professional description (max 300 chars)</span>
-          <textarea
-            value={professionalDescription}
-            onChange={(e) => setProfessionalDescription(e.target.value)}
-            maxLength={300}
-            style={{ minHeight: '80px', background: 'var(--panel-muted)', color: 'var(--text)' }}
-          />
+          <textarea value={professionalDescription} onChange={(e) => setProfessionalDescription(e.target.value)} maxLength={300} />
         </label>
         {error && <p className="error">{error}</p>}
         <button className="btn primary" type="submit" disabled={submitting}>
           {submitting ? 'Saving...' : 'Finish onboarding'}
         </button>
       </form>
-    </div>
+    </BrandPageShell>
   )
 }
 

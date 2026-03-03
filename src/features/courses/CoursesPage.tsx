@@ -1,11 +1,11 @@
+import BrandPageShell from '../../components/ui/BrandPageShell'
+
 const CoursesPage = () => (
-  <section className="page">
-    <div className="card">
-      <p className="eyebrow">Courses</p>
-      <h2>Learning tracks</h2>
-      <p className="muted">Content pipeline placeholder. Hook up curated modules here.</p>
-    </div>
-  </section>
+  <BrandPageShell title="COURSES" subtitle="Kuraterade larspaar for medlemmar i Vertex Dominium." memberNav>
+    <article className="brand-panel">
+      <p>Content pipeline placeholder. Hook up curated modules here.</p>
+    </article>
+  </BrandPageShell>
 )
 
 export default CoursesPage

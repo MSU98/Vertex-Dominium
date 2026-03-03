@@ -6,6 +6,7 @@ import { doc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { auth, db, firebaseReady, missingFirebaseKeys } from '../../lib/firebase'
 import { routes } from '../../routes/paths'
 import type { UserProfile } from '../../types/User'
+import BrandPageShell from '../../components/ui/BrandPageShell'
 
 const RegisterPage = () => {
   const [email, setEmail] = useState('')
@@ -18,10 +19,9 @@ const RegisterPage = () => {
 
   if (!firebaseReady || !authClient || !dbClient) {
     return (
-      <div className="page page-centered">
-        <div className="card">
-          <p className="eyebrow">Configuration needed</p>
-          <h2>Connect Firebase</h2>
+      <BrandPageShell title="BLI MEDLEM">
+        <article className="brand-panel">
+          <h3>Connect Firebase</h3>
           <p className="muted">
             Add the following keys to your <code>.env</code> file and restart <code>npm run dev</code>.
           </p>
@@ -30,8 +30,8 @@ const RegisterPage = () => {
               <li key={key}>{key}</li>
             ))}
           </ul>
-        </div>
-      </div>
+        </article>
+      </BrandPageShell>
     )
   }
 
@@ -64,10 +64,8 @@ const RegisterPage = () => {
   }
 
   return (
-    <div className="page page-centered">
-      <form className="card form" onSubmit={handleSubmit}>
-        <p className="eyebrow">Onboarding</p>
-        <h2>Create account</h2>
+    <BrandPageShell title="BLI MEDLEM">
+      <form className="brand-form" onSubmit={handleSubmit}>
         <label className="field">
           <span>Email</span>
           <input
@@ -97,7 +95,7 @@ const RegisterPage = () => {
           Already a member? <Link to="/login">Sign in</Link>
         </p>
       </form>
-    </div>
+    </BrandPageShell>
   )
 }
 

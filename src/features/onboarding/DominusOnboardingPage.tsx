@@ -4,6 +4,7 @@ import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/fi
 import useAuth from '../../hooks/useAuth'
 import { db } from '../../lib/firebase'
 import { routes } from '../../routes/paths'
+import BrandPageShell from '../../components/ui/BrandPageShell'
 
 const DominusOnboardingPage = () => {
   const { profile } = useAuth()
@@ -22,13 +23,11 @@ const DominusOnboardingPage = () => {
 
   if (!dbClient || !profile) {
     return (
-      <div className="page page-centered">
-        <div className="card">
-          <p className="eyebrow">Onboarding</p>
-          <h2>Dominus Negotium</h2>
-          <p className="muted">Please sign in and ensure Firebase is configured.</p>
-        </div>
-      </div>
+      <BrandPageShell title="DOMINUS ONBOARDING" memberNav>
+        <article className="brand-panel">
+          <p>Please sign in and ensure Firebase is configured.</p>
+        </article>
+      </BrandPageShell>
     )
   }
 
@@ -75,10 +74,8 @@ const DominusOnboardingPage = () => {
   }
 
   return (
-    <div className="page page-centered">
-      <form className="card form" onSubmit={handleSubmit}>
-        <p className="eyebrow">Onboarding</p>
-        <h2>Dominus Negotium application</h2>
+    <BrandPageShell title="DOMINUS ONBOARDING" memberNav>
+      <form className="brand-form" onSubmit={handleSubmit}>
         <label className="field">
           <span>Full name</span>
           <input value={fullName} onChange={(e) => setFullName(e.target.value)} required />
@@ -113,19 +110,14 @@ const DominusOnboardingPage = () => {
         </label>
         <label className="field">
           <span>Motivation</span>
-          <textarea
-            value={motivation}
-            onChange={(e) => setMotivation(e.target.value)}
-            style={{ minHeight: '120px', background: 'var(--panel-muted)', color: 'var(--text)' }}
-            required
-          />
+          <textarea value={motivation} onChange={(e) => setMotivation(e.target.value)} required />
         </label>
         {error && <p className="error">{error}</p>}
         <button className="btn primary" type="submit" disabled={submitting}>
           {submitting ? 'Submitting...' : 'Submit application'}
         </button>
       </form>
-    </div>
+    </BrandPageShell>
   )
 }
 
