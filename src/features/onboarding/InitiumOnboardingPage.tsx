@@ -4,6 +4,7 @@ import { doc, serverTimestamp, updateDoc } from 'firebase/firestore'
 import useAuth from '../../hooks/useAuth'
 import { db } from '../../lib/firebase'
 import { routes } from '../../routes/paths'
+import BrandPageShell from '../../components/ui/BrandPageShell'
 
 const InitiumOnboardingPage = () => {
   const { profile } = useAuth()
@@ -18,13 +19,11 @@ const InitiumOnboardingPage = () => {
 
   if (!dbClient || !profile) {
     return (
-      <div className="page page-centered">
-        <div className="card">
-          <p className="eyebrow">Onboarding</p>
-          <h2>Initium</h2>
-          <p className="muted">Please sign in and ensure Firebase is configured.</p>
-        </div>
-      </div>
+      <BrandPageShell title="INITIUM ONBOARDING" memberNav>
+        <article className="brand-panel">
+          <p>Please sign in and ensure Firebase is configured.</p>
+        </article>
+      </BrandPageShell>
     )
   }
 
@@ -61,10 +60,8 @@ const InitiumOnboardingPage = () => {
   }
 
   return (
-    <div className="page page-centered">
-      <form className="card form" onSubmit={handleSubmit}>
-        <p className="eyebrow">Onboarding</p>
-        <h2>Initium</h2>
+    <BrandPageShell title="INITIUM ONBOARDING" memberNav>
+      <form className="brand-form" onSubmit={handleSubmit}>
         <label className="field">
           <span>Full name</span>
           <input value={fullName} onChange={(e) => setFullName(e.target.value)} required />
@@ -90,7 +87,7 @@ const InitiumOnboardingPage = () => {
           {submitting ? 'Saving...' : 'Finish onboarding'}
         </button>
       </form>
-    </div>
+    </BrandPageShell>
   )
 }
 

@@ -1,11 +1,16 @@
+import BrandPageShell from '../../components/ui/BrandPageShell'
+
 const ApplicationPendingPage = () => (
-  <div className="page page-centered">
-    <div className="card">
-      <p className="eyebrow">Dominus Negotium</p>
-      <h2>Your application is under review.</h2>
-      <p className="muted">We will notify you when a decision is made.</p>
-    </div>
-  </div>
+  <BrandPageShell
+    title="APPLICATION PENDING"
+    subtitle="Dominus Negotium ansokan granskas just nu."
+    memberNav
+  >
+    <article className="brand-panel">
+      <h3>Your application is under review.</h3>
+      <p>We will notify you when a decision is made.</p>
+    </article>
+  </BrandPageShell>
 )
 
 export default ApplicationPendingPage

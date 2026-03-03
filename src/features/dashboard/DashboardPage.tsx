@@ -1,18 +1,17 @@
 import useAuth from '../../hooks/useAuth'
+import BrandPageShell from '../../components/ui/BrandPageShell'
 
 const DashboardPage = () => {
   const { profile } = useAuth()
 
   return (
-    <section className="page">
-      <div className="card">
-        <p className="eyebrow">Dashboard</p>
-        <h2>Operational dashboard</h2>
-        <p className="muted">Signed in as: {profile?.email ?? 'unknown'}</p>
-        <p className="muted">Plan: {profile?.membershipPlan ?? 'none'}</p>
-        <p className="muted">Status: {profile?.membershipStatus ?? 'unknown'}</p>
-      </div>
-    </section>
+    <BrandPageShell title="DASHBOARD" subtitle="Din oversikt i medlemsportalen." memberNav>
+      <article className="brand-panel">
+        <p>Signed in as: {profile?.email ?? 'unknown'}</p>
+        <p>Plan: {profile?.membershipPlan ?? 'none'}</p>
+        <p>Status: {profile?.membershipStatus ?? 'unknown'}</p>
+      </article>
+    </BrandPageShell>
   )
 }
 

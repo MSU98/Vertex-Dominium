@@ -1,5 +1,6 @@
 import useAuth from '../../hooks/useAuth'
 import { useModuleAccess } from '../../hooks/useModuleAccess'
+import BrandPageShell from '../../components/ui/BrandPageShell'
 
 const ProfilePage = () => {
   const { profile } = useAuth()
@@ -13,26 +14,23 @@ const ProfilePage = () => {
       : null
 
   return (
-    <section className="page">
-      <div className="card">
-        <p className="eyebrow">Profile</p>
-        <h2>{profile?.fullName ?? 'Member profile'}</h2>
-        {badge && <p className="muted">{badge}</p>}
-        <p className="muted">Email: {profile?.email ?? '-'}</p>
-        <p className="muted">Plan: {profile?.membershipPlan ?? 'none'}</p>
+    <BrandPageShell title="PROFILE" subtitle="Din medlemsprofil i Vertex Dominium." memberNav>
+      <article className="brand-panel">
+        <h3>{profile?.fullName ?? 'Member profile'}</h3>
+        {badge && <p>{badge}</p>}
+        <p>Email: {profile?.email ?? '-'}</p>
+        <p>Plan: {profile?.membershipPlan ?? 'none'}</p>
         {showExtendedProfile ? (
           <>
-            <p className="muted">Company: {profile?.company ?? '-'}</p>
-            <p className="muted">LinkedIn: {profile?.linkedin ?? '-'}</p>
-            <p className="muted">
-              Description: {profile?.professionalDescription ?? 'No description provided.'}
-            </p>
+            <p>Company: {profile?.company ?? '-'}</p>
+            <p>LinkedIn: {profile?.linkedin ?? '-'}</p>
+            <p>Description: {profile?.professionalDescription ?? 'No description provided.'}</p>
           </>
         ) : (
-          <p className="muted">Extended profile fields unlock with Ascensio or higher.</p>
+          <p>Extended profile fields unlock with Ascensio or higher.</p>
         )}
-      </div>
-    </section>
+      </article>
+    </BrandPageShell>
   )
 }
 

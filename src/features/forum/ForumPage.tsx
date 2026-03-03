@@ -1,11 +1,11 @@
+import BrandPageShell from '../../components/ui/BrandPageShell'
+
 const ForumPage = () => (
-  <section className="page">
-    <div className="card">
-      <p className="eyebrow">Forum</p>
-      <h2>Community space</h2>
-      <p className="muted">Discussion board placeholder. Wire to threads and replies when ready.</p>
-    </div>
-  </section>
+  <BrandPageShell title="FORUM" subtitle="Diskussioner, ideer och samarbete mellan medlemmar." memberNav>
+    <article className="brand-panel">
+      <p>Discussion board placeholder. Wire to threads and replies when ready.</p>
+    </article>
+  </BrandPageShell>
 )
 
 export default ForumPage

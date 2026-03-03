@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { auth, firebaseReady, missingFirebaseKeys } from '../../lib/firebase'
 import { routes } from '../../routes/paths'
+import BrandPageShell from '../../components/ui/BrandPageShell'
 
 const LoginPage = () => {
   const [email, setEmail] = useState('')
@@ -15,10 +16,9 @@ const LoginPage = () => {
 
   if (!firebaseReady || !authClient) {
     return (
-      <div className="page page-centered">
-        <div className="card">
-          <p className="eyebrow">Configuration needed</p>
-          <h2>Connect Firebase</h2>
+      <BrandPageShell title="LOGGA IN">
+        <article className="brand-panel">
+          <h3>Connect Firebase</h3>
           <p className="muted">
             Add the following keys to your <code>.env</code> file and restart <code>npm run dev</code>.
           </p>
@@ -27,8 +27,8 @@ const LoginPage = () => {
               <li key={key}>{key}</li>
             ))}
           </ul>
-        </div>
-      </div>
+        </article>
+      </BrandPageShell>
     )
   }
 
@@ -48,10 +48,8 @@ const LoginPage = () => {
   }
 
   return (
-    <div className="page page-centered">
-      <form className="card form" onSubmit={handleSubmit}>
-        <p className="eyebrow">Access</p>
-        <h2>Sign in</h2>
+    <BrandPageShell title="LOGGA IN">
+      <form className="brand-form" onSubmit={handleSubmit}>
         <label className="field">
           <span>Email</span>
           <input
@@ -80,7 +78,7 @@ const LoginPage = () => {
           No account? <Link to="/register">Create one</Link>
         </p>
       </form>
-    </div>
+    </BrandPageShell>
   )
 }
 
