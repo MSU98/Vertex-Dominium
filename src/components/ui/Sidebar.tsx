@@ -37,10 +37,10 @@ const Sidebar = () => {
         ))}
         {isAdmin && (
           <NavLink
-            to={routes.adminDnApplications}
+            to={routes.adminReviews}
             className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
           >
-            Admin panel
+            Reviews
           </NavLink>
         )}
       </nav>

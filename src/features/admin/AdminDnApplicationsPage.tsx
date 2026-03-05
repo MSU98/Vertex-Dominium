@@ -86,7 +86,7 @@ const AdminDnApplicationsPage = () => {
 
   if (!db) {
     return (
-      <BrandPageShell title="ADMIN PANEL" subtitle="Granska Dominus-ansokningar." memberNav>
+      <BrandPageShell title="REVIEWS" subtitle="Granska Dominus-ansokningar." memberNav>
         <article className="brand-panel">
           <h3>Firebase not configured</h3>
           <p>Add Firebase env keys to use the admin panel.</p>
@@ -96,7 +96,7 @@ const AdminDnApplicationsPage = () => {
   }
 
   return (
-    <BrandPageShell title="ADMIN PANEL" subtitle="Dominus applications" memberNav>
+    <BrandPageShell title="REVIEWS" subtitle="Dominus applications" memberNav>
       <article className="brand-panel">
         {loading && <p className="muted">Loading...</p>}
         {error && <p className="error">{error}</p>}

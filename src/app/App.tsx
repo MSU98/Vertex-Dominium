@@ -46,6 +46,12 @@ const App = () => (
             <Route path={routes.forum} element={<ForumPage />} />
             <Route path={routes.profile} element={<ProfilePage />} />
             <Route
+              path={routes.adminReviews}
+              element={<RequireRole allowedRoles={['admin']} />}
+            >
+              <Route index element={<AdminDnApplicationsPage />} />
+            </Route>
+            <Route
               path={routes.adminDnApplications}
               element={<RequireRole allowedRoles={['admin']} />}
             >

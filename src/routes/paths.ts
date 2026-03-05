@@ -15,6 +15,7 @@ export const routes = {
   feed: '/feed',
   forum: '/forum',
   profile: '/profile',
+  adminReviews: '/admin/reviews',
   adminDnApplications: '/admin/dn-applications',
 }
 

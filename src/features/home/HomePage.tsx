@@ -25,7 +25,7 @@ const HomePage = () => {
                 <Link to={routes.feed}>FEED</Link>
                 <Link to={routes.forum}>FORUM</Link>
                 <Link to={routes.profile}>PROFILE</Link>
-                {isAdmin && <Link to={routes.adminDnApplications}>ADMIN</Link>}
+                {isAdmin && <Link to={routes.adminReviews}>REVIEWS</Link>}
               </>
             ) : (
               <>
