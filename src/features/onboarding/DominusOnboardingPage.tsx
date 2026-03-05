@@ -13,19 +13,20 @@ const DominusOnboardingPage = () => {
   const [companyName, setCompanyName] = useState(profile?.company ?? '')
   const [orgNumber, setOrgNumber] = useState(profile?.orgNumber ?? '')
   const [title, setTitle] = useState(profile?.title ?? '')
-  const [decisionMandate, setDecisionMandate] = useState('')
-  const [email, setEmail] = useState(profile?.email ?? '')
+  const [decisionMandate, setDecisionMandate] = useState(profile?.decisionMandate ?? '')
+  const [businessEmail, setBusinessEmail] = useState(profile?.businessEmail ?? profile?.email ?? '')
   const [phone, setPhone] = useState(profile?.phone ?? '')
   const [motivation, setMotivation] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [password, setPassword] = useState('')
   const dbClient = db
 
   if (!dbClient || !profile) {
     return (
       <BrandPageShell title="DOMINUS ONBOARDING" memberNav>
         <article className="brand-panel">
-          <p>Please sign in and ensure Firebase is configured.</p>
+          <p>Logga in och kontrollera att Firebase ar konfigurerat.</p>
         </article>
       </BrandPageShell>
     )
@@ -44,7 +45,7 @@ const DominusOnboardingPage = () => {
         orgNumber,
         title,
         decisionMandate,
-        email,
+        businessEmail,
         phone,
         motivation,
         status: 'pending',
@@ -57,6 +58,8 @@ const DominusOnboardingPage = () => {
         orgNumber,
         phone,
         title,
+        decisionMandate,
+        businessEmail,
         membershipPlan: 'dominus',
         membershipStatus: 'pending',
         onboardingComplete: true,
@@ -67,7 +70,7 @@ const DominusOnboardingPage = () => {
       navigate(routes.applicationPending)
     } catch (err) {
       console.error(err)
-      setError('Could not submit application. Try again.')
+      setError('Kunde inte skicka ansokan. Forsok igen.')
     } finally {
       setSubmitting(false)
     }
@@ -77,44 +80,73 @@ const DominusOnboardingPage = () => {
     <BrandPageShell title="DOMINUS ONBOARDING" memberNav>
       <form className="brand-form" onSubmit={handleSubmit}>
         <label className="field">
-          <span>Full name</span>
+          <span>Fornamn/efternamn</span>
           <input value={fullName} onChange={(e) => setFullName(e.target.value)} required />
         </label>
         <label className="field">
-          <span>Company name</span>
+          <span>Foretagsnamn</span>
           <input value={companyName} onChange={(e) => setCompanyName(e.target.value)} required />
         </label>
         <label className="field">
-          <span>Org number</span>
+          <span>Organisationsnummer</span>
           <input value={orgNumber} onChange={(e) => setOrgNumber(e.target.value)} required />
         </label>
         <label className="field">
-          <span>Title</span>
+          <span>Titel/befattning</span>
           <input value={title} onChange={(e) => setTitle(e.target.value)} required />
         </label>
         <label className="field">
-          <span>Decision mandate</span>
+          <span>Beslutsmandat</span>
           <input
             value={decisionMandate}
             onChange={(e) => setDecisionMandate(e.target.value)}
+            placeholder="Agare, VD, ledningsgrupp eller annat"
             required
           />
         </label>
         <label className="field">
-          <span>Email</span>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <span>E-post (foretagsdoman)</span>
+          <input
+            type="email"
+            value={businessEmail}
+            onChange={(e) => setBusinessEmail(e.target.value)}
+            required
+          />
         </label>
         <label className="field">
-          <span>Phone</span>
+          <span>Losenord</span>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            minLength={8}
+            required
+          />
+        </label>
+        <label className="field">
+          <span>Telefonnummer</span>
           <input value={phone} onChange={(e) => setPhone(e.target.value)} required />
         </label>
         <label className="field">
-          <span>Motivation</span>
+          <span>Kort ansokan (varfor vill du bli medlem?)</span>
           <textarea value={motivation} onChange={(e) => setMotivation(e.target.value)} required />
         </label>
+        <article className="brand-panel-sub">
+          <h3>Steg 2 (vid godkand ansokan)</h3>
+          <p className="muted">Full onboarding samlar in foljande:</p>
+          <ul className="membership-benefits">
+            <li>Faktureringsuppgifter</li>
+            <li>Foretagsstorlek (antal anstallda)</li>
+            <li>Omsattning</li>
+            <li>Geografisk rackvidd</li>
+            <li>Bransch/inriktning</li>
+            <li>LinkedIn</li>
+            <li>Intresse for affarsnatverk, matchmaking och styrelse/radgivande sammanhang</li>
+          </ul>
+        </article>
         {error && <p className="error">{error}</p>}
         <button className="btn primary" type="submit" disabled={submitting}>
-          {submitting ? 'Submitting...' : 'Submit application'}
+          {submitting ? 'Skickar...' : 'Skicka ansokan'}
         </button>
       </form>
     </BrandPageShell>

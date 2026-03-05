@@ -13,7 +13,8 @@ type DnApplication = {
   orgNumber: string
   title: string
   decisionMandate: string
-  email: string
+  businessEmail?: string
+  email?: string
   phone: string
   motivation: string
   status: ApplicationStatus
@@ -109,7 +110,7 @@ const AdminDnApplicationsPage = () => {
               </p>
               <p className="muted">Org: {app.orgNumber}</p>
               <p className="muted">Decision mandate: {app.decisionMandate}</p>
-              <p className="muted">Email: {app.email}</p>
+              <p className="muted">Business email: {app.businessEmail ?? app.email ?? '-'}</p>
               <p className="muted">Phone: {app.phone}</p>
               <p className="muted">Motivation: {app.motivation}</p>
               <p className="muted">Status: {app.status}</p>

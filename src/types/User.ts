@@ -26,6 +26,8 @@ export interface UserProfile {
   orgNumber?: string
   linkedin?: string
   professionalDescription?: string
+  decisionMandate?: string
+  businessEmail?: string
   termsAccepted?: boolean
   privacyPolicyAccepted?: boolean
   communicationConsent?: boolean
