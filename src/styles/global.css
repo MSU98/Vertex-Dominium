@@ -364,6 +364,33 @@ a {
   outline: 1px solid var(--accent);
   border-color: var(--accent);
 }
+
+.consent-group {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  display: grid;
+  gap: 10px;
+}
+
+.consent-group legend {
+  padding: 0 6px;
+  color: #d7d7d7;
+}
+
+.consent-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #e5e5e5;
+}
+
+.consent-item input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+}
 .app-shell {
   display: grid;
   grid-template-columns: 240px 1fr;
