@@ -10,7 +10,16 @@ const AscensioOnboardingPage = () => {
   const { profile } = useAuth()
   const navigate = useNavigate()
   const [fullName, setFullName] = useState(profile?.fullName ?? '')
+  const [email, setEmail] = useState(profile?.email ?? '')
+  const [password, setPassword] = useState('')
+  const [countryCity, setCountryCity] = useState(profile?.countryCity ?? profile?.city ?? '')
+  const [title, setTitle] = useState(profile?.title ?? '')
+  const [professionalInterests, setProfessionalInterests] = useState(
+    profile?.professionalInterests ?? '',
+  )
   const [phone, setPhone] = useState(profile?.phone ?? '')
+  const [currentBusiness, setCurrentBusiness] = useState(profile?.currentBusiness ?? '')
+  const [industry, setIndustry] = useState(profile?.industry ?? '')
   const [company, setCompany] = useState(profile?.company ?? '')
   const [orgNumber, setOrgNumber] = useState(profile?.orgNumber ?? '')
   const [linkedin, setLinkedin] = useState(profile?.linkedin ?? '')
@@ -25,7 +34,7 @@ const AscensioOnboardingPage = () => {
     return (
       <BrandPageShell title="ASCENSIO ONBOARDING" memberNav>
         <article className="brand-panel">
-          <p>Please sign in and ensure Firebase is configured.</p>
+          <p>Logga in och kontrollera att Firebase ar konfigurerat.</p>
         </article>
       </BrandPageShell>
     )
@@ -37,13 +46,23 @@ const AscensioOnboardingPage = () => {
     setError(null)
 
     try {
+      const descriptionWords = professionalDescription.trim().split(/\s+/).filter(Boolean)
+      const cappedDescription = descriptionWords.slice(0, 300).join(' ')
+
       await updateDoc(doc(dbClient, 'users', profile.uid), {
         fullName,
+        email,
+        countryCity,
+        city: countryCity,
+        title,
+        professionalInterests,
         phone,
+        currentBusiness,
+        industry,
         company,
         orgNumber,
         linkedin,
-        professionalDescription: professionalDescription.slice(0, 300),
+        professionalDescription: cappedDescription,
         membershipPlan: 'ascensio',
         membershipStatus: 'active',
         onboardingComplete: true,
@@ -53,7 +72,7 @@ const AscensioOnboardingPage = () => {
       navigate(routes.dashboard)
     } catch (err) {
       console.error(err)
-      setError('Could not save onboarding. Try again.')
+      setError('Kunde inte spara onboarding. Forsok igen.')
     } finally {
       setSubmitting(false)
     }
@@ -63,32 +82,79 @@ const AscensioOnboardingPage = () => {
     <BrandPageShell title="ASCENSIO ONBOARDING" memberNav>
       <form className="brand-form" onSubmit={handleSubmit}>
         <label className="field">
-          <span>Full name</span>
+          <span>Fornamn & efternamn</span>
           <input value={fullName} onChange={(e) => setFullName(e.target.value)} required />
         </label>
         <label className="field">
-          <span>Phone</span>
+          <span>E-postadress</span>
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        </label>
+        <label className="field">
+          <span>Losenord</span>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            minLength={8}
+            required
+          />
+        </label>
+        <label className="field">
+          <span>Land/stad</span>
+          <input value={countryCity} onChange={(e) => setCountryCity(e.target.value)} required />
+        </label>
+        <label className="field">
+          <span>Yrkesroll</span>
+          <input value={title} onChange={(e) => setTitle(e.target.value)} required />
+        </label>
+        <label className="field">
+          <span>Yrkesintressen (fritext)</span>
+          <input
+            value={professionalInterests}
+            onChange={(e) => setProfessionalInterests(e.target.value)}
+            required
+          />
+        </label>
+        <label className="field">
+          <span>Telefonnummer</span>
           <input value={phone} onChange={(e) => setPhone(e.target.value)} required />
         </label>
         <label className="field">
-          <span>Company</span>
+          <span>Nuvarande verksamhet</span>
+          <input
+            value={currentBusiness}
+            onChange={(e) => setCurrentBusiness(e.target.value)}
+            placeholder="Anstalld, egenforetagare, konsult eller ledare"
+            required
+          />
+        </label>
+        <label className="field">
+          <span>Verksamhet/bransch</span>
+          <input value={industry} onChange={(e) => setIndustry(e.target.value)} required />
+        </label>
+        <label className="field">
+          <span>Foretagsnamn</span>
           <input value={company} onChange={(e) => setCompany(e.target.value)} required />
         </label>
         <label className="field">
-          <span>Org number</span>
+          <span>Organisationsnummer</span>
           <input value={orgNumber} onChange={(e) => setOrgNumber(e.target.value)} required />
         </label>
         <label className="field">
-          <span>LinkedIn</span>
-          <input value={linkedin} onChange={(e) => setLinkedin(e.target.value)} />
+          <span>LinkedIn-profil</span>
+          <input value={linkedin} onChange={(e) => setLinkedin(e.target.value)} required />
         </label>
         <label className="field">
-          <span>Professional description (max 300 chars)</span>
-          <textarea value={professionalDescription} onChange={(e) => setProfessionalDescription(e.target.value)} maxLength={300} />
+          <span>Kort professionell beskrivning (max 300 ord)</span>
+          <textarea
+            value={professionalDescription}
+            onChange={(e) => setProfessionalDescription(e.target.value)}
+            required
+          />
         </label>
         {error && <p className="error">{error}</p>}
         <button className="btn primary" type="submit" disabled={submitting}>
-          {submitting ? 'Saving...' : 'Finish onboarding'}
+          {submitting ? 'Sparar...' : 'Slutfor onboarding'}
         </button>
       </form>
     </BrandPageShell>
