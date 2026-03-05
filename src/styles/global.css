@@ -227,8 +227,27 @@ a {
   line-height: 1.45;
 }
 
-.membership-select {
+.membership-tier-subtitle {
+  color: #d8d8d8;
+  font-style: italic;
+}
+
+.membership-benefits {
+  margin: 0;
+  padding-left: 22px;
+  color: #e5e5e5;
+  line-height: 1.45;
+  display: grid;
+  gap: 8px;
+}
+
+.membership-tier .membership-price {
   margin-top: auto;
+  color: #bea05c;
+  font-weight: 600;
+}
+
+.membership-select {
   border: 1px solid #bea05c;
   background: transparent;
   color: #bea05c;

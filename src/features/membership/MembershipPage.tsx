@@ -6,21 +6,51 @@ import { db } from '../../lib/firebase'
 import { routes } from '../../routes/paths'
 import type { MembershipPlan } from '../../types/User'
 
-const plans: { id: MembershipPlan; title: string; copy: string }[] = [
+type MembershipTier = {
+  id: MembershipPlan
+  title: string
+  subtitle: string
+  benefits: string[]
+  price: string
+}
+
+const plans: MembershipTier[] = [
   {
     id: 'initium',
-    title: 'INITIUM',
-    copy: 'Basniva for medlemmar med tillgang till kurser, forum och grundprofil.',
+    title: 'INITIUM I',
+    subtitle: 'Betydelse: "Början/inträdet"',
+    benefits: [
+      'Tillgång till köp av utbildningar och coaching/vägledning.',
+      'Flöde (enbart inlagg fran ledning) och forum.',
+      'Digitalt medlemsmärke (INITIUM märke) att anvanda i sin biografi pa LinkedIn och sociala medier.',
+      'Shop.',
+      'Välkomstmail.',
+    ],
+    price: '199 kr/månad',
   },
   {
     id: 'ascensio',
-    title: 'ASCENSIO',
-    copy: 'Utokad niva med fler profilfunktioner, badge och starkare synlighet i portalen.',
+    title: 'ASCENSIO II',
+    subtitle: 'Betydelse: "Uppstigning/avancemang"',
+    benefits: [
+      'Samtliga delar fran INITIUM.',
+      'Profil med biografi.',
+      'Profilbild med ASCENSIO stämpel som kan anvandas pa LinkedIn och sociala medier.',
+    ],
+    price: '799 kr/månad',
   },
   {
     id: 'dominus',
-    title: 'DOMINIUS NEGOTIUM',
-    copy: 'Exklusiv niva for medlemmar som ansoker om premiumyta och strategiska mojligheter.',
+    title: 'DOMINIUS NEGOTIUM III',
+    subtitle: 'Betydelse: "Herre/Den som har kontroll, Verksamhet"',
+    benefits: [
+      'Enbart for beslutsfattare från företag.',
+      'Samtliga delar fran Initium och Ascensio.',
+      'DOMINIUS NEGOTIUM stämpel.',
+      'Välkomstvideo från grundare.',
+      'Uppstartsmöte.',
+    ],
+    price: '3999 kr/månad',
   },
 ]
 
@@ -66,7 +96,7 @@ const MembershipPage = () => {
       navigate(target)
     } catch (err) {
       console.error(err)
-      setError('Kunde inte spara val av medlemskap. Forsok igen.')
+      setError('Kunde inte spara val av medlemskap. Försök igen.')
       setToast('Kunde inte spara medlemsvalet.')
     } finally {
       setSubmitting(null)
@@ -93,20 +123,26 @@ const MembershipPage = () => {
 
       <section className="membership-intro">
         <h1>VERTEX DOMINIUM</h1>
-        <h2>VARA MEDLEMSNIVAER</h2>
+        <h2>VÅRA MEDLEMSNIVÅER</h2>
       </section>
 
       <section className="membership-grid">
         {plans.map((plan) => (
           <article key={plan.id} className="membership-tier">
             <h3>{plan.title}</h3>
-            <p>{plan.copy}</p>
+            <p className="membership-tier-subtitle">{plan.subtitle}</p>
+            <ul className="membership-benefits">
+              {plan.benefits.map((benefit) => (
+                <li key={benefit}>{benefit}</li>
+              ))}
+            </ul>
+            <p className="membership-price">Pris inklusive moms: {plan.price}</p>
             <button
               className="membership-select"
               onClick={() => handleSelect(plan.id)}
               disabled={Boolean(submitting)}
             >
-              {submitting === plan.id ? 'SPARAR...' : 'VALJ NIVAN'}
+              {submitting === plan.id ? 'SPARAR...' : 'VÄLJ NIVÅN'}
             </button>
           </article>
         ))}
