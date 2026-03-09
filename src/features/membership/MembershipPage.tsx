@@ -7,9 +7,13 @@ import { routes } from '../../routes/paths'
 import type { MembershipPlan } from '../../types/User'
 
 const plans: { id: MembershipPlan; label: string; description: string }[] = [
-  { id: 'initium', label: 'Initium', description: 'Core community access.' },
-  { id: 'ascensio', label: 'Ascensio', description: 'Growth tier with profile and community perks.' },
-  { id: 'dominus', label: 'Dominus Negotium', description: 'Application-only business tier.' },
+  { id: 'initium', label: 'Initium', description: 'Grundläggande tillgång till nätverket.' },
+  {
+    id: 'ascensio',
+    label: 'Ascensio',
+    description: 'Utökad nivå med profilfunktioner och medlemsförmåner.',
+  },
+  { id: 'dominus', label: 'Dominus Negotium', description: 'Affärsnivå som kräver ansökan.' },
 ]
 
 const MembershipPage = () => {
@@ -23,9 +27,9 @@ const MembershipPage = () => {
     return (
       <div className="page page-centered">
         <div className="card">
-          <p className="eyebrow">Membership</p>
-          <h2>Loading...</h2>
-          <p className="muted">Please sign in and ensure Firebase is configured.</p>
+          <p className="eyebrow">Medlemskap</p>
+          <h2>Laddar...</h2>
+          <p className="muted">Logga in och kontrollera att Firebase är konfigurerat.</p>
         </div>
       </div>
     )
@@ -54,8 +58,8 @@ const MembershipPage = () => {
       navigate(target)
     } catch (err) {
       console.error(err)
-      setError('Could not set membership. Try again.')
-      setToast('Failed to save membership selection.')
+      setError('Det gick inte att välja medlemskap. Försök igen.')
+      setToast('Det gick inte att spara ditt medlemsval.')
     } finally {
       setSubmitting(null)
     }
@@ -64,8 +68,8 @@ const MembershipPage = () => {
   return (
     <div className="page page-centered">
       <div className="card" style={{ maxWidth: '640px' }}>
-        <p className="eyebrow">Choose membership</p>
-        <h2>Select your plan</h2>
+        <p className="eyebrow">Välj medlemskap</p>
+        <h2>Välj din nivå</h2>
         <div className="page" style={{ gap: '12px' }}>
           {plans.map((plan) => (
             <div key={plan.id} className="card" style={{ padding: '16px' }}>
@@ -76,7 +80,7 @@ const MembershipPage = () => {
                 onClick={() => handleSelect(plan.id)}
                 disabled={Boolean(submitting)}
               >
-                {submitting === plan.id ? 'Saving...' : 'Select'}
+                {submitting === plan.id ? 'Sparar...' : 'Välj'}
               </button>
             </div>
           ))}

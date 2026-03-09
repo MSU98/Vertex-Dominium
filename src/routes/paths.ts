@@ -1,5 +1,6 @@
 export const routes = {
   home: '/',
+  appHome: '/dashboard',
   about: '/about',
   contact: '/contact',
   login: '/login',

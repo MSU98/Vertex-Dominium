@@ -1,9 +1,28 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { FirebaseError } from 'firebase/app'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { auth, firebaseReady, missingFirebaseKeys } from '../../lib/firebase'
 import { routes } from '../../routes/paths'
+
+const getLoginErrorMessage = (error: unknown) => {
+  if (!(error instanceof FirebaseError)) {
+    return 'Could not sign in. Check credentials or try again.'
+  }
+
+  switch (error.code) {
+    case 'auth/invalid-credential':
+    case 'auth/wrong-password':
+    case 'auth/user-not-found':
+    case 'auth/invalid-email':
+      return 'Email or password is incorrect.'
+    case 'auth/too-many-requests':
+      return 'Too many login attempts. Wait a moment and try again.'
+    default:
+      return `Sign-in failed: ${error.code}`
+  }
+}
 
 const LoginPage = () => {
   const [email, setEmail] = useState('')
@@ -39,7 +58,7 @@ const LoginPage = () => {
       await signInWithEmailAndPassword(auth, email, password)
       navigate(routes.appHome, { replace: true })
     } catch (err) {
-      setError('Could not sign in. Check credentials or try again.')
+      setError(getLoginErrorMessage(err))
       console.error(err)
     } finally {
       setSubmitting(false)

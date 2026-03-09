@@ -1,11 +1,31 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { FirebaseError } from 'firebase/app'
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { auth, db, firebaseReady, missingFirebaseKeys } from '../../lib/firebase'
 import { routes } from '../../routes/paths'
 import type { UserProfile } from '../../types/User'
+
+const getRegisterErrorMessage = (error: unknown) => {
+  if (!(error instanceof FirebaseError)) {
+    return 'Could not create account. Please try again.'
+  }
+
+  switch (error.code) {
+    case 'auth/email-already-in-use':
+      return 'This email address is already registered.'
+    case 'auth/invalid-email':
+      return 'Enter a valid email address.'
+    case 'auth/weak-password':
+      return 'Password is too weak. Use at least 6 characters.'
+    case 'permission-denied':
+      return 'Account was created, but saving the profile to Firestore was denied.'
+    default:
+      return `Registration failed: ${error.code}`
+  }
+}
 
 const RegisterPage = () => {
   const [email, setEmail] = useState('')
@@ -54,7 +74,7 @@ const RegisterPage = () => {
       await setDoc(doc(db, 'users', credentials.user.uid), baseProfile)
       navigate(routes.appHome, { replace: true })
     } catch (err) {
-      setError('Could not create account. Please try again.')
+      setError(getRegisterErrorMessage(err))
       console.error(err)
     } finally {
       setSubmitting(false)

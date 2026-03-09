@@ -7,29 +7,29 @@ const ProfilePage = () => {
   const showExtendedProfile = canAccess('profileExtended')
   const badge =
     profile?.membershipPlan === 'dominus'
-      ? 'Dominus badge'
+      ? 'Dominus-markering'
       : profile?.membershipPlan === 'ascensio'
-      ? 'Ascensio badge'
+        ? 'Ascensio-markering'
       : null
 
   return (
     <section className="page">
       <div className="card">
-        <p className="eyebrow">Profile</p>
-        <h2>{profile?.fullName ?? 'Member profile'}</h2>
+        <p className="eyebrow">Profil</p>
+        <h2>{profile?.fullName ?? 'Medlemsprofil'}</h2>
         {badge && <p className="muted">{badge}</p>}
-        <p className="muted">Email: {profile?.email ?? '-'}</p>
-        <p className="muted">Plan: {profile?.membershipPlan ?? 'none'}</p>
+        <p className="muted">E-post: {profile?.email ?? '-'}</p>
+        <p className="muted">Plan: {profile?.membershipPlan ?? 'ingen'}</p>
         {showExtendedProfile ? (
           <>
-            <p className="muted">Company: {profile?.company ?? '-'}</p>
+            <p className="muted">Företag: {profile?.company ?? '-'}</p>
             <p className="muted">LinkedIn: {profile?.linkedin ?? '-'}</p>
             <p className="muted">
-              Description: {profile?.professionalDescription ?? 'No description provided.'}
+              Beskrivning: {profile?.professionalDescription ?? 'Ingen beskrivning angiven.'}
             </p>
           </>
         ) : (
-          <p className="muted">Extended profile fields unlock with Ascensio or higher.</p>
+          <p className="muted">Utökade profilfält låses upp med Ascensio eller högre.</p>
         )}
       </div>
     </section>
