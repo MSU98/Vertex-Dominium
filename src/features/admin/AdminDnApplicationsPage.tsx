@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react'
 import {
   collection,
   doc,
+  getDoc,
   onSnapshot,
   orderBy,
   query,
   serverTimestamp,
-  setDoc,
   updateDoc,
 } from 'firebase/firestore'
 import { db } from '../../lib/firebase'
@@ -95,7 +95,13 @@ const AdminDnApplicationsPage = () => {
               updatedAt: serverTimestamp(),
             }
 
-      await setDoc(doc(db, 'users', application.uid), userUpdates, { merge: true })
+      const userRef = doc(db, 'users', application.uid)
+      const userSnap = await getDoc(userRef)
+      if (userSnap.exists()) {
+        await updateDoc(userRef, userUpdates)
+      } else {
+        setError('Application updated, but user profile is missing.')
+      }
     } catch (err) {
       console.error(err)
       setError('Action failed. Try again.')
@@ -115,14 +121,18 @@ const AdminDnApplicationsPage = () => {
     )
   }
 
+  const pendingApplications = applications.filter((app) => app.status === 'pending')
+
   return (
     <BrandPageShell title="REVIEWS" subtitle="Membership applications" memberNav>
       <article className="brand-panel">
         {loading && <p className="muted">Loading...</p>}
         {error && <p className="error">{error}</p>}
-        {!loading && applications.length === 0 && <p className="muted">No applications.</p>}
+        {!loading && pendingApplications.length === 0 && (
+          <p className="muted">No pending applications.</p>
+        )}
         <div className="brand-panel-grid">
-          {applications.map((app) => (
+          {pendingApplications.map((app) => (
             <div key={app.id} className="brand-panel-sub">
               <h3>{app.fullName}</h3>
               <p className="muted">Plan: {app.membershipPlan ?? 'dominus'}</p>
@@ -137,19 +147,19 @@ const AdminDnApplicationsPage = () => {
               <p className="muted">Phone: {app.phone ?? '-'}</p>
               <p className="muted">Interests: {app.interests?.join(', ') ?? '-'}</p>
               <p className="muted">Motivation: {app.motivation ?? '-'}</p>
-              <p className="muted">Status: {app.status}</p>
+              <p className="muted">Status: pending</p>
               <div className="actions">
                 <button
                   className="btn primary"
                   onClick={() => handleDecision(app, 'approved')}
-                  disabled={app.status !== 'pending' || Boolean(actionId)}
+                  disabled={Boolean(actionId)}
                 >
                   {actionId === app.id ? 'Working...' : 'Approve'}
                 </button>
                 <button
                   className="btn ghost"
                   onClick={() => handleDecision(app, 'rejected')}
-                  disabled={app.status !== 'pending' || Boolean(actionId)}
+                  disabled={Boolean(actionId)}
                 >
                   Reject
                 </button>
