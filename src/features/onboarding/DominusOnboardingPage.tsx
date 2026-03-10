@@ -40,6 +40,7 @@ const DominusOnboardingPage = () => {
     try {
       await addDoc(collection(dbClient, 'dnApplications'), {
         uid: profile.uid,
+        membershipPlan: 'dominus',
         fullName,
         companyName,
         orgNumber,

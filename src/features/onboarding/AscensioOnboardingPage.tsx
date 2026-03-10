@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { doc, serverTimestamp, updateDoc } from 'firebase/firestore'
+import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore'
 import useAuth from '../../hooks/useAuth'
 import { db } from '../../lib/firebase'
 import { routes } from '../../routes/paths'
@@ -49,6 +49,20 @@ const AscensioOnboardingPage = () => {
       const descriptionWords = professionalDescription.trim().split(/\s+/).filter(Boolean)
       const cappedDescription = descriptionWords.slice(0, 300).join(' ')
 
+      await addDoc(collection(dbClient, 'dnApplications'), {
+        uid: profile.uid,
+        membershipPlan: 'ascensio',
+        fullName,
+        companyName: company,
+        orgNumber,
+        title,
+        email,
+        phone,
+        motivation: cappedDescription,
+        status: 'pending',
+        createdAt: serverTimestamp(),
+      })
+
       await updateDoc(doc(dbClient, 'users', profile.uid), {
         fullName,
         email,
@@ -64,12 +78,12 @@ const AscensioOnboardingPage = () => {
         linkedin,
         professionalDescription: cappedDescription,
         membershipPlan: 'ascensio',
-        membershipStatus: 'active',
+        membershipStatus: 'pending',
         onboardingComplete: true,
-        role: 'ascensio',
+        role: 'initium',
         updatedAt: serverTimestamp(),
       })
-      navigate(routes.dashboard)
+      navigate(routes.applicationPending)
     } catch (err) {
       console.error(err)
       setError('Kunde inte spara onboarding. Forsok igen.')

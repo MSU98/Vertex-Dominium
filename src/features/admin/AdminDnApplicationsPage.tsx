@@ -2,22 +2,32 @@ import { useEffect, useState } from 'react'
 import { collection, doc, onSnapshot, orderBy, query, serverTimestamp, updateDoc } from 'firebase/firestore'
 import { db } from '../../lib/firebase'
 import BrandPageShell from '../../components/ui/BrandPageShell'
+import type { MembershipPlan, UserRole } from '../../types/User'
 
 type ApplicationStatus = 'pending' | 'approved' | 'rejected'
 
 type DnApplication = {
   id: string
   uid: string
+  membershipPlan?: MembershipPlan
   fullName: string
-  companyName: string
-  orgNumber: string
+  companyName?: string
+  orgNumber?: string
   title: string
-  decisionMandate: string
+  decisionMandate?: string
   businessEmail?: string
   email?: string
-  phone: string
-  motivation: string
+  phone?: string
+  motivation?: string
+  city?: string
+  interests?: string[]
   status: ApplicationStatus
+}
+
+const resolveRoleFromPlan = (plan: MembershipPlan | undefined): UserRole => {
+  if (plan === 'dominus') return 'dominus'
+  if (plan === 'ascensio') return 'ascensio'
+  return 'initium'
 }
 
 const AdminDnApplicationsPage = () => {
@@ -60,17 +70,18 @@ const AdminDnApplicationsPage = () => {
         updatedAt: serverTimestamp(),
       })
 
+      const plan = application.membershipPlan ?? 'dominus'
       const userUpdates =
         status === 'approved'
           ? {
-              role: 'dominus',
-              membershipPlan: 'dominus',
+              role: resolveRoleFromPlan(plan),
+              membershipPlan: plan,
               membershipStatus: 'active',
               onboardingComplete: true,
               updatedAt: serverTimestamp(),
             }
           : {
-              membershipPlan: 'dominus',
+              membershipPlan: plan,
               membershipStatus: 'rejected',
               updatedAt: serverTimestamp(),
             }
@@ -86,7 +97,7 @@ const AdminDnApplicationsPage = () => {
 
   if (!db) {
     return (
-      <BrandPageShell title="REVIEWS" subtitle="Granska Dominus-ansokningar." memberNav>
+      <BrandPageShell title="REVIEWS" subtitle="Granska medlemsansokningar." memberNav>
         <article className="brand-panel">
           <h3>Firebase not configured</h3>
           <p>Add Firebase env keys to use the admin panel.</p>
@@ -96,7 +107,7 @@ const AdminDnApplicationsPage = () => {
   }
 
   return (
-    <BrandPageShell title="REVIEWS" subtitle="Dominus applications" memberNav>
+    <BrandPageShell title="REVIEWS" subtitle="Membership applications" memberNav>
       <article className="brand-panel">
         {loading && <p className="muted">Loading...</p>}
         {error && <p className="error">{error}</p>}
@@ -105,14 +116,18 @@ const AdminDnApplicationsPage = () => {
           {applications.map((app) => (
             <div key={app.id} className="brand-panel-sub">
               <h3>{app.fullName}</h3>
+              <p className="muted">Plan: {app.membershipPlan ?? 'dominus'}</p>
               <p className="muted">
-                {app.title} @ {app.companyName}
+                {app.title}
+                {app.companyName ? ` @ ${app.companyName}` : ''}
               </p>
-              <p className="muted">Org: {app.orgNumber}</p>
-              <p className="muted">Decision mandate: {app.decisionMandate}</p>
+              <p className="muted">Org: {app.orgNumber ?? '-'}</p>
+              <p className="muted">City: {app.city ?? '-'}</p>
+              <p className="muted">Decision mandate: {app.decisionMandate ?? '-'}</p>
               <p className="muted">Business email: {app.businessEmail ?? app.email ?? '-'}</p>
-              <p className="muted">Phone: {app.phone}</p>
-              <p className="muted">Motivation: {app.motivation}</p>
+              <p className="muted">Phone: {app.phone ?? '-'}</p>
+              <p className="muted">Interests: {app.interests?.join(', ') ?? '-'}</p>
+              <p className="muted">Motivation: {app.motivation ?? '-'}</p>
               <p className="muted">Status: {app.status}</p>
               <div className="actions">
                 <button
