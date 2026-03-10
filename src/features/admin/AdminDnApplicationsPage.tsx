@@ -1,5 +1,14 @@
 import { useEffect, useState } from 'react'
-import { collection, doc, onSnapshot, orderBy, query, serverTimestamp, updateDoc } from 'firebase/firestore'
+import {
+  collection,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+} from 'firebase/firestore'
 import { db } from '../../lib/firebase'
 import BrandPageShell from '../../components/ui/BrandPageShell'
 import type { MembershipPlan, UserRole } from '../../types/User'
@@ -86,7 +95,7 @@ const AdminDnApplicationsPage = () => {
               updatedAt: serverTimestamp(),
             }
 
-      await updateDoc(doc(db, 'users', application.uid), userUpdates)
+      await setDoc(doc(db, 'users', application.uid), userUpdates, { merge: true })
     } catch (err) {
       console.error(err)
       setError('Action failed. Try again.')
