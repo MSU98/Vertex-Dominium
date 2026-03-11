@@ -1,8 +1,5 @@
-import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { doc, serverTimestamp, updateDoc } from 'firebase/firestore'
 import useAuth from '../../hooks/useAuth'
-import { db } from '../../lib/firebase'
 import { routes } from '../../routes/paths'
 import type { MembershipPlan } from '../../types/User'
 
@@ -21,8 +18,8 @@ const plans: MembershipTier[] = [
     subtitle: 'Betydelse: "Början/inträdet"',
     benefits: [
       'Tillgång till köp av utbildningar och coaching/vägledning.',
-      'Flöde (enbart inlagg fran ledning) och forum.',
-      'Digitalt medlemsmärke (INITIUM märke) att anvanda i sin biografi pa LinkedIn och sociala medier.',
+      'Flöde (enbart inlägg från ledning) och forum.',
+      'Digitalt medlemsmärke (INITIUM märke) att använda i sin biografi på LinkedIn och sociala medier.',
       'Shop.',
       'Välkomstmail.',
     ],
@@ -33,9 +30,9 @@ const plans: MembershipTier[] = [
     title: 'ASCENSIO II',
     subtitle: 'Betydelse: "Uppstigning/avancemang"',
     benefits: [
-      'Samtliga delar fran INITIUM.',
+      'Samtliga delar från INITIUM.',
       'Profil med biografi.',
-      'Profilbild med ASCENSIO stämpel som kan anvandas pa LinkedIn och sociala medier.',
+      'Profilbild med ASCENSIO stämpel som kan användas på LinkedIn och sociala medier.',
     ],
     price: '799 kr/månad',
   },
@@ -44,8 +41,8 @@ const plans: MembershipTier[] = [
     title: 'DOMINIUS NEGOTIUM III',
     subtitle: 'Betydelse: "Herre/Den som har kontroll, Verksamhet"',
     benefits: [
-      'Enbart for beslutsfattare från företag.',
-      'Samtliga delar fran Initium och Ascensio.',
+      'Enbart för beslutsfattare från företag.',
+      'Samtliga delar från Initium och Ascensio.',
       'DOMINIUS NEGOTIUM stämpel.',
       'Välkomstvideo från grundare.',
       'Uppstartsmöte.',
@@ -55,52 +52,15 @@ const plans: MembershipTier[] = [
 ]
 
 const MembershipPage = () => {
-  const { profile } = useAuth()
+  const { currentUser } = useAuth()
   const navigate = useNavigate()
-  const [submitting, setSubmitting] = useState<MembershipPlan | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [toast, setToast] = useState<string | null>(null)
-  const dbClient = db
 
-  if (!dbClient || !profile) {
-    return (
-      <div className="membership-hero page-centered">
-        <div className="card" style={{ width: 'min(480px, 92vw)' }}>
-          <p className="eyebrow">Membership</p>
-          <h2>Loading...</h2>
-        </div>
-      </div>
-    )
-  }
-
-  const handleSelect = async (plan: MembershipPlan) => {
-    if (!profile.uid) return
-    setSubmitting(plan)
-    setError(null)
-    setToast(null)
-    try {
-      await updateDoc(doc(dbClient, 'users', profile.uid), {
-        membershipPlan: plan,
-        membershipStatus: 'pending',
-        onboardingComplete: false,
-        updatedAt: serverTimestamp(),
-      })
-
-      const target =
-        plan === 'initium'
-          ? routes.onboardingInitium
-          : plan === 'ascensio'
-          ? routes.onboardingAscensio
-          : routes.onboardingDominus
-
-      navigate(target)
-    } catch (err) {
-      console.error(err)
-      setError('Kunde inte spara val av medlemskap. Försök igen.')
-      setToast('Kunde inte spara medlemsvalet.')
-    } finally {
-      setSubmitting(null)
+  const handleSelect = (planId: MembershipPlan) => {
+    if (!currentUser) {
+      navigate(routes.login)
+      return
     }
+    navigate(`${routes.payment}?planId=${planId}`)
   }
 
   return (
@@ -140,16 +100,12 @@ const MembershipPage = () => {
             <button
               className="membership-select"
               onClick={() => handleSelect(plan.id)}
-              disabled={Boolean(submitting)}
             >
-              {submitting === plan.id ? 'SPARAR...' : 'VÄLJ NIVÅN'}
+              VÄLJ NIVÅN
             </button>
           </article>
         ))}
       </section>
-
-      {error && <p className="membership-error">{error}</p>}
-      {toast && <div className="toast toast-error">{toast}</div>}
     </div>
   )
 }

@@ -40,7 +40,7 @@ const LoginPage = () => {
       await signInWithEmailAndPassword(authClient, email, password)
       navigate(routes.home, { replace: true })
     } catch (err) {
-      setError('Could not sign in. Check credentials or try again.')
+      setError('Felaktiga uppgifter. Kontrollera email och lösenord.')
       console.error(err)
     } finally {
       setSubmitting(false)
@@ -48,36 +48,93 @@ const LoginPage = () => {
   }
 
   return (
-    <BrandPageShell title="LOGGA IN">
-      <form className="brand-form" onSubmit={handleSubmit}>
-        <label className="field">
-          <span>Email</span>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            autoComplete="email"
-          />
-        </label>
-        <label className="field">
-          <span>Password</span>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            autoComplete="current-password"
-          />
-        </label>
-        {error && <p className="error">{error}</p>}
-        <button className="btn primary" type="submit" disabled={submitting}>
-          {submitting ? 'Signing in...' : 'Sign in'}
-        </button>
-        <p className="muted">
-          No account? <Link to="/register">Create one</Link>
-        </p>
-      </form>
+    <BrandPageShell title="LOGGA IN" subtitle="Välkommen tillbaka till Vertex Dominium.">
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <form
+          className="brand-form"
+          onSubmit={handleSubmit}
+          style={{
+            width: 'min(480px, 100%)',
+            display: 'grid',
+            gap: '20px',
+          }}
+        >
+          {/* Email */}
+          <label className="field">
+            <span style={{ fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+              Email
+            </span>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoComplete="email"
+              placeholder="din@email.com"
+              style={{ marginTop: '6px' }}
+            />
+          </label>
+
+          {/* Lösenord */}
+          <label className="field">
+            <span style={{ fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+              Lösenord
+            </span>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="current-password"
+              placeholder="••••••••"
+              style={{ marginTop: '6px' }}
+            />
+          </label>
+
+          {/* Felmeddelande */}
+          {error && (
+            <p className="error" style={{ margin: 0, fontSize: '0.85rem' }}>
+              {error}
+            </p>
+          )}
+
+          {/* Logga in-knapp */}
+          <button
+            className="btn primary"
+            type="submit"
+            disabled={submitting}
+            style={{ marginTop: '4px', letterSpacing: '0.1em' }}
+          >
+            {submitting ? 'LOGGAR IN...' : 'LOGGA IN'}
+          </button>
+
+          {/* Divider */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            color: '#98a3b8',
+            fontSize: '0.8rem',
+          }}>
+            <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.12)' }} />
+            ELLER
+            <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.12)' }} />
+          </div>
+
+          {/* Registrera */}
+          <Link
+            to={routes.register}
+            className="btn ghost"
+            style={{ textAlign: 'center', letterSpacing: '0.1em' }}
+          >
+            SKAPA KONTO
+          </Link>
+
+          <p className="muted" style={{ textAlign: 'center', fontSize: '0.8rem', margin: 0 }}>
+            Genom att logga in godkänner du våra villkor.
+          </p>
+        </form>
+      </div>
     </BrandPageShell>
   )
 }

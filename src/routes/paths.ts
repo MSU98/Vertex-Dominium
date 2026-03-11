@@ -17,5 +17,8 @@ export const routes = {
   profile: '/profile',
   adminReviews: '/admin/reviews',
   adminDnApplications: '/admin/dn-applications',
+  payment: '/payment',
+  verify: '/verify',
+  subscribe: '/subscribe',
 }
 
