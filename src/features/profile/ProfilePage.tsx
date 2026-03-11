@@ -16,9 +16,9 @@ const ProfilePage = () => {
   const showExtendedProfile = canAccess('profileExtended')
   const badge =
     profile?.membershipPlan === 'dominus'
-      ? 'Dominus badge'
+      ? 'Dominus-markering'
       : profile?.membershipPlan === 'ascensio'
-      ? 'Ascensio badge'
+        ? 'Ascensio-markering'
       : null
 
   const handleLogout = async () => {
@@ -39,20 +39,21 @@ const ProfilePage = () => {
   }
 
   return (
-    <BrandPageShell title="PROFILE" subtitle="Din medlemsprofil i Vertex Dominium." memberNav>
+    <BrandPageShell title="PROFIL" subtitle="Din medlemsprofil i Vertex Dominium." memberNav>
       <article className="brand-panel">
-        <h3>{profile?.fullName ?? 'Member profile'}</h3>
+        <h3>{profile?.fullName ?? 'Medlemsprofil'}</h3>
         {badge && <p>{badge}</p>}
-        <p>Email: {profile?.email ?? '-'}</p>
-        <p>Plan: {profile?.membershipPlan ?? 'none'}</p>
+        <p>E-post: {profile?.email ?? '-'}</p>
+        <p>Plan: {profile?.membershipPlan ?? 'ingen'}</p>
         {showExtendedProfile ? (
           <>
-            <p>Company: {profile?.company ?? '-'}</p>
+            <p>Företag: {profile?.company ?? '-'}</p>
             <p>LinkedIn: {profile?.linkedin ?? '-'}</p>
-            <p>Description: {profile?.professionalDescription ?? 'No description provided.'}</p>
+            <p>Beskrivning: {profile?.professionalDescription ?? 'Ingen beskrivning angiven.'}</p>
           </>
         ) : (
-          <p>Extended profile fields unlock with Ascensio or higher.</p>
+          <p>Utökade profilfält låses upp med Ascensio eller högre.</p>
+
         )}
         <div className="actions">
           <button className="btn ghost" onClick={handleLogout} disabled={loggingOut}>

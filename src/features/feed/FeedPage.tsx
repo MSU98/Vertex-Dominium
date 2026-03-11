@@ -1,12 +1,15 @@
 import BrandPageShell from '../../components/ui/BrandPageShell'
 
 const FeedPage = () => (
-  <BrandPageShell title="FEED" subtitle="Medlemsuppdateringar och aktivitet i natverket." memberNav>
+  <BrandPageShell
+    title="FLÖDE"
+    subtitle="Medlemsuppdateringar och aktivitet i nätverket."
+    memberNav
+  >
     <article className="brand-panel">
-      <p>Activity feed placeholder. Connect to Firestore collections later.</p>
+      <p>Plats för aktivitetsflöde. Koppla till Firestore-samlingar senare.</p>
     </article>
   </BrandPageShell>
 )
 
 export default FeedPage
-

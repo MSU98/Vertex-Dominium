@@ -21,8 +21,8 @@ const plans: MembershipTier[] = [
     subtitle: 'Betydelse: "Början/inträdet"',
     benefits: [
       'Tillgång till köp av utbildningar och coaching/vägledning.',
-      'Flöde (enbart inlagg fran ledning) och forum.',
-      'Digitalt medlemsmärke (INITIUM märke) att anvanda i sin biografi pa LinkedIn och sociala medier.',
+      'Flöde (enbart inlägg från ledning) och forum.',
+      'Digitalt medlemsmärke (INITIUM-märke) att använda i sin biografi på LinkedIn och sociala medier.',
       'Shop.',
       'Välkomstmail.',
     ],
@@ -33,25 +33,27 @@ const plans: MembershipTier[] = [
     title: 'ASCENSIO II',
     subtitle: 'Betydelse: "Uppstigning/avancemang"',
     benefits: [
-      'Samtliga delar fran INITIUM.',
+      'Samtliga delar från INITIUM.',
       'Profil med biografi.',
-      'Profilbild med ASCENSIO stämpel som kan anvandas pa LinkedIn och sociala medier.',
+      'Profilbild med ASCENSIO-stämpel som kan användas på LinkedIn och sociala medier.',
     ],
     price: '799 kr/månad',
   },
   {
     id: 'dominus',
-    title: 'DOMINIUS NEGOTIUM III',
-    subtitle: 'Betydelse: "Herre/Den som har kontroll, Verksamhet"',
+    title: 'DOMINUS NEGOTIUM III',
+    subtitle: 'Betydelse: "Herre/den som har kontroll, verksamhet"',
     benefits: [
-      'Enbart for beslutsfattare från företag.',
-      'Samtliga delar fran Initium och Ascensio.',
-      'DOMINIUS NEGOTIUM stämpel.',
+      'Enbart för beslutsfattare från företag.',
+      'Samtliga delar från INITIUM och ASCENSIO.',
+      'DOMINUS NEGOTIUM-stämpel.',
       'Välkomstvideo från grundare.',
       'Uppstartsmöte.',
     ],
     price: '3999 kr/månad',
   },
+]
+
 ]
 
 const MembershipPage = () => {
@@ -66,8 +68,10 @@ const MembershipPage = () => {
     return (
       <div className="membership-hero page-centered">
         <div className="card" style={{ width: 'min(480px, 92vw)' }}>
-          <p className="eyebrow">Membership</p>
-          <h2>Loading...</h2>
+          <p className="eyebrow">Medlemskap</p>
+          <h2>Laddar...</h2>
+          <p className="muted">Logga in och kontrollera att Firebase är konfigurerat.</p>
+
         </div>
       </div>
     )
@@ -96,8 +100,9 @@ const MembershipPage = () => {
       navigate(target)
     } catch (err) {
       console.error(err)
-      setError('Kunde inte spara val av medlemskap. Försök igen.')
-      setToast('Kunde inte spara medlemsvalet.')
+      setError('Det gick inte att spara valet av medlemskap. Försök igen.')
+      setToast('Det gick inte att spara medlemsvalet.')
+
     } finally {
       setSubmitting(null)
     }
@@ -109,6 +114,43 @@ const MembershipPage = () => {
         <div className="landing-nav-left">MENY</div>
         <div className="landing-nav-logo">
           <img src="/vertex-logo.png" alt="Vertex Dominium" />
+        </div>
+        <div className="landing-nav-right">
+          <Link to={routes.dashboard}>Översikt</Link>
+          <Link to={routes.profile}>Profil</Link>
+        </div>
+      </header>
+
+      <div className="membership-shell">
+        <div className="membership-intro card">
+          <p className="eyebrow">Välj medlemskap</p>
+          <h2>Välj din nivå</h2>
+        </div>
+
+        <div className="membership-plan-list">
+          {plans.map((plan) => (
+            <article key={plan.id} className="membership-plan-card card">
+              <p className="membership-plan-title">{plan.title}</p>
+              <p className="muted">{plan.subtitle}</p>
+              <p className="membership-price">{plan.price}</p>
+
+              <ul className="membership-benefits">
+                {plan.benefits.map((benefit) => (
+                  <li key={benefit}>{benefit}</li>
+                ))}
+              </ul>
+
+              <button
+                className="btn primary"
+                onClick={() => handleSelect(plan.id)}
+                disabled={Boolean(submitting)}
+              >
+                {submitting === plan.id ? 'Sparar...' : 'Välj'}
+              </button>
+            </article>
+          ))}
+        </div>
+
         </div>
         <nav className="landing-nav-right membership-top-links">
           <Link to={routes.hem}>HEM</Link>
