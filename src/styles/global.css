@@ -164,6 +164,245 @@ a {
   line-height: 1.5;
 }
 
+.membership-hero {
+  min-height: 100vh;
+  padding: 24px 28px 50px;
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.62)), url('/boardroom-bg.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.membership-nav {
+  width: 100%;
+  margin: 0;
+}
+
+.membership-top-links {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.membership-intro {
+  max-width: 1100px;
+  margin: 78px auto 40px;
+  text-align: center;
+}
+
+.membership-intro h1 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 4.2rem);
+  letter-spacing: 0.12em;
+  font-weight: 500;
+}
+
+.membership-intro h2 {
+  margin: 18px 0 0;
+  font-size: clamp(1.2rem, 2.4vw, 2.1rem);
+  letter-spacing: 0.08em;
+  font-weight: 400;
+}
+
+.membership-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.membership-tier {
+  background: rgba(2, 2, 2, 0.86);
+  padding: 26px;
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.membership-tier + .membership-tier {
+  border-left: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.membership-tier h3 {
+  margin: 0;
+  font-size: clamp(1.9rem, 3vw, 2.7rem);
+  line-height: 1.05;
+  letter-spacing: 0.04em;
+  color: #bea05c;
+  font-weight: 500;
+}
+
+.membership-tier p {
+  margin: 0;
+  color: #e5e5e5;
+  line-height: 1.45;
+}
+
+.membership-tier-subtitle {
+  color: #d8d8d8;
+  font-style: italic;
+}
+
+.membership-benefits {
+  margin: 0;
+  padding-left: 22px;
+  color: #e5e5e5;
+  line-height: 1.45;
+  display: grid;
+  gap: 8px;
+}
+
+.membership-tier .membership-price {
+  margin-top: auto;
+  color: #bea05c;
+  font-weight: 600;
+}
+
+.membership-select {
+  border: 1px solid #bea05c;
+  background: transparent;
+  color: #bea05c;
+  padding: 10px 12px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.membership-select:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.membership-error {
+  max-width: 1100px;
+  margin: 16px auto 0;
+  color: #ff8d8d;
+}
+
+.brand-page {
+  min-height: 100vh;
+  padding: 24px 28px 50px;
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.62)), url('/boardroom-bg.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.brand-page-intro {
+  max-width: 1100px;
+  margin: 78px auto 30px;
+  text-align: center;
+}
+
+.brand-page-intro h1 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 4.2rem);
+  letter-spacing: 0.12em;
+  font-weight: 500;
+}
+
+.brand-page-intro h2 {
+  margin: 16px 0 0;
+  font-size: clamp(1.2rem, 2.4vw, 2.1rem);
+  letter-spacing: 0.08em;
+  font-weight: 400;
+}
+
+.brand-page-intro p {
+  margin: 14px auto 0;
+  max-width: 720px;
+  color: #e5e5e5;
+}
+
+.brand-page-content {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.brand-panel {
+  background: rgba(2, 2, 2, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  padding: 26px;
+}
+
+.brand-panel h3 {
+  margin: 0 0 12px;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+}
+
+.brand-panel p {
+  margin: 0 0 10px;
+  line-height: 1.45;
+  color: #e5e5e5;
+}
+
+.brand-panel p:last-child {
+  margin-bottom: 0;
+}
+
+.brand-panel-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.brand-panel-sub {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(20, 20, 20, 0.75);
+  padding: 16px;
+}
+
+.brand-form {
+  width: min(520px, 100%);
+  display: grid;
+  gap: 14px;
+  background: rgba(2, 2, 2, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  padding: 26px;
+}
+
+.field textarea {
+  min-height: 100px;
+  resize: vertical;
+  background: var(--panel-muted);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.field textarea:focus {
+  outline: 1px solid var(--accent);
+  border-color: var(--accent);
+}
+
+.consent-group {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  display: grid;
+  gap: 10px;
+}
+
+.consent-group legend {
+  padding: 0 6px;
+  color: #d7d7d7;
+}
+
+.consent-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #e5e5e5;
+}
+
+.consent-item input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+}
 .app-shell {
   display: grid;
   grid-template-columns: 280px 1fr;
@@ -799,6 +1038,29 @@ h2 {
     grid-template-columns: 1fr;
     gap: 18px;
     padding: 30px 18px 46px;
+  }
+
+  .membership-hero {
+    padding: 16px 14px 24px;
+  }
+
+  .brand-page {
+    padding: 16px 14px 24px;
+  }
+  .membership-intro {
+    margin: 44px auto 22px;
+  }
+
+  .brand-page-intro {
+    margin: 44px auto 22px;
+  }
+  .membership-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .membership-tier + .membership-tier {
+    border-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
   }
 
   .app-shell {

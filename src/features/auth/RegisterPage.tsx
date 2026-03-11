@@ -7,6 +7,7 @@ import { doc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { auth, db, firebaseReady, missingFirebaseKeys } from '../../lib/firebase'
 import { routes } from '../../routes/paths'
 import type { UserProfile } from '../../types/User'
+import BrandPageShell from '../../components/ui/BrandPageShell'
 
 const getRegisterErrorMessage = (error: unknown) => {
   if (!(error instanceof FirebaseError)) {
@@ -33,13 +34,14 @@ const RegisterPage = () => {
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const navigate = useNavigate()
+  const authClient = auth
+  const dbClient = db
 
-  if (!firebaseReady || !auth || !db) {
+  if (!firebaseReady || !authClient || !dbClient) {
     return (
-      <div className="page page-centered">
-        <div className="card">
-          <p className="eyebrow">Configuration needed</p>
-          <h2>Connect Firebase</h2>
+      <BrandPageShell title="BLI MEDLEM">
+        <article className="brand-panel">
+          <h3>Connect Firebase</h3>
           <p className="muted">
             Add the following keys to your <code>.env</code> file and restart <code>npm run dev</code>.
           </p>
@@ -48,8 +50,8 @@ const RegisterPage = () => {
               <li key={key}>{key}</li>
             ))}
           </ul>
-        </div>
-      </div>
+        </article>
+      </BrandPageShell>
     )
   }
 
@@ -59,7 +61,7 @@ const RegisterPage = () => {
     setError(null)
 
     try {
-      const credentials = await createUserWithEmailAndPassword(auth, email, password)
+      const credentials = await createUserWithEmailAndPassword(authClient, email, password)
       const baseProfile: UserProfile = {
         uid: credentials.user.uid,
         email,
@@ -71,8 +73,8 @@ const RegisterPage = () => {
         updatedAt: serverTimestamp() as unknown as UserProfile['updatedAt'],
       }
 
-      await setDoc(doc(db, 'users', credentials.user.uid), baseProfile)
-      navigate(routes.appHome, { replace: true })
+      await setDoc(doc(dbClient, 'users', credentials.user.uid), baseProfile)
+      navigate(routes.home, { replace: true })
     } catch (err) {
       setError(getRegisterErrorMessage(err))
       console.error(err)
@@ -82,10 +84,8 @@ const RegisterPage = () => {
   }
 
   return (
-    <div className="page page-centered">
-      <form className="card form" onSubmit={handleSubmit}>
-        <p className="eyebrow">Onboarding</p>
-        <h2>Create account</h2>
+    <BrandPageShell title="BLI MEDLEM">
+      <form className="brand-form" onSubmit={handleSubmit}>
         <label className="field">
           <span>Email</span>
           <input
@@ -115,7 +115,7 @@ const RegisterPage = () => {
           Already a member? <Link to="/login">Sign in</Link>
         </p>
       </form>
-    </div>
+    </BrandPageShell>
   )
 }
 

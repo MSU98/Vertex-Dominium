@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from 'react-router-dom'
-import { useAuthContext } from './AuthContext'
+import { useAuthContext } from './auth-context'
 import { routes } from '../routes/paths'
 import type { UserRole } from '../types/User'
 
@@ -16,7 +16,7 @@ const RequireRole = ({ allowedRoles }: RequireRoleProps) => {
   }
 
   if (!role || !allowedRoles.includes(role)) {
-    return <Navigate to={currentUser ? routes.appHome : routes.login} replace />
+    return <Navigate to={currentUser ? routes.home : routes.login} replace />
   }
 
   return <Outlet />

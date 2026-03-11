@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import useAuth from '../../hooks/useAuth'
+import BrandPageShell from '../../components/ui/BrandPageShell'
 import { useModuleAccess } from '../../hooks/useModuleAccess'
 import type { PortalModule } from '../../types/Access'
 import { routes } from '../../routes/paths'
@@ -66,6 +67,7 @@ const toDisplayName = (fullName: string | undefined, email: string | undefined) 
     .trim()
     .replace(/\b\w/g, (char) => char.toUpperCase())
 }
+
 
 const DashboardPage = () => {
   const { profile } = useAuth()
@@ -143,143 +145,155 @@ const DashboardPage = () => {
   })()
 
   return (
-    <section className="page dashboard-page">
-      <div className="dashboard-hero card">
-        <div className="hero-copy">
-          <p className="eyebrow">Översikt</p>
-          <p className="dashboard-subtitle">
-            Din medlemsportal för nätverk, utbildning och profilhantering.
-          </p>
-        </div>
-
-        <div className="hero-meta">
-          <p className="eyebrow">Medlem</p>
-          <h1 className="dashboard-title">{displayName}</h1>
-          <span className={`tier-badge ${planClass}`}>{toLabel(profile?.membershipPlan)}</span>
-          <p className="hero-email">{profile?.email ?? 'Ingen e-post kopplad'}</p>
-        </div>
-      </div>
-
-      <div className="dashboard-summary-grid">
-        <div className="summary-card card">
-          <p className="eyebrow">Roll</p>
-          <h3>{toLabel(profile?.role)}</h3>
-          <p className="muted">Din interna åtkomstnivå.</p>
-        </div>
-        <div className="summary-card card">
-          <p className="eyebrow">Plan</p>
-          <h3>{toLabel(profile?.membershipPlan)}</h3>
-          <p className="muted">Initium, Ascensio eller Dominus.</p>
-        </div>
-        <div className="summary-card card">
-          <p className="eyebrow">Status</p>
-          <h3>{toLabel(profile?.membershipStatus)}</h3>
-          <p className="muted">Nuvarande aktiveringsläge.</p>
-        </div>
-        <div className="summary-card card">
-          <p className="eyebrow">Profilgrad</p>
-          <h3>{completionPercent}%</h3>
-          <div className="progress-track">
-            <span className="progress-bar" style={{ width: `${completionPercent}%` }} />
+    <BrandPageShell title="DASHBOARD" subtitle="Din översikt i medlemsportalen." memberNav>
+      <section className="page dashboard-page">
+        <div className="dashboard-hero card">
+          <div className="hero-copy">
+            <p className="eyebrow">Översikt</p>
+            <p className="dashboard-subtitle">
+              Din medlemsportal för nätverk, utbildning och profilhantering.
+            </p>
           </div>
-          <p className="muted">
-            {completedCount}/{completionFields.length} fält ifyllda
-          </p>
-        </div>
-      </div>
 
-      <div className="dashboard-main-grid">
-        <div className="card spotlight-card">
-          <p className="eyebrow">Nästa steg</p>
-          <h3>{nextStep.label}</h3>
-          <p className="muted">{nextStep.hint}</p>
-          <div className="actions">
-            <Link className="btn primary" to={nextStep.to}>
-              Fortsätt
-            </Link>
+          <div className="hero-meta">
+            <p className="eyebrow">Medlem</p>
+            <h1 className="dashboard-title">{displayName}</h1>
+            <span className={`tier-badge ${planClass}`}>{toLabel(profile?.membershipPlan)}</span>
+            <p className="hero-email">{profile?.email ?? 'Ingen e-post kopplad'}</p>
           </div>
         </div>
 
-        <div className="card contact-card">
+        <div className="dashboard-summary-grid">
+          <div className="summary-card card">
+            <p className="eyebrow">Roll</p>
+            <h3>{toLabel(profile?.role)}</h3>
+            <p className="muted">Din interna åtkomstnivå.</p>
+          </div>
+          <div className="summary-card card">
+            <p className="eyebrow">Plan</p>
+            <h3>{toLabel(profile?.membershipPlan)}</h3>
+            <p className="muted">Initium, Ascensio eller Dominus.</p>
+          </div>
+          <div className="summary-card card">
+            <p className="eyebrow">Status</p>
+            <h3>{toLabel(profile?.membershipStatus)}</h3>
+            <p className="muted">Nuvarande aktiveringsläge.</p>
+          </div>
+          <div className="summary-card card">
+            <p className="eyebrow">Profilgrad</p>
+            <h3>{completionPercent}%</h3>
+            <div className="progress-track">
+              <span className="progress-bar" style={{ width: `${completionPercent}%` }} />
+            </div>
+            <p className="muted">
+              {completedCount}/{completionFields.length} fält ifyllda
+            </p>
+          </div>
+        </div>
+
+        <div className="dashboard-main-grid">
+          <div className="card spotlight-card">
+            <p className="eyebrow">Nästa steg</p>
+            <h3>{nextStep.label}</h3>
+            <p className="muted">{nextStep.hint}</p>
+            <div className="actions">
+              <Link className="btn primary" to={nextStep.to}>
+                Fortsätt
+              </Link>
+            </div>
+          </div>
+
+          <div className="card contact-card">
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">Medlemsuppgifter</p>
+                <h3>Kontaktprofil</h3>
+              </div>
+              <Link className="btn ghost" to={routes.profile}>
+                Redigera profil
+              </Link>
+            </div>
+
+            <div className="contact-grid">
+              {contactRows.map((row) => (
+                <div key={row.label} className="contact-row">
+                  <span>{row.label}</span>
+                  <strong>{row.value}</strong>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="card membership-card">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">Medlemsuppgifter</p>
-              <h3>Kontaktprofil</h3>
+              <p className="eyebrow">Medlemsnivåer</p>
+              <h3>Åtkomstnivåer</h3>
             </div>
-            <Link className="btn ghost" to={routes.profile}>
-              Redigera profil
+            <Link className="btn ghost" to={routes.membership}>
+              Se nivåer
             </Link>
           </div>
 
-          <div className="contact-grid">
-            {contactRows.map((row) => (
-              <div key={row.label} className="contact-row">
-                <span>{row.label}</span>
-                <strong>{row.value}</strong>
-              </div>
-            ))}
+          <div className="tier-grid">
+            <article className={`tier-panel ${planKey === 'initium' ? 'active' : ''}`}>
+              <p className="tier-name">Initium</p>
+              <p className="tier-copy">
+                Grundläggande tillgång för medlemmar som kliver in i nätverket.
+              </p>
+            </article>
+            <article className={`tier-panel ${planKey === 'ascensio' ? 'active' : ''}`}>
+              <p className="tier-name">Ascensio</p>
+              <p className="tier-copy">
+                Utökad tillgång för medlemmar med en bredare deltagandenivå.
+              </p>
+            </article>
+            <article className={`tier-panel ${planKey === 'dominus' ? 'active' : ''}`}>
+              <p className="tier-name">Dominus</p>
+              <p className="tier-copy">
+                Högsta nivån med premiumtillgång och privata medlemsfördelar.
+              </p>
+            </article>
           </div>
         </div>
-      </div>
 
-      <div className="card membership-card">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">Medlemsnivåer</p>
-            <h3>Åtkomstnivåer</h3>
+        <div className="card module-section">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">Modulåtkomst</p>
+              <h3>Tillgängliga ytor</h3>
+            </div>
+            <p className="muted">Låsta moduler öppnas genom rätt medlemsnivå.</p>
           </div>
-          <Link className="btn ghost" to={routes.membership}>
-            Se nivåer
-          </Link>
-        </div>
 
-        <div className="tier-grid">
-          <article className={`tier-panel ${planKey === 'initium' ? 'active' : ''}`}>
-            <p className="tier-name">Initium</p>
-            <p className="tier-copy">Grundläggande tillgång för medlemmar som kliver in i nätverket.</p>
-          </article>
-          <article className={`tier-panel ${planKey === 'ascensio' ? 'active' : ''}`}>
-            <p className="tier-name">Ascensio</p>
-            <p className="tier-copy">Utökad tillgång för medlemmar med en bredare deltagandenivå.</p>
-          </article>
-          <article className={`tier-panel ${planKey === 'dominus' ? 'active' : ''}`}>
-            <p className="tier-name">Dominus</p>
-            <p className="tier-copy">Högsta nivån med premiumtillgång och privata medlemsfördelar.</p>
-          </article>
-        </div>
-      </div>
+          <div className="module-grid">
+            {modules.map((item) => {
+              const unlocked = canAccess(item.key)
 
-      <div className="card module-section">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">Modulåtkomst</p>
-            <h3>Tillgängliga ytor</h3>
+              return (
+                <article key={item.key} className="module-card">
+                  <div className="module-card-top">
+                    <h3>{item.label}</h3>
+                    <span className={`module-status ${unlocked ? 'open' : 'locked'}`}>
+                      {unlocked ? 'Öppet' : 'Låst'}
+                    </span>
+                  </div>
+                  <p className="muted">{item.note}</p>
+                  <Link
+                    className="btn ghost module-link"
+                    to={unlocked ? item.to : routes.membership}
+                  >
+                    {unlocked ? 'Öppna modul' : 'Hantera åtkomst'}
+                  </Link>
+                </article>
+              )
+            })}
           </div>
-          <p className="muted">Låsta moduler öppnas genom rätt medlemsnivå.</p>
         </div>
+      </section>
+    </BrandPageShell>
 
-        <div className="module-grid">
-          {modules.map((item) => {
-            const unlocked = canAccess(item.key)
-
-            return (
-              <article key={item.key} className="module-card">
-                <div className="module-card-top">
-                  <h3>{item.label}</h3>
-                  <span className={`module-status ${unlocked ? 'open' : 'locked'}`}>
-                    {unlocked ? 'Öppet' : 'Låst'}
-                  </span>
-                </div>
-                <p className="muted">{item.note}</p>
-                <Link className="btn ghost module-link" to={unlocked ? item.to : routes.membership}>
-                  {unlocked ? 'Öppna modul' : 'Hantera åtkomst'}
-                </Link>
-              </article>
-            )
-          })}
-        </div>
-      </div>
-    </section>
   )
 }
 

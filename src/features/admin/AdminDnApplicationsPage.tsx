@@ -1,21 +1,42 @@
 import { useEffect, useState } from 'react'
-import { collection, doc, onSnapshot, orderBy, query, serverTimestamp, updateDoc } from 'firebase/firestore'
+import {
+  collection,
+  doc,
+  getDoc,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+  updateDoc,
+} from 'firebase/firestore'
 import { db } from '../../lib/firebase'
+import BrandPageShell from '../../components/ui/BrandPageShell'
+import type { MembershipPlan, UserRole } from '../../types/User'
 
 type ApplicationStatus = 'pending' | 'approved' | 'rejected'
 
 type DnApplication = {
   id: string
   uid: string
+  membershipPlan?: MembershipPlan
   fullName: string
-  companyName: string
-  orgNumber: string
+  companyName?: string
+  orgNumber?: string
   title: string
-  decisionMandate: string
-  email: string
-  phone: string
-  motivation: string
+  decisionMandate?: string
+  businessEmail?: string
+  email?: string
+  phone?: string
+  motivation?: string
+  city?: string
+  interests?: string[]
   status: ApplicationStatus
+}
+
+const resolveRoleFromPlan = (plan: MembershipPlan | undefined): UserRole => {
+  if (plan === 'dominus') return 'dominus'
+  if (plan === 'ascensio') return 'ascensio'
+  return 'initium'
 }
 
 const AdminDnApplicationsPage = () => {
@@ -25,8 +46,9 @@ const AdminDnApplicationsPage = () => {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!db) return
-    const q = query(collection(db, 'dnApplications'), orderBy('createdAt', 'desc'))
+    const dbClient = db
+    if (!dbClient) return
+    const q = query(collection(dbClient, 'dnApplications'), orderBy('createdAt', 'desc'))
     const unsub = onSnapshot(
       q,
       (snapshot) => {
@@ -45,7 +67,7 @@ const AdminDnApplicationsPage = () => {
     )
 
     return () => unsub()
-  }, [db])
+  }, [])
 
   const handleDecision = async (application: DnApplication, status: ApplicationStatus) => {
     if (!db) return
@@ -57,22 +79,29 @@ const AdminDnApplicationsPage = () => {
         updatedAt: serverTimestamp(),
       })
 
+      const plan = application.membershipPlan ?? 'dominus'
       const userUpdates =
         status === 'approved'
           ? {
-              role: 'dominus',
-              membershipPlan: 'dominus',
+              role: resolveRoleFromPlan(plan),
+              membershipPlan: plan,
               membershipStatus: 'active',
               onboardingComplete: true,
               updatedAt: serverTimestamp(),
             }
           : {
-              membershipPlan: 'dominus',
+              membershipPlan: plan,
               membershipStatus: 'rejected',
               updatedAt: serverTimestamp(),
             }
 
-      await updateDoc(doc(db, 'users', application.uid), userUpdates)
+      const userRef = doc(db, 'users', application.uid)
+      const userSnap = await getDoc(userRef)
+      if (userSnap.exists()) {
+        await updateDoc(userRef, userUpdates)
+      } else {
+        setError('Application updated, but user profile is missing.')
+      }
     } catch (err) {
       console.error(err)
       setError('Action failed. Try again.')
@@ -83,49 +112,54 @@ const AdminDnApplicationsPage = () => {
 
   if (!db) {
     return (
-      <section className="page">
-        <div className="card">
-          <p className="eyebrow">Admin</p>
-          <h2>Firebase not configured</h2>
-          <p className="muted">Add Firebase env keys to use the admin panel.</p>
-        </div>
-      </section>
+      <BrandPageShell title="REVIEWS" subtitle="Granska medlemsansokningar." memberNav>
+        <article className="brand-panel">
+          <h3>Firebase not configured</h3>
+          <p>Add Firebase env keys to use the admin panel.</p>
+        </article>
+      </BrandPageShell>
     )
   }
 
+  const pendingApplications = applications.filter((app) => app.status === 'pending')
+
   return (
-    <section className="page">
-      <div className="card">
-        <p className="eyebrow">Admin</p>
-        <h2>Dominus applications</h2>
+    <BrandPageShell title="REVIEWS" subtitle="Membership applications" memberNav>
+      <article className="brand-panel">
         {loading && <p className="muted">Loading...</p>}
         {error && <p className="error">{error}</p>}
-        {!loading && applications.length === 0 && <p className="muted">No applications.</p>}
-        <div className="page" style={{ gap: '12px' }}>
-          {applications.map((app) => (
-            <div key={app.id} className="card" style={{ padding: '16px' }}>
+        {!loading && pendingApplications.length === 0 && (
+          <p className="muted">No pending applications.</p>
+        )}
+        <div className="brand-panel-grid">
+          {pendingApplications.map((app) => (
+            <div key={app.id} className="brand-panel-sub">
               <h3>{app.fullName}</h3>
+              <p className="muted">Plan: {app.membershipPlan ?? 'dominus'}</p>
               <p className="muted">
-                {app.title} @ {app.companyName}
+                {app.title}
+                {app.companyName ? ` @ ${app.companyName}` : ''}
               </p>
-              <p className="muted">Org: {app.orgNumber}</p>
-              <p className="muted">Decision mandate: {app.decisionMandate}</p>
-              <p className="muted">Email: {app.email}</p>
-              <p className="muted">Phone: {app.phone}</p>
-              <p className="muted">Motivation: {app.motivation}</p>
-              <p className="muted">Status: {app.status}</p>
+              <p className="muted">Org: {app.orgNumber ?? '-'}</p>
+              <p className="muted">City: {app.city ?? '-'}</p>
+              <p className="muted">Decision mandate: {app.decisionMandate ?? '-'}</p>
+              <p className="muted">Business email: {app.businessEmail ?? app.email ?? '-'}</p>
+              <p className="muted">Phone: {app.phone ?? '-'}</p>
+              <p className="muted">Interests: {app.interests?.join(', ') ?? '-'}</p>
+              <p className="muted">Motivation: {app.motivation ?? '-'}</p>
+              <p className="muted">Status: pending</p>
               <div className="actions">
                 <button
                   className="btn primary"
                   onClick={() => handleDecision(app, 'approved')}
-                  disabled={app.status !== 'pending' || Boolean(actionId)}
+                  disabled={Boolean(actionId)}
                 >
                   {actionId === app.id ? 'Working...' : 'Approve'}
                 </button>
                 <button
                   className="btn ghost"
                   onClick={() => handleDecision(app, 'rejected')}
-                  disabled={app.status !== 'pending' || Boolean(actionId)}
+                  disabled={Boolean(actionId)}
                 >
                   Reject
                 </button>
@@ -133,8 +167,8 @@ const AdminDnApplicationsPage = () => {
             </div>
           ))}
         </div>
-      </div>
-    </section>
+      </article>
+    </BrandPageShell>
   )
 }
 

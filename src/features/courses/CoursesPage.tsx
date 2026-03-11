@@ -1,11 +1,16 @@
+import BrandPageShell from '../../components/ui/BrandPageShell'
+
 const CoursesPage = () => (
-  <section className="page">
-    <div className="card">
-      <p className="eyebrow">Kurser</p>
-      <h2>Föreläsningar</h2>
-      <p className="muted">Plats för innehåll. Koppla in utvalda moduler här senare.</p>
-    </div>
-  </section>
+  <BrandPageShell
+    title="KURSER"
+    subtitle="Kuraterade föreläsningar för medlemmar i Vertex Dominium."
+    memberNav
+  >
+    <article className="brand-panel">
+      <p>Plats för innehåll. Koppla in utvalda moduler här senare.</p>
+    </article>
+  </BrandPageShell>
 )
 
 export default CoursesPage
+

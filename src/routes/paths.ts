@@ -1,6 +1,8 @@
 export const routes = {
   home: '/',
   appHome: '/dashboard',
+  hem: '/hem',
+
   about: '/about',
   contact: '/contact',
   login: '/login',
@@ -15,6 +17,7 @@ export const routes = {
   feed: '/feed',
   forum: '/forum',
   profile: '/profile',
+  adminReviews: '/admin/reviews',
   adminDnApplications: '/admin/dn-applications',
 }
 

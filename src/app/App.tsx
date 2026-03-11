@@ -26,15 +26,17 @@ const App = () => (
     <BrowserRouter>
       <Routes>
         <Route path={routes.home} element={<HomePage />} />
+        <Route path={routes.hem} element={<HomePage />} />
         <Route path={routes.about} element={<AboutPage />} />
         <Route path={routes.contact} element={<ContactPage />} />
         <Route path={routes.login} element={<LoginPage />} />
         <Route path={routes.register} element={<RegisterPage />} />
 
         <Route element={<RequireAuth />}>
+          <Route path={routes.membership} element={<MembershipPage />} />
+
           <Route element={<DashboardLayout />}>
             <Route path={routes.dashboard} element={<DashboardPage />} />
-            <Route path={routes.membership} element={<MembershipPage />} />
             <Route path={routes.onboardingInitium} element={<InitiumOnboardingPage />} />
             <Route path={routes.onboardingAscensio} element={<AscensioOnboardingPage />} />
             <Route path={routes.onboardingDominus} element={<DominusOnboardingPage />} />
@@ -43,6 +45,12 @@ const App = () => (
             <Route path={routes.feed} element={<FeedPage />} />
             <Route path={routes.forum} element={<ForumPage />} />
             <Route path={routes.profile} element={<ProfilePage />} />
+            <Route
+              path={routes.adminReviews}
+              element={<RequireRole allowedRoles={['admin']} />}
+            >
+              <Route index element={<AdminDnApplicationsPage />} />
+            </Route>
             <Route
               path={routes.adminDnApplications}
               element={<RequireRole allowedRoles={['admin']} />}

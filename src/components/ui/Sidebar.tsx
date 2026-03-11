@@ -87,6 +87,7 @@ const Sidebar = () => {
         ))}
 
         {isAdmin && (
+        {isAdmin && (
           <div className="nav-section">
             <p className="nav-section-label">Admin</p>
             <nav className="nav">
@@ -96,8 +97,16 @@ const Sidebar = () => {
               >
                 Ansökningar
               </NavLink>
+              <NavLink
+                to={routes.adminReviews}
+                className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+              >
+                Reviews
+              </NavLink>
             </nav>
           </div>
+        )}
+
         )}
       </div>
 
