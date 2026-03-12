@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { doc, serverTimestamp, updateDoc } from 'firebase/firestore'
+import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore'
 import useAuth from '../../hooks/useAuth'
 import { db } from '../../lib/firebase'
 import { routes } from '../../routes/paths'
@@ -44,6 +44,18 @@ const InitiumOnboardingPage = () => {
       .slice(0, 3)
 
     try {
+      await addDoc(collection(dbClient, 'dnApplications'), {
+        uid: profile.uid,
+        membershipPlan: 'initium',
+        fullName,
+        email,
+        title,
+        city,
+        interests: parsedInterests,
+        status: 'pending',
+        createdAt: serverTimestamp(),
+      })
+
       await updateDoc(doc(dbClient, 'users', profile.uid), {
         fullName,
         email,
@@ -55,11 +67,11 @@ const InitiumOnboardingPage = () => {
         privacyPolicyAccepted: acceptPrivacyPolicy,
         communicationConsent: acceptCommunication,
         membershipPlan: 'initium',
-        membershipStatus: 'active',
+        membershipStatus: 'pending',
         onboardingComplete: true,
         updatedAt: serverTimestamp(),
       })
-      navigate(routes.dashboard)
+      navigate(routes.applicationPending)
     } catch (err) {
       console.error(err)
       setError('Could not save onboarding. Try again.')
