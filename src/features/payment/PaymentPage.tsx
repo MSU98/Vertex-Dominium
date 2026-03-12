@@ -146,7 +146,9 @@ const PaymentPage = () => {
           </div>
           <p style={{ marginTop: '12px' }}>
             Pris:{' '}
-            <strong style={{ color: '#5cd9b1' }}>
+            <strong style={{ color: '#c9a84c' }}>
+
+
               {billing === 'month' ? plan.priceMonth : plan.priceYear}
             </strong>
           </p>
@@ -174,7 +176,7 @@ const PaymentPage = () => {
                     cursor: 'pointer',
                     border:
                       method === 'klarna'
-                        ? '1px solid #5cd9b1'
+                        ? '1px solid #c9a84c'
                         : '1px solid rgba(255,255,255,0.16)',
                   }}
                   onClick={() => setMethod('klarna')}
@@ -190,7 +192,7 @@ const PaymentPage = () => {
                     cursor: 'pointer',
                     border:
                       method === 'direct'
-                        ? '1px solid #5cd9b1'
+                        ? '1px solid #c9a84c'
                         : '1px solid rgba(255,255,255,0.16)',
                   }}
                   onClick={() => setMethod('direct')}
