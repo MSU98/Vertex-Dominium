@@ -71,7 +71,7 @@ const InitiumOnboardingPage = () => {
         onboardingComplete: true,
         updatedAt: serverTimestamp(),
       })
-      navigate(routes.applicationPending)
+      navigate(`${routes.payment}?planId=initium`)
     } catch (err) {
       console.error(err)
       setError('Could not save onboarding. Try again.')
