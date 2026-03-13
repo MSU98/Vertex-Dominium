@@ -83,7 +83,7 @@ const AscensioOnboardingPage = () => {
         role: 'initium',
         updatedAt: serverTimestamp(),
       })
-      navigate(routes.applicationPending)
+      navigate(`${routes.payment}?planId=ascensio`)
     } catch (err) {
       console.error(err)
       setError('Kunde inte spara onboarding. Forsok igen.')
