@@ -87,7 +87,6 @@ const Sidebar = () => {
         ))}
 
         {isAdmin && (
-        {isAdmin && (
           <div className="nav-section">
             <p className="nav-section-label">Admin</p>
             <nav className="nav">
@@ -106,13 +105,15 @@ const Sidebar = () => {
             </nav>
           </div>
         )}
-
-        )}
       </div>
 
       <div className="sidebar-footer">
         <div className="member-card">
-          <div className="member-avatar">{displayName.charAt(0).toUpperCase()}</div>
+          {profile?.avatarUrl ? (
+            <img className="member-avatar-image" src={profile.avatarUrl} alt={displayName} />
+          ) : (
+            <div className="member-avatar">{displayName.charAt(0).toUpperCase()}</div>
+          )}
           <p className="member-name">{displayName}</p>
           <p className="member-email">{profile?.email ?? 'Ingen e-post kopplad'}</p>
           <span className="member-plan-badge">{planLabel}</span>
