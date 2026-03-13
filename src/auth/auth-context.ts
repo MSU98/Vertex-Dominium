@@ -9,6 +9,7 @@ export type AuthContextValue = {
   role: UserRole | null
   membershipStatus: MembershipStatus | null
   membershipPlan: MembershipPlan
+  setProfileState: (profile: UserProfile | null) => void
 }
 
 export const AuthContext = createContext<AuthContextValue | undefined>(undefined)

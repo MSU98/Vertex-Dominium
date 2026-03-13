@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import useAuth from '../../hooks/useAuth'
 import { routes } from '../../routes/paths'
+import HeaderAccountMenu from './HeaderAccountMenu'
 
 type BrandPageShellProps = {
   title: string
@@ -18,7 +19,9 @@ const BrandPageShell = ({ title, subtitle, memberNav = false, children }: BrandP
   return (
     <div className="brand-page">
       <header className="landing-nav membership-nav">
-        <div className="landing-nav-left">MENY</div>
+        <div className="landing-nav-left">
+          <HeaderAccountMenu showMemberNav={showMemberNav} />
+        </div>
         <div className="landing-nav-logo">
           <img src="/vertex-logo.png" alt="Vertex Dominium" />
         </div>

@@ -61,6 +61,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       role: profile?.role ?? null,
       membershipStatus: profile?.membershipStatus ?? null,
       membershipPlan: profile?.membershipPlan ?? null,
+      setProfileState: setProfile,
     }),
     [currentUser, profile, loading],
   )

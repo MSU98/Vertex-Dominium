@@ -154,9 +154,12 @@ const DashboardPage = () => {
             </p>
           </div>
 
-          <div className="hero-meta">
-            <p className="eyebrow">Medlem</p>
-            <h1 className="dashboard-title">{displayName}</h1>
+        <div className="hero-meta">
+          <p className="eyebrow">Medlem</p>
+          {profile?.avatarUrl ? (
+            <img className="hero-avatar" src={profile.avatarUrl} alt={displayName} />
+          ) : null}
+          <h1 className="dashboard-title">{displayName}</h1>
             <span className={`tier-badge ${planClass}`}>{toLabel(profile?.membershipPlan)}</span>
             <p className="hero-email">{profile?.email ?? 'Ingen e-post kopplad'}</p>
           </div>

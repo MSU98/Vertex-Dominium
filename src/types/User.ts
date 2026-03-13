@@ -7,6 +7,7 @@ export type MembershipStatus = 'pending' | 'active' | 'rejected' | 'inactive'
 export interface UserProfile {
   uid: string
   email: string
+  avatarUrl?: string
   role: UserRole
   membershipPlan: MembershipPlan
   membershipStatus: MembershipStatus
