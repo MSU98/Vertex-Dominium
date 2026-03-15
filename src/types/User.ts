@@ -2,8 +2,7 @@ import { Timestamp } from 'firebase/firestore'
 
 export type UserRole = 'initium' | 'ascensio' | 'dominus' | 'admin'
 export type MembershipPlan = 'initium' | 'ascensio' | 'dominus' | null
-export type MembershipStatus = 'pending' | 'active' | 'rejected' | 'inactive'
-
+export type MembershipStatus = 'pending' | 'active' | 'rejected' | 'inactive' | 'approved'
 export interface UserProfile {
   uid: string
   email: string
@@ -33,4 +32,3 @@ export interface UserProfile {
   privacyPolicyAccepted?: boolean
   communicationConsent?: boolean
 }
-
