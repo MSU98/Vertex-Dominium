@@ -85,7 +85,7 @@ const DominusOnboardingPage = () => {
           <input value={fullName} onChange={(e) => setFullName(e.target.value)} required />
         </label>
         <label className="field">
-          <span>Foretagsnamn</span>
+          <span>Företagsnamn</span>
           <input value={companyName} onChange={(e) => setCompanyName(e.target.value)} required />
         </label>
         <label className="field">
@@ -106,7 +106,7 @@ const DominusOnboardingPage = () => {
           />
         </label>
         <label className="field">
-          <span>E-post (foretagsdoman)</span>
+          <span>E-post (företagsdomän)</span>
           <input
             type="email"
             value={businessEmail}
@@ -115,7 +115,7 @@ const DominusOnboardingPage = () => {
           />
         </label>
         <label className="field">
-          <span>Losenord</span>
+          <span>Lösenord</span>
           <input
             type="password"
             value={password}
@@ -133,16 +133,16 @@ const DominusOnboardingPage = () => {
           <textarea value={motivation} onChange={(e) => setMotivation(e.target.value)} required />
         </label>
         <article className="brand-panel-sub">
-          <h3>Steg 2 (vid godkand ansokan)</h3>
-          <p className="muted">Full onboarding samlar in foljande:</p>
+          <h3>Steg 2 (vid godkänd ansokan)</h3>
+          <p className="muted">Full onboarding samlar in följande:</p>
           <ul className="membership-benefits">
             <li>Faktureringsuppgifter</li>
-            <li>Foretagsstorlek (antal anstallda)</li>
-            <li>Omsattning</li>
-            <li>Geografisk rackvidd</li>
+            <li>Foretagsstorlek (antal anställda)</li>
+            <li>Omsättning</li>
+            <li>Geografisk räckvidd</li>
             <li>Bransch/inriktning</li>
             <li>LinkedIn</li>
-            <li>Intresse for affarsnatverk, matchmaking och styrelse/radgivande sammanhang</li>
+            <li>Intresse for affärsnätverk, matchmaking och styrelse/rådgivande sammanhang</li>
           </ul>
         </article>
         {error && <p className="error">{error}</p>}

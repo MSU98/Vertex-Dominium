@@ -85,7 +85,7 @@ const AdminDnApplicationsPage = () => {
           ? {
               role: resolveRoleFromPlan(plan),
               membershipPlan: plan,
-              membershipStatus: 'active',
+              membershipStatus: 'approved',
               onboardingComplete: true,
               updatedAt: serverTimestamp(),
             }
