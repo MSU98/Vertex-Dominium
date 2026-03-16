@@ -68,7 +68,6 @@ const toDisplayName = (fullName: string | undefined, email: string | undefined) 
     .replace(/\b\w/g, (char) => char.toUpperCase())
 }
 
-
 const DashboardPage = () => {
   const { profile } = useAuth()
   const { canAccess } = useModuleAccess()
@@ -155,9 +154,12 @@ const DashboardPage = () => {
             </p>
           </div>
 
-          <div className="hero-meta">
-            <p className="eyebrow">Medlem</p>
-            <h1 className="dashboard-title">{displayName}</h1>
+        <div className="hero-meta">
+          <p className="eyebrow">Medlem</p>
+          {profile?.avatarUrl ? (
+            <img className="hero-avatar" src={profile.avatarUrl} alt={displayName} />
+          ) : null}
+          <h1 className="dashboard-title">{displayName}</h1>
             <span className={`tier-badge ${planClass}`}>{toLabel(profile?.membershipPlan)}</span>
             <p className="hero-email">{profile?.email ?? 'Ingen e-post kopplad'}</p>
           </div>
@@ -224,7 +226,20 @@ const DashboardPage = () => {
             </div>
           </div>
         </div>
-
+        {profile?.membershipPlan === 'dominus' && profile?.membershipStatus === 'active' && (
+          <div className="card spotlight-card" style={{ marginTop: '16px' }}>
+            <p className="eyebrow">Betalning</p>
+            <h3>Slutför din Dominus-betalning</h3>
+            <p className="muted">
+              Din ansökan är godkänd! Slutför betalningen för att aktivera ditt medlemskap.
+            </p>
+            <div className="actions">
+              <Link className="btn primary" to={`${routes.payment}?planId=dominus`}>
+                Gå till betalning
+              </Link>
+            </div>
+          </div>
+        )}
         <div className="card membership-card">
           <div className="section-heading">
             <div>
@@ -293,7 +308,6 @@ const DashboardPage = () => {
         </div>
       </section>
     </BrandPageShell>
-
   )
 }
 

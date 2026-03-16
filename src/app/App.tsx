@@ -8,11 +8,14 @@ import AboutPage from '../features/public/AboutPage'
 import ContactPage from '../features/public/ContactPage'
 import LoginPage from '../features/auth/LoginPage'
 import RegisterPage from '../features/auth/RegisterPage'
+import VerifyPage from '../features/auth/VerifyPage'
+import SubscribePage from '../features/auth/SubscribePage'
 import DashboardPage from '../features/dashboard/DashboardPage'
 import CoursesPage from '../features/courses/CoursesPage'
 import FeedPage from '../features/feed/FeedPage'
 import ForumPage from '../features/forum/ForumPage'
 import MembershipPage from '../features/membership/MembershipPage'
+import PaymentPage from '../features/payment/PaymentPage'
 import InitiumOnboardingPage from '../features/onboarding/InitiumOnboardingPage'
 import AscensioOnboardingPage from '../features/onboarding/AscensioOnboardingPage'
 import DominusOnboardingPage from '../features/onboarding/DominusOnboardingPage'
@@ -31,9 +34,12 @@ const App = () => (
         <Route path={routes.contact} element={<ContactPage />} />
         <Route path={routes.login} element={<LoginPage />} />
         <Route path={routes.register} element={<RegisterPage />} />
+        <Route path={routes.membership} element={<MembershipPage />} />
 
         <Route element={<RequireAuth />}>
-          <Route path={routes.membership} element={<MembershipPage />} />
+          <Route path={routes.payment} element={<PaymentPage />} />
+          <Route path={routes.verify} element={<VerifyPage />} />
+          <Route path={routes.subscribe} element={<SubscribePage />} />
 
           <Route element={<DashboardLayout />}>
             <Route path={routes.dashboard} element={<DashboardPage />} />
@@ -45,10 +51,7 @@ const App = () => (
             <Route path={routes.feed} element={<FeedPage />} />
             <Route path={routes.forum} element={<ForumPage />} />
             <Route path={routes.profile} element={<ProfilePage />} />
-            <Route
-              path={routes.adminReviews}
-              element={<RequireRole allowedRoles={['admin']} />}
-            >
+            <Route path={routes.adminReviews} element={<RequireRole allowedRoles={['admin']} />}>
               <Route index element={<AdminDnApplicationsPage />} />
             </Route>
             <Route
