@@ -22,5 +22,6 @@ export const routes = {
   payment: '/payment',
   verify: '/verify',
   subscribe: '/subscribe',
+  splash: '/splash',
 }
 

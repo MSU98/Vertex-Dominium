@@ -2,7 +2,6 @@ import { Link, useNavigate } from 'react-router-dom'
 import useAuth from '../../hooks/useAuth'
 import { routes } from '../../routes/paths'
 import type { MembershipPlan } from '../../types/User'
-import HeaderAccountMenu from '../../components/ui/HeaderAccountMenu'
 
 type SelectableMembershipPlan = Exclude<MembershipPlan, null>
 
@@ -63,9 +62,9 @@ const MembershipPage = () => {
     return (
       <div className="membership-hero page-centered">
         <div className="card" style={{ width: 'min(480px, 92vw)' }}>
-          <p className="eyebrow">Membership</p>
-          <h2>Loading...</h2>
-          <p className="muted">Log in and confirm Firebase configuration.</p>
+          <p className="eyebrow">Medlemskap</p>
+          <h2>Laddar...</h2>
+          <p className="muted">Logga in och kontrollera att Firebase är konfigurerat.</p>
         </div>
       </div>
     )
@@ -87,9 +86,7 @@ const MembershipPage = () => {
   return (
     <div className="membership-hero">
       <header className="landing-nav membership-nav">
-        <div className="landing-nav-left">
-          <HeaderAccountMenu showMemberNav />
-        </div>
+        <div className="landing-nav-left">MENY</div>
         <div className="landing-nav-logo">
           <img src="/vertex-logo.png" alt="Vertex Dominium" />
         </div>
@@ -107,7 +104,7 @@ const MembershipPage = () => {
 
       <section className="membership-intro">
         <h1>VERTEX DOMINIUM</h1>
-        <h2>VARA MEDLEMSNIVAER</h2>
+        <h2>VÅRA MEDLEMSNIVÅER</h2>
       </section>
 
       <section className="membership-grid">
