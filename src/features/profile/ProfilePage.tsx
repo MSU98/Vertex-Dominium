@@ -1,10 +1,20 @@
 import { useEffect, useState } from 'react'
-import { doc, serverTimestamp, updateDoc } from 'firebase/firestore'
+import {
+  collection,
+  doc,
+  query,
+  where,
+  getDocs,
+  limit,
+  updateDoc,
+  serverTimestamp,
+} from 'firebase/firestore'
 import BrandPageShell from '../../components/ui/BrandPageShell'
 import useAuth from '../../hooks/useAuth'
 import { useModuleAccess } from '../../hooks/useModuleAccess'
 import { db } from '../../lib/firebase'
 import type { UserProfile } from '../../types/User'
+import type { Subscription } from '../../types/Subscription'
 
 type ProfileFormState = {
   fullName: string
@@ -28,6 +38,8 @@ const ProfilePage = () => {
   const [avatarPreviewUrl, setAvatarPreviewUrl] = useState('')
   const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(null)
   const [removeAvatar, setRemoveAvatar] = useState(false)
+  const [subscription, setSubscription] = useState<Subscription | null>(null)
+  const [loadingSub, setLoadingSub] = useState(true)
   const [form, setForm] = useState<ProfileFormState>({
     fullName: '',
     phone: '',
@@ -95,6 +107,32 @@ const ProfilePage = () => {
       }
     }
   }, [avatarPreviewUrl])
+
+  useEffect(() => {
+    if (!profile?.uid || !db) {
+      setLoadingSub(false)
+      return
+    }
+    const fetchSubscription = async () => {
+      try {
+        const q = query(
+          collection(db!, 'subscriptions'),
+          where('userId', '==', profile.uid),
+          where('status', '==', 'active'),
+          limit(1),
+        )
+        const snap = await getDocs(q)
+        if (!snap.empty) {
+          setSubscription({ id: snap.docs[0].id, ...snap.docs[0].data() } as Subscription)
+        }
+      } catch (err) {
+        console.error('Failed to fetch subscription', err)
+      } finally {
+        setLoadingSub(false)
+      }
+    }
+    fetchSubscription()
+  }, [profile?.uid])
 
   const handleChange =
     (field: keyof ProfileFormState) =>
@@ -278,7 +316,9 @@ const ProfilePage = () => {
             </label>
           </>
         ) : (
-          <p className="muted">Titel, LinkedIn och beskrivning låses upp med Ascensio eller högre.</p>
+          <p className="muted">
+            Titel, LinkedIn och beskrivning låses upp med Ascensio eller högre.
+          </p>
         )}
 
         <div className="actions">
@@ -290,6 +330,50 @@ const ProfilePage = () => {
         {message && <p className="muted">{message}</p>}
         {error && <p className="error">{error}</p>}
       </form>
+      <article className="brand-panel" style={{ marginTop: '16px' }}>
+        <h3>Medlemskap</h3>
+        {loadingSub ? (
+          <p className="muted">Laddar...</p>
+        ) : subscription ? (
+          <>
+            <p>
+              Status: <strong style={{ color: '#c9a84c' }}>Aktiv</strong>
+            </p>
+            <p>
+              Plan: <strong>{subscription.planId}</strong>
+            </p>
+            <p>Startdatum: {subscription.startDate.toDate().toLocaleDateString('sv-SE')}</p>
+            <p>
+              Nästa betalning: {subscription.nextBillingDate.toDate().toLocaleDateString('sv-SE')}
+            </p>
+            <button
+              className="btn ghost"
+              style={{ marginTop: '12px' }}
+              onClick={async () => {
+                if (!subscription || !db) return
+                try {
+                  await updateDoc(doc(db, 'subscriptions', subscription.id), {
+                    status: 'cancelled',
+                  })
+                  await updateDoc(doc(db!, 'users', profile!.uid), {
+                    membershipStatus: 'inactive',
+                    role: 'initium',
+                    updatedAt: serverTimestamp(),
+                  })
+                  setSubscription(null)
+                  window.location.reload()
+                } catch (err) {
+                  console.error(err)
+                }
+              }}
+            >
+              Avbryt medlemskap
+            </button>
+          </>
+        ) : (
+          <p className="muted">Du har inget aktivt medlemskap.</p>
+        )}
+      </article>
     </BrandPageShell>
   )
 }

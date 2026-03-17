@@ -104,7 +104,7 @@ const AscensioOnboardingPage = () => {
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </label>
         <label className="field">
-          <span>Losenord</span>
+          <span>Lösenord</span>
           <input
             type="password"
             value={password}
@@ -147,7 +147,7 @@ const AscensioOnboardingPage = () => {
           <input value={industry} onChange={(e) => setIndustry(e.target.value)} required />
         </label>
         <label className="field">
-          <span>Foretagsnamn</span>
+          <span>Företagsnamn</span>
           <input value={company} onChange={(e) => setCompany(e.target.value)} required />
         </label>
         <label className="field">

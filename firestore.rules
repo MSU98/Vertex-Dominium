@@ -25,8 +25,15 @@ service cloud.firestore {
 
     match /dnApplications/{applicationId} {
       allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
-      allow get, list: if isSignedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow get: if isSignedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow list: if isAdmin();
       allow update, delete: if isAdmin();
+    }
+    match /subscriptions/{subscriptionId} {
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow get, list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow update: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isAdmin();
     }
   }
 }

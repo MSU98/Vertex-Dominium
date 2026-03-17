@@ -1,3 +1,4 @@
+import SplashScreen from '../features/auth/SplashScreen'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import RequireAuth from '../auth/RequireAuth'
 import RequireRole from '../auth/RequireRole'
@@ -37,10 +38,10 @@ const App = () => (
         <Route path={routes.membership} element={<MembershipPage />} />
 
         <Route element={<RequireAuth />}>
+          <Route path={routes.splash} element={<SplashScreen />} /> {/* ← här */}
           <Route path={routes.payment} element={<PaymentPage />} />
           <Route path={routes.verify} element={<VerifyPage />} />
           <Route path={routes.subscribe} element={<SubscribePage />} />
-
           <Route element={<DashboardLayout />}>
             <Route path={routes.dashboard} element={<DashboardPage />} />
             <Route path={routes.onboardingInitium} element={<InitiumOnboardingPage />} />

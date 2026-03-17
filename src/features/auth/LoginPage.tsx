@@ -39,7 +39,8 @@ const LoginPage = () => {
         <article className="brand-panel">
           <h3>Connect Firebase</h3>
           <p className="muted">
-            Add the following keys to your <code>.env</code> file and restart <code>npm run dev</code>.
+            Add the following keys to your <code>.env</code> file and restart{' '}
+            <code>npm run dev</code>.
           </p>
           <ul className="muted" style={{ paddingLeft: '20px', margin: '8px 0' }}>
             {missingFirebaseKeys.map((key) => (
@@ -57,7 +58,7 @@ const LoginPage = () => {
     setError(null)
     try {
       await signInWithEmailAndPassword(authClient, email, password)
-      navigate(routes.home, { replace: true })
+      navigate(routes.splash, { replace: true })
     } catch (err) {
       setError(getLoginErrorMessage(err))
       console.error(err)

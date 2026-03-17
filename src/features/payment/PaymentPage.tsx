@@ -9,6 +9,8 @@ import {
   where,
   getDocs,
   limit,
+  updateDoc,
+  doc,
 } from 'firebase/firestore'
 import { db } from '../../lib/firebase'
 import useAuth from '../../hooks/useAuth'
@@ -112,6 +114,11 @@ const PaymentPage = () => {
         createdAt: serverTimestamp(),
       })
 
+      await updateDoc(doc(dbClient, 'users', profile.uid), {
+        membershipStatus: 'active',
+        updatedAt: serverTimestamp(),
+      })
+
       navigate(routes.profile, { replace: true })
     } catch (err) {
       console.error(err)
@@ -148,8 +155,6 @@ const PaymentPage = () => {
           <p style={{ marginTop: '12px' }}>
             Pris:{' '}
             <strong style={{ color: '#c9a84c' }}>
-
-
               {billing === 'month' ? plan.priceMonth : plan.priceYear}
             </strong>
           </p>

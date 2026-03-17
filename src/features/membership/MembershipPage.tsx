@@ -1,8 +1,5 @@
-import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { doc, serverTimestamp, updateDoc } from 'firebase/firestore'
 import useAuth from '../../hooks/useAuth'
-import { db } from '../../lib/firebase'
 import { routes } from '../../routes/paths'
 import type { MembershipPlan } from '../../types/User'
 
@@ -59,13 +56,9 @@ const plans: MembershipTier[] = [
 const MembershipPage = () => {
   const { profile } = useAuth()
   const navigate = useNavigate()
-  const [submitting, setSubmitting] = useState<SelectableMembershipPlan | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [toast, setToast] = useState<string | null>(null)
-  const dbClient = db
   const isAdmin = profile?.role === 'admin'
 
-  if (!dbClient || !profile) {
+  if (!profile) {
     return (
       <div className="membership-hero page-centered">
         <div className="card" style={{ width: 'min(480px, 92vw)' }}>
@@ -77,36 +70,17 @@ const MembershipPage = () => {
     )
   }
 
-  const handleSelect = async (plan: SelectableMembershipPlan) => {
-    if (!profile.uid) return
+  const handleSelect = (plan: SelectableMembershipPlan) => {
+    const target =
+      plan === 'dominus'
+        ? routes.onboardingDominus
+        : profile?.onboardingComplete
+          ? `${routes.payment}?planId=${plan}`
+          : plan === 'initium'
+            ? routes.onboardingInitium
+            : routes.onboardingAscensio
 
-    setSubmitting(plan)
-    setError(null)
-    setToast(null)
-
-    try {
-      await updateDoc(doc(dbClient, 'users', profile.uid), {
-        membershipPlan: plan,
-        membershipStatus: 'pending',
-        onboardingComplete: false,
-        updatedAt: serverTimestamp(),
-      })
-
-      const target =
-        plan === 'initium'
-          ? routes.onboardingInitium
-          : plan === 'ascensio'
-          ? routes.onboardingAscensio
-          : routes.onboardingDominus
-
-      navigate(target)
-    } catch (err) {
-      console.error(err)
-      setError('Det gick inte att spara valet av medlemskap. Försök igen.')
-      setToast('Det gick inte att spara medlemsvalet.')
-    } finally {
-      setSubmitting(null)
-    }
+    navigate(target)
   }
 
   return (
@@ -147,16 +121,22 @@ const MembershipPage = () => {
             <button
               className="membership-select"
               onClick={() => handleSelect(plan.id)}
-              disabled={Boolean(submitting)}
+              disabled={
+                profile?.membershipPlan === plan.id && profile?.membershipStatus === 'active'
+              }
+              style={
+                profile?.membershipPlan === plan.id && profile?.membershipStatus === 'active'
+                  ? { opacity: 0.5, cursor: 'default' }
+                  : {}
+              }
             >
-              {submitting === plan.id ? 'SPARAR...' : 'VÄLJ NIVÅ'}
+              {profile?.membershipPlan === plan.id && profile?.membershipStatus === 'active'
+                ? 'DIN PLAN'
+                : 'VÄLJ NIVÅ'}{' '}
             </button>
           </article>
         ))}
       </section>
-
-      {error && <p className="membership-error">{error}</p>}
-      {toast && <div className="toast toast-error">{toast}</div>}
     </div>
   )
 }

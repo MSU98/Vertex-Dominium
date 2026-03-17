@@ -51,30 +51,30 @@ const HomePage = () => {
       <section className="landing-content">
         <h2>STRATEGY. JUDGEMENT. LEGACY.</h2>
         <p>
-          Vertex Dominium ar ett exklusivt medlemsnatverk for entreprenorer, investerare och
-          beslutsfattare. Plattformen ar byggd for medlemmar som vill utveckla sitt kapital, sitt
-          inflytande och sitt omdome i ett rum med hog kvalitet.
+          Vertex Dominium är ett exklusivt medlemsnätverk för entreprenörer, investerare och
+          beslutsfattare. Plattformen är byggd för medlemmar som vill utveckla sitt kapital, sitt
+          inflytande och sitt omdöme i ett rum med hög kvalitet.
         </p>
         <p>
-          Medlemskapet ar uppdelat i Initium, Ascensio och Dominus med tydlig tillgang till
-          moduler, innehall och samarbetsytor. Portalen ar byggd for tillvaxt, relationer och
+          Medlemskapet är uppdelat i Initium, Ascensio och Dominus med tydlig tillgång till
+          moduler, innehåll och samarbetsytor. Portalen är byggd för tillväxt, relationer och
           strategisk riktning.
         </p>
       </section>
 
       <section className="landing-bottom-grid">
         <article>
-          <h3>VAR VISION</h3>
+          <h3>VÅR VISION</h3>
           <p>
-            Vi bygger ett modernt hus for beslutskraftiga medlemmar som vill kombinera strategi,
-            kompetens och tillgang till ratt sammanhang.
+            Vi bygger ett modernt hus för beslutskraftiga medlemmar som vill kombinera strategi,
+            kompetens och tillgång till rätt sammanhang.
           </p>
         </article>
         <article>
-          <h3>EXKLUSIVA INVESTERINGS-MOJLIGHETER</h3>
+          <h3>EXKLUSIVA INVESTERINGS-MÖJLIGHETER</h3>
           <p>
-            Dominus-nivan oppnar for kuraterade mojligheter och privata ytor. Fokus ligger pa
-            kvalitet, struktur och langsiktig vardeuppbyggnad.
+            Dominus-nivån öppnar för kuraterade möjligheter och privata ytor. Fokus ligger på
+            kvalitet, struktur och långsiktig värdeuppbyggnad.
           </p>
         </article>
       </section>
