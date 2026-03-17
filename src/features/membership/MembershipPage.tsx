@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import useAuth from '../../hooks/useAuth'
 import { routes } from '../../routes/paths'
 import type { MembershipPlan } from '../../types/User'
+import HeaderAccountMenu from '../../components/ui/HeaderAccountMenu'
 
 type SelectableMembershipPlan = Exclude<MembershipPlan, null>
 
@@ -86,7 +87,9 @@ const MembershipPage = () => {
   return (
     <div className="membership-hero">
       <header className="landing-nav membership-nav">
-        <div className="landing-nav-left">MENY</div>
+        <div className="landing-nav-left">
+          <HeaderAccountMenu showMemberNav />
+        </div>
         <div className="landing-nav-logo">
           <img src="/vertex-logo.png" alt="Vertex Dominium" />
         </div>
