@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { FirebaseError } from 'firebase/app'
 import {
   addDoc,
   collection,
@@ -174,7 +175,13 @@ const ForumPage = () => {
       setBody('')
     } catch (submitError) {
       console.error('Failed to create forum post', submitError)
-      setError('Det gick inte att publicera inlagget. Forsok igen.')
+      if (submitError instanceof FirebaseError && submitError.code === 'permission-denied') {
+        setError(
+          'Firebase blockerar nya inlagg. Deploya firestore.rules sa att forumPosts far create/list-behorighet.',
+        )
+      } else {
+        setError('Det gick inte att publicera inlagget. Forsok igen.')
+      }
     } finally {
       setSubmitting(false)
     }
