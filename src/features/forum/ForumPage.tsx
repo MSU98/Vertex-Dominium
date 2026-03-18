@@ -90,6 +90,7 @@ const ForumPage = () => {
   const [body, setBody] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const isAdmin = profile?.role === 'admin'
 
   const authorName = useMemo(() => {
     if (profile?.fullName?.trim()) return profile.fullName.trim()
@@ -132,7 +133,14 @@ const ForumPage = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    if (!db || !profile?.uid || submitting) return
+    if (submitting) return
+
+    if (!isAdmin) {
+      setError('Du har inte beh\u00F6righet till att publicera ett inl\u00E4gg.')
+      return
+    }
+
+    if (!db || !profile?.uid) return
 
     const nextTitle = title.trim()
     const nextBody = body.trim()
