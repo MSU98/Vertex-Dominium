@@ -2,17 +2,19 @@ import { useEffect, useState } from 'react'
 import {
   collection,
   doc,
-  query,
-  where,
   getDocs,
   limit,
+  query,
   updateDoc,
   serverTimestamp,
+  where,
 } from 'firebase/firestore'
+import ForumPostCard from '../../components/forum/ForumPostCard'
 import BrandPageShell from '../../components/ui/BrandPageShell'
 import useAuth from '../../hooks/useAuth'
 import { useModuleAccess } from '../../hooks/useModuleAccess'
 import { db } from '../../lib/firebase'
+import type { ForumPost } from '../../types/ForumPost'
 import type { UserProfile } from '../../types/User'
 import type { Subscription } from '../../types/Subscription'
 
@@ -40,6 +42,8 @@ const ProfilePage = () => {
   const [removeAvatar, setRemoveAvatar] = useState(false)
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [loadingSub, setLoadingSub] = useState(true)
+  const [profilePosts, setProfilePosts] = useState<ForumPost[]>([])
+  const [loadingPosts, setLoadingPosts] = useState(true)
   const [form, setForm] = useState<ProfileFormState>({
     fullName: '',
     phone: '',
@@ -132,6 +136,44 @@ const ProfilePage = () => {
       }
     }
     fetchSubscription()
+  }, [profile?.uid])
+
+  useEffect(() => {
+    if (!profile?.uid || !db) {
+      setLoadingPosts(false)
+      return
+    }
+
+    const fetchProfilePosts = async () => {
+      setLoadingPosts(true)
+      try {
+        const postsSnapshot = await getDocs(
+          query(collection(db, 'forumPosts'), where('authorUid', '==', profile.uid)),
+        )
+
+        const nextPosts = postsSnapshot.docs
+          .map((entry) => {
+            const data = entry.data() as Omit<ForumPost, 'id'>
+            return {
+              id: entry.id,
+              ...data,
+            }
+          })
+          .sort((left, right) => {
+            const leftTime = left.createdAt?.toMillis() ?? 0
+            const rightTime = right.createdAt?.toMillis() ?? 0
+            return rightTime - leftTime
+          })
+
+        setProfilePosts(nextPosts)
+      } catch (postsError) {
+        console.error('Failed to fetch profile posts', postsError)
+      } finally {
+        setLoadingPosts(false)
+      }
+    }
+
+    fetchProfilePosts()
   }, [profile?.uid])
 
   const handleChange =
@@ -372,6 +414,20 @@ const ProfilePage = () => {
           </>
         ) : (
           <p className="muted">Du har inget aktivt medlemskap.</p>
+        )}
+      </article>
+      <article className="brand-panel profile-feed-panel" style={{ marginTop: '16px' }}>
+        <h3>Ditt forumflode</h3>
+        {loadingPosts ? (
+          <p className="muted">Laddar dina inlagg...</p>
+        ) : profilePosts.length > 0 ? (
+          <div className="forum-feed-list profile-feed-list">
+            {profilePosts.map((post) => (
+              <ForumPostCard key={post.id} post={post} />
+            ))}
+          </div>
+        ) : (
+          <p className="muted">Nar du publicerar i forumet visas dina inlagg har.</p>
         )}
       </article>
     </BrandPageShell>
