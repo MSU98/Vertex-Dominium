@@ -1239,6 +1239,46 @@ a {
   text-align: right;
 }
 
+.hero-professional {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  align-content: start;
+  text-align: center;
+  min-width: 240px;
+}
+
+.hero-professional h3 {
+  margin: 0;
+  font-size: 1.08rem;
+  color: #f7f1e5;
+}
+
+.hero-professional p {
+  margin: 0;
+  color: #d0c5b3;
+  line-height: 1.35;
+}
+
+.hero-company-logo {
+  width: 100%;
+  max-width: 180px;
+  min-height: 64px;
+  max-height: 88px;
+  object-fit: contain;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.2);
+  padding: 8px;
+}
+
+.hero-company-logo-fallback {
+  display: grid;
+  place-items: center;
+  color: #a89d8c;
+  font-size: 0.9rem;
+}
+
 .hero-avatar {
   width: 64px;
   height: 64px;
@@ -1648,6 +1688,12 @@ h2 {
 
   .hero-meta {
     justify-items: start;
+    text-align: left;
+  }
+
+  .hero-professional {
+    justify-items: start;
+    text-align: left;
   }
 
   .dashboard-summary-grid,
