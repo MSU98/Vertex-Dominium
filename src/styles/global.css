@@ -771,17 +771,23 @@ a {
   display: grid;
   gap: 12px;
   justify-items: start;
+  align-content: start;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .profile-avatar-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 10px;
+  align-items: flex-start;
 }
 
 .profile-avatar-preview {
-  width: 80px;
-  height: 80px;
+  width: 108px;
+  height: 108px;
   border-radius: 999px;
   object-fit: cover;
   border: 1px solid rgba(255, 255, 255, 0.14);
@@ -797,8 +803,45 @@ a {
 }
 
 .profile-avatar-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 210px;
   position: relative;
   overflow: hidden;
+}
+
+.profile-professional-card {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.profile-company-logo-editor {
+  display: grid;
+  gap: 12px;
+}
+
+.profile-company-logo-preview {
+  width: 100%;
+  max-width: 260px;
+  min-height: 90px;
+  max-height: 130px;
+  border-radius: 12px;
+  object-fit: contain;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.22);
+  padding: 10px;
+}
+
+.profile-company-logo-fallback {
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 0.9rem;
 }
 
 .brand-form {
@@ -808,6 +851,50 @@ a {
   background: rgba(2, 2, 2, 0.86);
   border: 1px solid rgba(255, 255, 255, 0.16);
   padding: 26px;
+}
+
+.profile-form {
+  width: min(980px, 100%);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 18px;
+}
+
+.profile-form > .eyebrow,
+.profile-form > h3,
+.profile-form > label.field,
+.profile-form > .actions,
+.profile-form > .muted,
+.profile-form > .error {
+  grid-column: 1 / -1;
+}
+
+.profile-form > .profile-avatar-editor {
+  order: 1;
+  grid-column: 1;
+}
+
+.profile-form > .profile-professional-card {
+  order: 2;
+  grid-column: 2;
+  align-self: start;
+}
+
+.profile-form > label.field {
+  order: 3;
+}
+
+.profile-form > .actions {
+  order: 4;
+  justify-content: flex-start;
+}
+
+.profile-form > .actions .btn {
+  min-width: 180px;
+}
+
+.profile-form > .muted,
+.profile-form > .error {
+  order: 5;
 }
 
 .field textarea {
@@ -1572,6 +1659,15 @@ h2 {
   .forum-composer-actions,
   .forum-post-actions {
     flex-wrap: wrap;
+  }
+
+  .profile-form {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-form > .profile-avatar-editor,
+  .profile-form > .profile-professional-card {
+    grid-column: 1 / -1;
   }
 }
 .splash-screen {
