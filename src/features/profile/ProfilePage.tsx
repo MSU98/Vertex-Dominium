@@ -23,6 +23,7 @@ type ProfileFormState = {
   phone: string
   city: string
   company: string
+  professionalHeadline: string
   title: string
   linkedin: string
   professionalDescription: string
@@ -40,6 +41,10 @@ const ProfilePage = () => {
   const [avatarPreviewUrl, setAvatarPreviewUrl] = useState('')
   const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(null)
   const [removeAvatar, setRemoveAvatar] = useState(false)
+  const [companyLogoUrl, setCompanyLogoUrl] = useState('')
+  const [companyLogoPreviewUrl, setCompanyLogoPreviewUrl] = useState('')
+  const [selectedCompanyLogoFile, setSelectedCompanyLogoFile] = useState<File | null>(null)
+  const [removeCompanyLogo, setRemoveCompanyLogo] = useState(false)
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [loadingSub, setLoadingSub] = useState(true)
   const [profilePosts, setProfilePosts] = useState<ForumPost[]>([])
@@ -49,12 +54,13 @@ const ProfilePage = () => {
     phone: '',
     city: '',
     company: '',
+    professionalHeadline: '',
     title: '',
     linkedin: '',
     professionalDescription: '',
   })
 
-  const fileToAvatarDataUrl = (file: File) =>
+  const fileToDataUrl = (file: File, maxSize: number) =>
     new Promise<string>((resolve, reject) => {
       const reader = new FileReader()
 
@@ -64,7 +70,6 @@ const ProfilePage = () => {
 
         image.onerror = () => reject(new Error('Kunde inte tolka bildfilen.'))
         image.onload = () => {
-          const maxSize = 256
           const scale = Math.min(maxSize / image.width, maxSize / image.height, 1)
           const width = Math.max(1, Math.round(image.width * scale))
           const height = Math.max(1, Math.round(image.height * scale))
@@ -88,12 +93,16 @@ const ProfilePage = () => {
       reader.readAsDataURL(file)
     })
 
+  const fileToAvatarDataUrl = (file: File) => fileToDataUrl(file, 256)
+  const fileToCompanyLogoDataUrl = (file: File) => fileToDataUrl(file, 420)
+
   useEffect(() => {
     setForm({
       fullName: profile?.fullName ?? '',
       phone: profile?.phone ?? '',
       city: profile?.city ?? '',
       company: profile?.company ?? '',
+      professionalHeadline: profile?.professionalHeadline ?? '',
       title: profile?.title ?? '',
       linkedin: profile?.linkedin ?? '',
       professionalDescription: profile?.professionalDescription ?? '',
@@ -102,6 +111,10 @@ const ProfilePage = () => {
     setAvatarPreviewUrl(profile?.avatarUrl ?? '')
     setSelectedAvatarFile(null)
     setRemoveAvatar(false)
+    setCompanyLogoUrl(profile?.companyLogoUrl ?? '')
+    setCompanyLogoPreviewUrl(profile?.companyLogoUrl ?? '')
+    setSelectedCompanyLogoFile(null)
+    setRemoveCompanyLogo(false)
   }, [profile])
 
   useEffect(() => {
@@ -109,18 +122,21 @@ const ProfilePage = () => {
       if (avatarPreviewUrl.startsWith('blob:')) {
         URL.revokeObjectURL(avatarPreviewUrl)
       }
+      if (companyLogoPreviewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(companyLogoPreviewUrl)
+      }
     }
-  }, [avatarPreviewUrl])
+  }, [avatarPreviewUrl, companyLogoPreviewUrl])
 
   useEffect(() => {
-    if (!profile?.uid || !db) {
+    if (!profile?.uid || !dbClient) {
       setLoadingSub(false)
       return
     }
     const fetchSubscription = async () => {
       try {
         const q = query(
-          collection(db!, 'subscriptions'),
+          collection(dbClient, 'subscriptions'),
           where('userId', '==', profile.uid),
           where('status', '==', 'active'),
           limit(1),
@@ -136,10 +152,10 @@ const ProfilePage = () => {
       }
     }
     fetchSubscription()
-  }, [profile?.uid])
+  }, [dbClient, profile?.uid])
 
   useEffect(() => {
-    if (!profile?.uid || !db) {
+    if (!profile?.uid || !dbClient) {
       setLoadingPosts(false)
       return
     }
@@ -149,7 +165,7 @@ const ProfilePage = () => {
       try {
         if (!db) return
         const postsSnapshot = await getDocs(
-          query(collection(db, 'forumPosts'), where('authorUid', '==', profile.uid)),
+          query(collection(dbClient, 'forumPosts'), where('authorUid', '==', profile.uid)),
         )
 
         const nextPosts = postsSnapshot.docs
@@ -175,7 +191,7 @@ const ProfilePage = () => {
     }
 
     fetchProfilePosts()
-  }, [profile?.uid])
+  }, [dbClient, profile?.uid])
 
   const handleChange =
     (field: keyof ProfileFormState) =>
@@ -223,6 +239,46 @@ const ProfilePage = () => {
     setError(null)
   }
 
+  const handleCompanyLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      setError('Välj en bildfil för företagsloggan.')
+      event.target.value = ''
+      return
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      setError('Företagsloggan är för stor. Välj en bild under 8 MB.')
+      event.target.value = ''
+      return
+    }
+
+    if (companyLogoPreviewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(companyLogoPreviewUrl)
+    }
+
+    setSelectedCompanyLogoFile(file)
+    setCompanyLogoPreviewUrl(URL.createObjectURL(file))
+    setRemoveCompanyLogo(false)
+    setMessage('Företagslogga vald. Klicka på "Spara profil" för att spara den.')
+    setError(null)
+    event.target.value = ''
+  }
+
+  const handleRemoveCompanyLogo = () => {
+    if (companyLogoPreviewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(companyLogoPreviewUrl)
+    }
+
+    setSelectedCompanyLogoFile(null)
+    setCompanyLogoPreviewUrl('')
+    setCompanyLogoUrl('')
+    setRemoveCompanyLogo(true)
+    setMessage('Företagsloggan tas bort när du klickar på "Spara profil".')
+    setError(null)
+  }
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
@@ -234,21 +290,32 @@ const ProfilePage = () => {
 
     try {
       let nextAvatarUrl = avatarUrl.trim()
+      let nextCompanyLogoUrl = companyLogoUrl.trim()
 
       if (removeAvatar) {
         nextAvatarUrl = ''
+      }
+
+      if (removeCompanyLogo) {
+        nextCompanyLogoUrl = ''
       }
 
       if (selectedAvatarFile) {
         nextAvatarUrl = await fileToAvatarDataUrl(selectedAvatarFile)
       }
 
+      if (selectedCompanyLogoFile) {
+        nextCompanyLogoUrl = await fileToCompanyLogoDataUrl(selectedCompanyLogoFile)
+      }
+
       const updates = {
         avatarUrl: nextAvatarUrl,
+        companyLogoUrl: nextCompanyLogoUrl,
         fullName: form.fullName.trim(),
         phone: form.phone.trim(),
         city: form.city.trim(),
         company: form.company.trim(),
+        professionalHeadline: form.professionalHeadline.trim(),
         updatedAt: serverTimestamp(),
         ...(showExtendedProfile
           ? {
@@ -265,6 +332,10 @@ const ProfilePage = () => {
       setAvatarPreviewUrl(nextAvatarUrl)
       setSelectedAvatarFile(null)
       setRemoveAvatar(false)
+      setCompanyLogoUrl(nextCompanyLogoUrl)
+      setCompanyLogoPreviewUrl(nextCompanyLogoUrl)
+      setSelectedCompanyLogoFile(null)
+      setRemoveCompanyLogo(false)
       setProfileState({
         ...profile,
         ...updates,
@@ -282,10 +353,11 @@ const ProfilePage = () => {
 
   const avatarDisplay = avatarPreviewUrl || avatarUrl
   const avatarFallback = (profile?.fullName ?? profile?.email ?? 'M').charAt(0).toUpperCase()
+  const companyLogoDisplay = companyLogoPreviewUrl || companyLogoUrl
 
   return (
     <BrandPageShell title="PROFIL" subtitle="Hantera dina medlemsuppgifter." memberNav>
-      <form className="brand-form" onSubmit={handleSubmit}>
+      <form className="brand-form profile-form" onSubmit={handleSubmit}>
         <p className="eyebrow">Kontaktprofil</p>
         <h3>{profile?.fullName ?? 'Medlemsprofil'}</h3>
 
@@ -333,8 +405,51 @@ const ProfilePage = () => {
           <input type="text" value={form.city} onChange={handleChange('city')} />
         </label>
 
+        <article className="profile-professional-card">
+          <p className="eyebrow">Yrkesprofil</p>
+          <div className="profile-company-logo-editor">
+            {companyLogoDisplay ? (
+              <img
+                className="profile-company-logo-preview"
+                src={companyLogoDisplay}
+                alt="Företagslogga"
+              />
+            ) : (
+              <div className="profile-company-logo-preview profile-company-logo-fallback">
+                Ingen logga vald
+              </div>
+            )}
+
+            <div className="profile-avatar-actions">
+              <label className="btn ghost profile-avatar-button">
+                {companyLogoDisplay ? 'Byt företagslogga' : 'Lägg till företagslogga'}
+                <input type="file" accept="image/*" onChange={handleCompanyLogoUpload} hidden />
+              </label>
+              {companyLogoDisplay && (
+                <button
+                  type="button"
+                  className="btn ghost profile-avatar-button"
+                  onClick={handleRemoveCompanyLogo}
+                >
+                  Ta bort företagslogga
+                </button>
+              )}
+            </div>
+          </div>
+
+          <label className="field">
+            <span>Yrkesrubrik</span>
+            <input
+              type="text"
+              value={form.professionalHeadline}
+              onChange={handleChange('professionalHeadline')}
+              placeholder="T.ex. CEO, Affärsutvecklingschef eller Entreprenör"
+            />
+          </label>
+        </article>
+
         <label className="field">
-          <span>Företag</span>
+          <span>Företagsnamn</span>
           <input type="text" value={form.company} onChange={handleChange('company')} />
         </label>
 
@@ -393,12 +508,12 @@ const ProfilePage = () => {
               className="btn ghost"
               style={{ marginTop: '12px' }}
               onClick={async () => {
-                if (!subscription || !db) return
+                if (!subscription || !dbClient || !profile?.uid) return
                 try {
-                  await updateDoc(doc(db, 'subscriptions', subscription.id), {
+                  await updateDoc(doc(dbClient, 'subscriptions', subscription.id), {
                     status: 'cancelled',
                   })
-                  await updateDoc(doc(db!, 'users', profile!.uid), {
+                  await updateDoc(doc(dbClient, 'users', profile.uid), {
                     membershipStatus: 'inactive',
                     role: 'initium',
                     updatedAt: serverTimestamp(),

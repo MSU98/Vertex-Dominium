@@ -88,6 +88,8 @@ const DashboardPage = () => {
   const displayName = toDisplayName(profile?.fullName, profile?.email)
   const planKey = profile?.membershipPlan ?? 'none'
   const planClass = planToneMap[planKey] ?? 'tier-none'
+  const professionalHeadline = profile?.professionalHeadline?.trim() || profile?.title?.trim()
+  const companyName = profile?.company?.trim()
 
   const contactRows = [
     { label: 'E-post', value: profile?.email ?? 'Inte tillagd än' },
@@ -207,6 +209,17 @@ const DashboardPage = () => {
             <p className="dashboard-subtitle">
               Din medlemsportal för nätverk, utbildning och profilhantering.
             </p>
+          </div>
+
+          <div className="hero-professional">
+            <p className="eyebrow">Yrkesprofil</p>
+            {profile?.companyLogoUrl ? (
+              <img className="hero-company-logo" src={profile.companyLogoUrl} alt="Företagslogga" />
+            ) : (
+              <div className="hero-company-logo hero-company-logo-fallback">Ingen logga</div>
+            )}
+            <h3>{professionalHeadline || 'Lägg till yrkesrubrik i profil'}</h3>
+            <p>{companyName || 'Lägg till företagsnamn i profil'}</p>
           </div>
 
           <div className="hero-meta">

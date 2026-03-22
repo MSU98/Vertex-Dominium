@@ -7,6 +7,7 @@ export interface UserProfile {
   uid: string
   email: string
   avatarUrl?: string
+  companyLogoUrl?: string
   role: UserRole
   membershipPlan: MembershipPlan
   membershipStatus: MembershipStatus
@@ -18,6 +19,7 @@ export interface UserProfile {
   city?: string
   countryCity?: string
   title?: string
+  professionalHeadline?: string
   interests?: string[]
   professionalInterests?: string
   phone?: string

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { FirebaseError } from 'firebase/app'
 import {
   addDoc,
   collection,
@@ -84,11 +85,13 @@ const getInitials = (name: string) =>
 
 const ForumPage = () => {
   const { profile } = useAuth()
+  const dbClient = db
   const [posts, setPosts] = useState<ForumPost[]>(starterPosts)
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const isAdmin = profile?.role === 'admin'
 
   const authorName = useMemo(() => {
     if (profile?.fullName?.trim()) return profile.fullName.trim()
@@ -104,11 +107,13 @@ const ForumPage = () => {
   const authorInitials = useMemo(() => getInitials(authorName), [authorName])
 
   useEffect(() => {
-    if (!db) return
+    if (!dbClient) return
 
     const loadPosts = async () => {
       try {
-        const snapshot = await getDocs(query(collection(db, 'forumPosts'), orderBy('createdAt', 'desc')))
+        const snapshot = await getDocs(
+          query(collection(dbClient, 'forumPosts'), orderBy('createdAt', 'desc')),
+        )
         const remotePosts = snapshot.docs.map((entry) => {
           const data = entry.data() as Omit<ForumPost, 'id'>
           return {
@@ -126,12 +131,19 @@ const ForumPage = () => {
     }
 
     loadPosts()
-  }, [])
+  }, [dbClient])
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    if (!db || !profile?.uid || submitting) return
+    if (submitting) return
+
+    if (!isAdmin) {
+      setError('Du har inte beh\u00F6righet till att publicera ett inl\u00E4gg.')
+      return
+    }
+
+    if (!dbClient || !profile?.uid) return
 
     const nextTitle = title.trim()
     const nextBody = body.trim()
@@ -145,7 +157,7 @@ const ForumPage = () => {
     setError(null)
 
     try {
-      await addDoc(collection(db, 'forumPosts'), {
+      await addDoc(collection(dbClient, 'forumPosts'), {
         authorUid: profile.uid,
         authorName,
         authorRole,
@@ -160,7 +172,9 @@ const ForumPage = () => {
         createdAt: serverTimestamp(),
       })
 
-      const snapshot = await getDocs(query(collection(db, 'forumPosts'), orderBy('createdAt', 'desc')))
+      const snapshot = await getDocs(
+        query(collection(dbClient, 'forumPosts'), orderBy('createdAt', 'desc')),
+      )
       const remotePosts = snapshot.docs.map((entry) => {
         const data = entry.data() as Omit<ForumPost, 'id'>
         return {
@@ -174,7 +188,13 @@ const ForumPage = () => {
       setBody('')
     } catch (submitError) {
       console.error('Failed to create forum post', submitError)
-      setError('Det gick inte att publicera inlagget. Forsok igen.')
+      if (submitError instanceof FirebaseError && submitError.code === 'permission-denied') {
+        setError(
+          'Firebase blockerar nya inlagg. Kontrollera att firestore.rules ar deployad och att ditt konto har admin-roll.',
+        )
+      } else {
+        setError('Det gick inte att publicera inlagget. Forsok igen.')
+      }
     } finally {
       setSubmitting(false)
     }

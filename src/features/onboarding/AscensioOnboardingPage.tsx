@@ -104,7 +104,7 @@ const AscensioOnboardingPage = () => {
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </label>
         <label className="field">
-          <span>Lösenord</span>
+          <span>Losenord</span>
           <input
             type="password"
             value={password}
