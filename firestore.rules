@@ -23,6 +23,12 @@ service cloud.firestore {
       }
     }
 
+    match /publicProfiles/{uid} {
+      allow get, list: if isSignedIn();
+      allow create, update: if isSignedIn() && request.auth.uid == uid;
+      allow delete: if isAdmin();
+    }
+
     match /dnApplications/{applicationId} {
       allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
       allow get: if isSignedIn() && (resource.data.uid == request.auth.uid || isAdmin());

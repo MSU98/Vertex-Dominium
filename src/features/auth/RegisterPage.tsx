@@ -5,6 +5,7 @@ import { FirebaseError } from 'firebase/app'
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { auth, db, firebaseReady, missingFirebaseKeys } from '../../lib/firebase'
+import { upsertPublicProfile } from '../../lib/publicProfile'
 import { routes } from '../../routes/paths'
 import type { UserProfile } from '../../types/User'
 import BrandPageShell from '../../components/ui/BrandPageShell'
@@ -74,6 +75,7 @@ const RegisterPage = () => {
       }
 
       await setDoc(doc(dbClient, 'users', credentials.user.uid), baseProfile)
+      await upsertPublicProfile(dbClient, credentials.user.uid, baseProfile)
       navigate(routes.home, { replace: true })
     } catch (err) {
       setError(getRegisterErrorMessage(err))

@@ -17,11 +17,13 @@ export const routes = {
   feed: '/feed',
   forum: '/forum',
   profile: '/profile',
+  publicProfile: '/profile/:uid',
   adminReviews: '/admin/reviews',
   adminDnApplications: '/admin/dn-applications',
   payment: '/payment',
   verify: '/verify',
   subscribe: '/subscribe',
   splash: '/splash',
+  profileView: (uid: string) => `/profile/${uid}`,
 }
 
