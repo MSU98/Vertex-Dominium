@@ -19,8 +19,7 @@ const DominusOnboardingPage = () => {
   const [motivation, setMotivation] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [password, setPassword] = useState('')
-  const dbClient = db
+const dbClient = db
 
   if (!dbClient || !profile) {
     return (
@@ -64,7 +63,6 @@ const DominusOnboardingPage = () => {
         membershipPlan: 'dominus',
         membershipStatus: 'pending',
         onboardingComplete: true,
-        role: 'initium',
         updatedAt: serverTimestamp(),
       })
 
@@ -114,17 +112,7 @@ const DominusOnboardingPage = () => {
             required
           />
         </label>
-        <label className="field">
-          <span>Lösenord</span>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            minLength={8}
-            required
-          />
-        </label>
-        <label className="field">
+<label className="field">
           <span>Telefonnummer</span>
           <input value={phone} onChange={(e) => setPhone(e.target.value)} required />
         </label>

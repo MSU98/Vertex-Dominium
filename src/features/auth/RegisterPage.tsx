@@ -65,8 +65,8 @@ const RegisterPage = () => {
       const baseProfile: UserProfile = {
         uid: credentials.user.uid,
         email,
-        role: 'initium',
-        membershipStatus: 'pending',
+        role: null,
+        membershipStatus: 'inactive',
         membershipPlan: null,
         onboardingComplete: false,
         createdAt: serverTimestamp() as unknown as UserProfile['createdAt'],

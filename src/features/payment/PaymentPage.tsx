@@ -119,9 +119,12 @@ const PaymentPage = () => {
         updatedAt: serverTimestamp(),
       })
 
-      navigate(routes.profile, { replace: true })
+      // Refresh profile and navigate
+      setTimeout(() => {
+        window.location.href = routes.dashboard
+      }, 500)
     } catch (err) {
-      console.error(err)
+      console.error('Payment error:', err)
       setError('Betalningen misslyckades. Försök igen.')
     } finally {
       setSubmitting(false)

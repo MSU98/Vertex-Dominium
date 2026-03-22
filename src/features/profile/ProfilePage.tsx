@@ -147,6 +147,7 @@ const ProfilePage = () => {
     const fetchProfilePosts = async () => {
       setLoadingPosts(true)
       try {
+        if (!db) return
         const postsSnapshot = await getDocs(
           query(collection(db, 'forumPosts'), where('authorUid', '==', profile.uid)),
         )

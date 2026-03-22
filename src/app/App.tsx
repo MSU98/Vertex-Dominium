@@ -20,8 +20,11 @@ import PaymentPage from '../features/payment/PaymentPage'
 import InitiumOnboardingPage from '../features/onboarding/InitiumOnboardingPage'
 import AscensioOnboardingPage from '../features/onboarding/AscensioOnboardingPage'
 import DominusOnboardingPage from '../features/onboarding/DominusOnboardingPage'
+import DominusOnboarding2Page from '../features/onboarding/DominusOnboarding2Page'
 import ApplicationPendingPage from '../features/application/ApplicationPendingPage'
+import ApplicationPending2Page from '../features/application/ApplicationPending2Page'
 import AdminDnApplicationsPage from '../features/admin/AdminDnApplicationsPage'
+import AdminDnApplications2Page from '../features/admin/AdminDnApplications2Page'
 import ProfilePage from '../features/profile/ProfilePage'
 import { routes } from '../routes/paths'
 
@@ -47,7 +50,9 @@ const App = () => (
             <Route path={routes.onboardingInitium} element={<InitiumOnboardingPage />} />
             <Route path={routes.onboardingAscensio} element={<AscensioOnboardingPage />} />
             <Route path={routes.onboardingDominus} element={<DominusOnboardingPage />} />
+            <Route path={routes.onboardingDominus2} element={<DominusOnboarding2Page />} />
             <Route path={routes.applicationPending} element={<ApplicationPendingPage />} />
+            <Route path={routes.applicationPending2} element={<ApplicationPending2Page />} />
             <Route path={routes.courses} element={<CoursesPage />} />
             <Route path={routes.feed} element={<FeedPage />} />
             <Route path={routes.forum} element={<ForumPage />} />
@@ -60,6 +65,12 @@ const App = () => (
               element={<RequireRole allowedRoles={['admin']} />}
             >
               <Route index element={<AdminDnApplicationsPage />} />
+            </Route>
+            <Route
+              path={routes.adminDnApplications2}
+              element={<RequireRole allowedRoles={['admin']} />}
+            >
+              <Route index element={<AdminDnApplications2Page />} />
             </Route>
           </Route>
         </Route>
