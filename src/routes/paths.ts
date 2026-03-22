@@ -19,6 +19,7 @@ export const routes = {
   feed: '/feed',
   forum: '/forum',
   profile: '/profile',
+  publicProfile: '/profile/:uid',
   adminReviews: '/admin/reviews',
   adminDnApplications: '/admin/dn-applications',
   adminDnApplications2: '/admin/dn-applications-2',
@@ -26,5 +27,6 @@ export const routes = {
   verify: '/verify',
   subscribe: '/subscribe',
   splash: '/splash',
+  profileView: (uid: string) => `/profile/${uid}`,
 }
 

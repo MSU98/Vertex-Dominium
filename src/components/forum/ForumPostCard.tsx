@@ -1,7 +1,32 @@
+import { useEffect, useMemo, useState } from 'react'
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  query,
+  serverTimestamp,
+  setDoc,
+  where,
+  type Timestamp,
+} from 'firebase/firestore'
+import { Link } from 'react-router-dom'
+import useAuth from '../../hooks/useAuth'
+import { db } from '../../lib/firebase'
+import { routes } from '../../routes/paths'
 import type { ForumPost } from '../../types/ForumPost'
 
 type ForumPostCardProps = {
   post: ForumPost
+}
+
+type PostComment = {
+  id: string
+  uid: string
+  authorName: string
+  body: string
+  createdAt?: Timestamp | null
 }
 
 const getInitials = (name: string) =>
@@ -32,40 +57,205 @@ const formatRelativeDate = (value?: ForumPost['createdAt']) => {
   return `${diffDays} d`
 }
 
-const ForumPostCard = ({ post }: ForumPostCardProps) => (
-  <article className="forum-card forum-post-card">
-    <header className="forum-post-header">
-      {post.authorAvatarUrl ? (
-        <img className="forum-post-avatar-image" src={post.authorAvatarUrl} alt={post.authorName} />
-      ) : (
-        <div className="forum-avatar forum-post-avatar">{getInitials(post.authorName)}</div>
-      )}
-      <div className="forum-post-meta">
-        <strong>{post.authorName}</strong>
-        <span>{post.authorRole}</span>
-        <span>
-          {formatRelativeDate(post.createdAt)} / {post.audience}
-        </span>
+const ForumPostCard = ({ post }: ForumPostCardProps) => {
+  const { currentUser, profile } = useAuth()
+  const dbClient = db
+  const [likeCount, setLikeCount] = useState(post.likeCount ?? 0)
+  const [commentCount, setCommentCount] = useState(post.commentCount ?? 0)
+  const [likedByMe, setLikedByMe] = useState(false)
+  const [comments, setComments] = useState<PostComment[]>([])
+  const [commentsOpen, setCommentsOpen] = useState(false)
+  const [commentDraft, setCommentDraft] = useState('')
+  const [commentSubmitting, setCommentSubmitting] = useState(false)
+  const [commentError, setCommentError] = useState<string | null>(null)
+
+  const likeDocId = useMemo(() => {
+    if (!currentUser) return ''
+    return `${post.id}_${currentUser.uid}`
+  }, [currentUser, post.id])
+
+  const commentAuthorName = useMemo(() => {
+    if (profile?.fullName?.trim()) return profile.fullName.trim()
+    return profile?.email?.split('@')[0] ?? 'Medlem'
+  }, [profile?.email, profile?.fullName])
+
+  useEffect(() => {
+    if (!dbClient || !post.id) return undefined
+
+    const likesQuery = query(collection(dbClient, 'forumPostLikes'), where('postId', '==', post.id))
+    const unsubscribeLikes = onSnapshot(
+      likesQuery,
+      (snapshot) => {
+        const nextCount = snapshot.size > 0 ? snapshot.size : (post.likeCount ?? 0)
+        setLikeCount(nextCount)
+        if (currentUser) {
+          setLikedByMe(snapshot.docs.some((entry) => entry.data().uid === currentUser.uid))
+        } else {
+          setLikedByMe(false)
+        }
+      },
+      (error) => console.error('Failed to watch likes', error),
+    )
+
+    const commentsQuery = query(
+      collection(dbClient, 'forumPostComments'),
+      where('postId', '==', post.id),
+    )
+    const unsubscribeComments = onSnapshot(
+      commentsQuery,
+      (snapshot) => {
+        const nextComments = snapshot.docs
+          .map((entry) => {
+            const data = entry.data() as Omit<PostComment, 'id'>
+            return { id: entry.id, ...data }
+          })
+          .sort((left, right) => {
+            const leftTime = left.createdAt?.toMillis() ?? 0
+            const rightTime = right.createdAt?.toMillis() ?? 0
+            return rightTime - leftTime
+          })
+
+        setComments(nextComments)
+        const nextCount = nextComments.length > 0 ? nextComments.length : (post.commentCount ?? 0)
+        setCommentCount(nextCount)
+      },
+      (error) => console.error('Failed to watch comments', error),
+    )
+
+    return () => {
+      unsubscribeLikes()
+      unsubscribeComments()
+    }
+  }, [currentUser, dbClient, post.commentCount, post.id, post.likeCount])
+
+  const handleToggleLike = async () => {
+    if (!dbClient || !currentUser || !likeDocId) return
+
+    try {
+      if (likedByMe) {
+        await deleteDoc(doc(dbClient, 'forumPostLikes', likeDocId))
+      } else {
+        await setDoc(doc(dbClient, 'forumPostLikes', likeDocId), {
+          postId: post.id,
+          uid: currentUser.uid,
+          createdAt: serverTimestamp(),
+        })
+      }
+    } catch (error) {
+      console.error('Failed to toggle like', error)
+    }
+  }
+
+  const handleCommentSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!dbClient || !currentUser || commentSubmitting) return
+
+    const body = commentDraft.trim()
+    if (!body) return
+
+    setCommentSubmitting(true)
+    setCommentError(null)
+    try {
+      await addDoc(collection(dbClient, 'forumPostComments'), {
+        postId: post.id,
+        uid: currentUser.uid,
+        authorName: commentAuthorName,
+        body,
+        createdAt: serverTimestamp(),
+      })
+      setCommentDraft('')
+    } catch (error) {
+      console.error('Failed to add comment', error)
+      setCommentError('Det gick inte att publicera kommentaren. Forsok igen.')
+    } finally {
+      setCommentSubmitting(false)
+    }
+  }
+
+  const toggleComments = () => {
+    setCommentsOpen((open) => !open)
+  }
+
+  return (
+    <article className="forum-card forum-post-card">
+      <header className="forum-post-header">
+        {post.authorAvatarUrl ? (
+          <img className="forum-post-avatar-image" src={post.authorAvatarUrl} alt={post.authorName} />
+        ) : (
+          <div className="forum-avatar forum-post-avatar">{getInitials(post.authorName)}</div>
+        )}
+        <div className="forum-post-meta">
+          <strong>
+            <Link className="forum-author-link" to={routes.profileView(post.authorUid)}>
+              {post.authorName}
+            </Link>
+          </strong>
+          <span>{post.authorRole}</span>
+          <span>
+            {formatRelativeDate(post.createdAt)} / {post.audience}
+          </span>
+        </div>
+      </header>
+
+      <div className="forum-post-tag">{post.topic}</div>
+      <h3>{post.title}</h3>
+      <p>{post.body}</p>
+
+      <div className="forum-post-insights">
+        <span>{likeCount} reaktioner</span>
+        <button type="button" className="forum-comments-toggle-link" onClick={toggleComments}>
+          {commentCount} kommentarer
+        </button>
+        <span>{post.repostCount} delningar</span>
       </div>
-    </header>
 
-    <div className="forum-post-tag">{post.topic}</div>
-    <h3>{post.title}</h3>
-    <p>{post.body}</p>
+      <div className="forum-post-actions">
+        <button type="button" className={likedByMe ? 'active' : ''} onClick={handleToggleLike}>
+          {likedByMe ? 'Gillad' : 'Gilla'}
+        </button>
+        <button type="button" className={commentsOpen ? 'active' : ''} onClick={toggleComments}>
+          {commentsOpen ? 'Dolj kommentarer' : 'Visa kommentarer'}
+        </button>
+        <button type="button">Dela</button>
+        <button type="button">Skicka</button>
+      </div>
 
-    <div className="forum-post-insights">
-      <span>{post.likeCount} reaktioner</span>
-      <span>{post.commentCount} kommentarer</span>
-      <span>{post.repostCount} delningar</span>
-    </div>
+      {commentsOpen && (
+        <section className="forum-comments">
+          <form className="forum-comment-form" onSubmit={handleCommentSubmit}>
+            <input
+              type="text"
+              value={commentDraft}
+              onChange={(event) => setCommentDraft(event.target.value)}
+              placeholder="Skriv en kommentar..."
+              maxLength={500}
+            />
+            <button type="submit" disabled={commentSubmitting || !commentDraft.trim()}>
+              {commentSubmitting ? 'Skickar...' : 'Publicera'}
+            </button>
+          </form>
+          {commentError && <p className="error">{commentError}</p>}
 
-    <div className="forum-post-actions">
-      <button type="button">Gilla</button>
-      <button type="button">Kommentera</button>
-      <button type="button">Dela</button>
-      <button type="button">Skicka</button>
-    </div>
-  </article>
-)
+          {comments.length > 0 ? (
+            <div className="forum-comment-list">
+              {comments.map((comment) => (
+                <article key={comment.id} className="forum-comment-item">
+                  <strong>
+                    <Link className="forum-comment-author-link" to={routes.profileView(comment.uid)}>
+                      {comment.authorName}
+                    </Link>
+                  </strong>
+                  <p>{comment.body}</p>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p className="muted">Inga kommentarer an.</p>
+          )}
+        </section>
+      )}
+    </article>
+  )
+}
 
 export default ForumPostCard

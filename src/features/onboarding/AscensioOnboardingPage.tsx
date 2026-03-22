@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore'
 import useAuth from '../../hooks/useAuth'
 import { db } from '../../lib/firebase'
+import { upsertPublicProfile } from '../../lib/publicProfile'
 import { routes } from '../../routes/paths'
 import BrandPageShell from '../../components/ui/BrandPageShell'
 
@@ -63,7 +64,7 @@ const AscensioOnboardingPage = () => {
         createdAt: serverTimestamp(),
       })
 
-      await updateDoc(doc(dbClient, 'users', profile.uid), {
+      const updates = {
         fullName,
         email,
         countryCity,
@@ -82,7 +83,9 @@ const AscensioOnboardingPage = () => {
         onboardingComplete: true,
         role: 'initium',
         updatedAt: serverTimestamp(),
-      })
+      }
+      await updateDoc(doc(dbClient, 'users', profile.uid), updates)
+      await upsertPublicProfile(dbClient, profile.uid, { ...profile, ...updates })
       navigate(`${routes.payment}?planId=ascensio`)
     } catch (err) {
       console.error(err)

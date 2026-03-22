@@ -20,6 +20,12 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
+    match /publicProfiles/{uid} {
+      allow get, list: if isSignedIn();
+      allow create, update: if isSignedIn() && request.auth.uid == uid;
+      allow delete: if isAdmin();
+    }
+
     match /dnApplications/{applicationId} {
       allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
       allow get: if isSignedIn() && (resource.data.uid == request.auth.uid || isAdmin());
@@ -33,6 +39,8 @@ service cloud.firestore {
       allow list: if isAdmin();
       allow update, delete: if isAdmin();
     }
+
+
     match /subscriptions/{subscriptionId} {
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
       allow get, list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
@@ -43,6 +51,20 @@ service cloud.firestore {
     match /forumPosts/{postId} {
       allow get, list: if isSignedIn();
       allow create, update, delete: if isAdmin();
+    }
+
+    match /forumPostLikes/{likeId} {
+      allow get, list: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.uid == request.auth.uid;
+    }
+
+    match /forumPostComments/{commentId} {
+      allow get, list: if isSignedIn();
+      allow create: if isSignedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.body is string;
+      allow delete: if isSignedIn() && resource.data.uid == request.auth.uid;
     }
   }
 }

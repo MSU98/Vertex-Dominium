@@ -26,6 +26,7 @@ import ApplicationPending2Page from '../features/application/ApplicationPending2
 import AdminDnApplicationsPage from '../features/admin/AdminDnApplicationsPage'
 import AdminDnApplications2Page from '../features/admin/AdminDnApplications2Page'
 import ProfilePage from '../features/profile/ProfilePage'
+import PublicProfilePage from '../features/profile/PublicProfilePage'
 import { routes } from '../routes/paths'
 
 const App = () => (
@@ -57,6 +58,7 @@ const App = () => (
             <Route path={routes.feed} element={<FeedPage />} />
             <Route path={routes.forum} element={<ForumPage />} />
             <Route path={routes.profile} element={<ProfilePage />} />
+            <Route path={routes.publicProfile} element={<PublicProfilePage />} />
             <Route path={routes.adminReviews} element={<RequireRole allowedRoles={['admin']} />}>
               <Route index element={<AdminDnApplicationsPage />} />
             </Route>

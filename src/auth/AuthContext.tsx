@@ -7,6 +7,7 @@ import {
 import { onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth'
 import { doc, getDoc } from 'firebase/firestore'
 import { auth, db, firebaseReady } from '../lib/firebase'
+import { upsertPublicProfile } from '../lib/publicProfile'
 import type { UserProfile } from '../types/User'
 import { AuthContext } from './auth-context'
 
@@ -38,7 +39,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const userDoc = await getDoc(doc(dbClient, 'users', user.uid))
         if (userDoc.exists()) {
           const data = userDoc.data() as UserProfile
-          setProfile({ ...data, uid: user.uid })
+          const hydratedProfile = { ...data, uid: user.uid }
+          setProfile(hydratedProfile)
+          try {
+            await upsertPublicProfile(dbClient, user.uid, hydratedProfile)
+          } catch (publicProfileError) {
+            console.error('Failed to sync public profile', publicProfileError)
+          }
         } else {
           setProfile(null)
         }
