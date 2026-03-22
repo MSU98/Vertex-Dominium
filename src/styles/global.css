@@ -1963,3 +1963,27 @@ h2 {
     transform: translateY(0);
   }
 }
+
+.forum-comments-toggle-link {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.forum-comments-toggle-link:hover {
+  color: #0a66c2;
+  text-decoration: underline;
+}
+
+.forum-comment-author-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.forum-comment-author-link:hover {
+  color: #0a66c2;
+  text-decoration: underline;
+}

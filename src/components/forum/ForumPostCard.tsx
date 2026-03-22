@@ -172,6 +172,10 @@ const ForumPostCard = ({ post }: ForumPostCardProps) => {
     }
   }
 
+  const toggleComments = () => {
+    setCommentsOpen((open) => !open)
+  }
+
   return (
     <article className="forum-card forum-post-card">
       <header className="forum-post-header">
@@ -199,7 +203,9 @@ const ForumPostCard = ({ post }: ForumPostCardProps) => {
 
       <div className="forum-post-insights">
         <span>{likeCount} reaktioner</span>
-        <span>{commentCount} kommentarer</span>
+        <button type="button" className="forum-comments-toggle-link" onClick={toggleComments}>
+          {commentCount} kommentarer
+        </button>
         <span>{post.repostCount} delningar</span>
       </div>
 
@@ -207,8 +213,8 @@ const ForumPostCard = ({ post }: ForumPostCardProps) => {
         <button type="button" className={likedByMe ? 'active' : ''} onClick={handleToggleLike}>
           {likedByMe ? 'Gillad' : 'Gilla'}
         </button>
-        <button type="button" onClick={() => setCommentsOpen((open) => !open)}>
-          Kommentera
+        <button type="button" className={commentsOpen ? 'active' : ''} onClick={toggleComments}>
+          {commentsOpen ? 'Dolj kommentarer' : 'Visa kommentarer'}
         </button>
         <button type="button">Dela</button>
         <button type="button">Skicka</button>
@@ -234,7 +240,11 @@ const ForumPostCard = ({ post }: ForumPostCardProps) => {
             <div className="forum-comment-list">
               {comments.map((comment) => (
                 <article key={comment.id} className="forum-comment-item">
-                  <strong>{comment.authorName}</strong>
+                  <strong>
+                    <Link className="forum-comment-author-link" to={routes.profileView(comment.uid)}>
+                      {comment.authorName}
+                    </Link>
+                  </strong>
                   <p>{comment.body}</p>
                 </article>
               ))}
