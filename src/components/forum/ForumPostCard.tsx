@@ -1,4 +1,6 @@
 import type { ForumPost } from '../../types/ForumPost'
+import { Link } from 'react-router-dom'
+import { routes } from '../../routes/paths'
 
 type ForumPostCardProps = {
   post: ForumPost
@@ -41,7 +43,11 @@ const ForumPostCard = ({ post }: ForumPostCardProps) => (
         <div className="forum-avatar forum-post-avatar">{getInitials(post.authorName)}</div>
       )}
       <div className="forum-post-meta">
-        <strong>{post.authorName}</strong>
+        <strong>
+          <Link className="forum-author-link" to={routes.profileView(post.authorUid)}>
+            {post.authorName}
+          </Link>
+        </strong>
         <span>{post.authorRole}</span>
         <span>
           {formatRelativeDate(post.createdAt)} / {post.audience}

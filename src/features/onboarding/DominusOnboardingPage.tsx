@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore'
 import useAuth from '../../hooks/useAuth'
 import { db } from '../../lib/firebase'
+import { upsertPublicProfile } from '../../lib/publicProfile'
 import { routes } from '../../routes/paths'
 import BrandPageShell from '../../components/ui/BrandPageShell'
 
@@ -53,7 +54,7 @@ const DominusOnboardingPage = () => {
         createdAt: serverTimestamp(),
       })
 
-      await updateDoc(doc(dbClient, 'users', profile.uid), {
+      const updates = {
         fullName,
         company: companyName,
         orgNumber,
@@ -66,7 +67,9 @@ const DominusOnboardingPage = () => {
         onboardingComplete: true,
         role: 'initium',
         updatedAt: serverTimestamp(),
-      })
+      }
+      await updateDoc(doc(dbClient, 'users', profile.uid), updates)
+      await upsertPublicProfile(dbClient, profile.uid, { ...profile, ...updates })
 
       navigate(routes.applicationPending)
     } catch (err) {

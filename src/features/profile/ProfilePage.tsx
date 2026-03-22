@@ -14,6 +14,7 @@ import BrandPageShell from '../../components/ui/BrandPageShell'
 import useAuth from '../../hooks/useAuth'
 import { useModuleAccess } from '../../hooks/useModuleAccess'
 import { db } from '../../lib/firebase'
+import { upsertPublicProfile } from '../../lib/publicProfile'
 import type { ForumPost } from '../../types/ForumPost'
 import type { UserProfile } from '../../types/User'
 import type { Subscription } from '../../types/Subscription'
@@ -326,6 +327,7 @@ const ProfilePage = () => {
       }
 
       await updateDoc(doc(dbClient, 'users', profile.uid), updates)
+      await upsertPublicProfile(dbClient, profile.uid, { ...profile, ...updates })
 
       setAvatarUrl(nextAvatarUrl)
       setAvatarPreviewUrl(nextAvatarUrl)
