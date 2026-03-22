@@ -8,16 +8,19 @@ import type { ForumPost } from '../../types/ForumPost'
 const FeedPage = () => {
   const [posts, setPosts] = useState<ForumPost[]>([])
   const [loading, setLoading] = useState(true)
+  const dbClient = db
 
   useEffect(() => {
-    if (!db) {
+    if (!dbClient) {
       setLoading(false)
       return
     }
 
     const loadPosts = async () => {
       try {
-        const snapshot = await getDocs(query(collection(db, 'forumPosts'), orderBy('createdAt', 'desc')))
+        const snapshot = await getDocs(
+          query(collection(dbClient, 'forumPosts'), orderBy('createdAt', 'desc')),
+        )
         const nextPosts = snapshot.docs.map((entry) => {
           const data = entry.data() as Omit<ForumPost, 'id'>
           return {
@@ -35,7 +38,7 @@ const FeedPage = () => {
     }
 
     loadPosts()
-  }, [])
+  }, [dbClient])
 
   return (
     <BrandPageShell

@@ -115,7 +115,7 @@ const DominusOnboardingPage = () => {
           />
         </label>
         <label className="field">
-          <span>Lösenord</span>
+          <span>Losenord</span>
           <input
             type="password"
             value={password}
