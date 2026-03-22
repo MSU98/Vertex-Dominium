@@ -2,13 +2,13 @@ import BrandPageShell from '../../components/ui/BrandPageShell'
 
 const ApplicationPendingPage = () => (
   <BrandPageShell
-    title="APPLICATION PENDING"
-    subtitle="Dominus Negotium ansokan granskas just nu."
+    title="ANSÖKAN PÅGÅR"
+    subtitle="Din Dominus Negotium-ansökan granskas just nu."
     memberNav
   >
     <article className="brand-panel">
-      <h3>Your application is under review.</h3>
-      <p>We will notify you when a decision is made.</p>
+      <h3>Din ansökan granskas.</h3>
+      <p>Vi meddelar dig när ett beslut har fattats.</p>
     </article>
   </BrandPageShell>
 )

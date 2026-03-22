@@ -71,7 +71,7 @@ const LoginPage = () => {
     <BrandPageShell title="LOGGA IN">
       <form className="brand-form" onSubmit={handleSubmit}>
         <label className="field">
-          <span>Email</span>
+          <span>E-post</span>
           <input
             type="email"
             value={email}
@@ -81,7 +81,7 @@ const LoginPage = () => {
           />
         </label>
         <label className="field">
-          <span>Password</span>
+          <span>Lösenord</span>
           <input
             type="password"
             value={password}
@@ -92,10 +92,10 @@ const LoginPage = () => {
         </label>
         {error && <p className="error">{error}</p>}
         <button className="btn primary" type="submit" disabled={submitting}>
-          {submitting ? 'Signing in...' : 'Sign in'}
+          {submitting ? 'Loggar in...' : 'Logga in'}
         </button>
         <p className="muted">
-          No account? <Link to="/register">Create one</Link>
+          Inget konto? <Link to="/register">Skapa ett</Link>
         </p>
       </form>
     </BrandPageShell>

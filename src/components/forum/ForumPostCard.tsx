@@ -166,7 +166,7 @@ const ForumPostCard = ({ post }: ForumPostCardProps) => {
       setCommentDraft('')
     } catch (error) {
       console.error('Failed to add comment', error)
-      setCommentError('Det gick inte att publicera kommentaren. Forsok igen.')
+      setCommentError('Det gick inte att publicera kommentaren. Försök igen.')
     } finally {
       setCommentSubmitting(false)
     }
@@ -214,7 +214,7 @@ const ForumPostCard = ({ post }: ForumPostCardProps) => {
           {likedByMe ? 'Gillad' : 'Gilla'}
         </button>
         <button type="button" className={commentsOpen ? 'active' : ''} onClick={toggleComments}>
-          {commentsOpen ? 'Dolj kommentarer' : 'Visa kommentarer'}
+          {commentsOpen ? 'Dölj kommentarer' : 'Visa kommentarer'}
         </button>
         <button type="button">Dela</button>
         <button type="button">Skicka</button>
@@ -250,7 +250,7 @@ const ForumPostCard = ({ post }: ForumPostCardProps) => {
               ))}
             </div>
           ) : (
-            <p className="muted">Inga kommentarer an.</p>
+            <p className="muted">Inga kommentarer än.</p>
           )}
         </section>
       )}

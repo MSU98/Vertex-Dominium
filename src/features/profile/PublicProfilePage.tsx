@@ -172,14 +172,14 @@ const PublicProfilePage = () => {
                 ))}
               </div>
             ) : (
-              <p className="muted">Ingen offentlig profilinformation ar tillagd an.</p>
+              <p className="muted">Ingen offentlig profilinformation är tillagd än.</p>
             )}
           </article>
 
           <article className="brand-panel profile-feed-panel">
-            <h3>Foruminlagg</h3>
+            <h3>Foruminlägg</h3>
             {postsLoading ? (
-              <p className="muted">Laddar inlagg...</p>
+              <p className="muted">Laddar inlägg...</p>
             ) : posts.length > 0 ? (
               <div className="forum-feed-list profile-feed-list">
                 {posts.map((post) => (
@@ -187,7 +187,7 @@ const PublicProfilePage = () => {
                 ))}
               </div>
             ) : (
-              <p className="muted">Inga inlagg publicerade an.</p>
+              <p className="muted">Inga inlägg publicerade än.</p>
             )}
           </article>
         </>

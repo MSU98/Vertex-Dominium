@@ -2,13 +2,13 @@ import BrandPageShell from '../../components/ui/BrandPageShell'
 
 const ApplicationPending2Page = () => (
   <BrandPageShell
-    title="APPLICATION PENDING"
+    title="ANSÖKAN PÅGÅR"
     subtitle="Din fullständiga onboarding granskas just nu."
     memberNav
   >
     <article className="brand-panel">
-      <h3>Your application is under review.</h3>
-      <p>We will notify you when a decision is made and you can complete your payment.</p>
+      <h3>Din ansökan granskas.</h3>
+      <p>Vi meddelar dig när ett beslut har fattats och du kan slutföra din betalning.</p>
     </article>
   </BrandPageShell>
 )

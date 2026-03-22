@@ -14,7 +14,7 @@ import useAuth from '../../hooks/useAuth'
 import { db } from '../../lib/firebase'
 import type { ForumPost } from '../../types/ForumPost'
 
-const quickFilters = ['Alla inlagg', 'Ledarskap', 'Affarer', 'Events']
+const quickFilters = ['Alla inlägg', 'Ledarskap', 'Affärer', 'Events']
 
 const starterPosts: ForumPost[] = [
   {
@@ -23,9 +23,9 @@ const starterPosts: ForumPost[] = [
     authorName: 'Kristina Hall',
     authorRole: 'Strategic Advisor at Vertex Dominium',
     topic: 'Roundtable',
-    title: 'Hur bygger vi starkare introduktioner for nya medlemmar?',
+    title: 'Hur bygger vi starkare introduktioner för nya medlemmar?',
     body:
-      'Jag vill samla konkreta format for onboarding, mastermind-grupper och forsta kontaktpunkter som faktiskt far nya medlemmar att stanna kvar och bidra.',
+      'Jag vill samla konkreta format för onboarding, mastermind-grupper och första kontaktpunkter som faktiskt får nya medlemmar att stanna kvar och bidra.',
     audience: 'Publikt i forumet',
     likeCount: 34,
     commentCount: 12,
@@ -38,10 +38,10 @@ const starterPosts: ForumPost[] = [
     authorName: 'Markus Leone',
     authorRole: 'Growth Operator',
     topic: 'Case study',
-    title: 'Vi testade ett mindre invite-only event och fick 3x hogre engagemang',
+    title: 'Vi testade ett mindre invite-only event och fick 3x högre engagemang',
     body:
-      'Upplagget var enklare an tidigare: fa deltagare, tydligt tema och en moderator som forberedde fragor i forvag. Det skapade battre samtal och fler uppfoljningar veckan efter.',
-    audience: 'Ascensio-natverket',
+      'Upplägget var enklare än tidigare: få deltagare, tydligt tema och en moderator som förberedde frågor i förväg. Det skapade bättre samtal och fler uppföljningar veckan efter.',
+    audience: 'Ascensio-nätverket',
     likeCount: 51,
     commentCount: 18,
     repostCount: 9,
@@ -52,10 +52,10 @@ const starterPosts: ForumPost[] = [
     authorUid: 'vertex-starter-3',
     authorName: 'Elina Berg',
     authorRole: 'Community Lead',
-    topic: 'Soker input',
-    title: 'Vilka KPI:er bor vi visa i medlemsflodet varje vecka?',
+    topic: 'Söker input',
+    title: 'Vilka KPI:er bör vi visa i medlemsflödet varje vecka?',
     body:
-      'Jag funderar pa att lyfta aktiva tradar, svarstid, antal introduktioner och toppdiskussioner. Vad skulle faktiskt fa dig att komma tillbaka oftare?',
+      'Jag funderar på att lyfta aktiva trådar, svarstid, antal introduktioner och toppdiskussioner. Vad skulle faktiskt få dig att komma tillbaka oftare?',
     audience: 'Dominus-rummet',
     likeCount: 22,
     commentCount: 27,
@@ -71,8 +71,8 @@ const trendingTopics = [
 ]
 
 const events = [
-  { title: 'Stockholm Breakfast Circle', date: '22 mars', attendees: '18 anmalda' },
-  { title: 'Founder Roundtable', date: '29 mars', attendees: '12 anmalda' },
+  { title: 'Stockholm Breakfast Circle', date: '22 mars', attendees: '18 anmälda' },
+  { title: 'Founder Roundtable', date: '29 mars', attendees: '12 anmälda' },
 ]
 
 const getInitials = (name: string) =>
@@ -149,7 +149,7 @@ const ForumPage = () => {
     const nextBody = body.trim()
 
     if (!nextTitle || !nextBody) {
-      setError('Fyll i en rubrik och en text for inlagget.')
+      setError('Fyll i en rubrik och en text för inlägget.')
       return
     }
 
@@ -162,7 +162,7 @@ const ForumPage = () => {
         authorName,
         authorRole,
         authorAvatarUrl: profile.avatarUrl ?? '',
-        topic: 'Nytt inlagg',
+        topic: 'Nytt inlägg',
         title: nextTitle,
         body: nextBody,
         audience: 'Publikt i forumet',
@@ -190,10 +190,10 @@ const ForumPage = () => {
       console.error('Failed to create forum post', submitError)
       if (submitError instanceof FirebaseError && submitError.code === 'permission-denied') {
         setError(
-          'Firebase blockerar nya inlagg. Kontrollera att firestore.rules ar deployad och att ditt konto har admin-roll.',
+          'Firebase blockerar nya inlägg. Kontrollera att firestore.rules är deployad och att ditt konto har admin-roll.',
         )
       } else {
-        setError('Det gick inte att publicera inlagget. Forsok igen.')
+        setError('Det gick inte att publicera inlägget. Försök igen.')
       }
     } finally {
       setSubmitting(false)
@@ -203,7 +203,7 @@ const ForumPage = () => {
   return (
     <BrandPageShell
       title="FORUM"
-      subtitle="Diskussioner, ideer och samarbete mellan medlemmar i ett flode som liknar ett professionellt natverk."
+      subtitle="Diskussioner, idéer och samarbete mellan medlemmar i ett flöde som liknar ett professionellt nätverk."
       memberNav
     >
       <section className="forum-layout">
@@ -213,7 +213,7 @@ const ForumPage = () => {
           <div className="forum-profile-body">
             <div className="forum-avatar">VD</div>
             <h3>Vertex Dominium</h3>
-            <p className="forum-profile-role">Professionellt medlemsnatverk</p>
+            <p className="forum-profile-role">Professionellt medlemsnätverk</p>
             <dl className="forum-profile-stats">
               <div>
                 <dt>Profilvisningar</dt>
@@ -229,7 +229,7 @@ const ForumPage = () => {
 
         <article className="forum-card forum-menu-card">
           <h3>Snabbnavigering</h3>
-          <a href="#forum-feed">Starta flode</a>
+          <a href="#forum-feed">Starta flöde</a>
           <a href="#forum-groups">Mina grupper</a>
           <a href="#forum-events">Kommande event</a>
         </article>
@@ -246,20 +246,20 @@ const ForumPage = () => {
             <input
               className="forum-composer-trigger"
               type="text"
-              placeholder="Skriv en rubrik for ditt inlagg"
+              placeholder="Skriv en rubrik för ditt inlägg"
               value={title}
               onChange={(event) => setTitle(event.target.value)}
             />
           </div>
           <textarea
             className="forum-composer-body"
-            placeholder="Dela en tanke, fraga eller uppdatering med natverket"
+            placeholder="Dela en tanke, fråga eller uppdatering med nätverket"
             value={body}
             onChange={(event) => setBody(event.target.value)}
           />
           <div className="forum-composer-actions">
             <button type="submit" disabled={submitting}>
-              {submitting ? 'Publicerar...' : 'Publicera inlagg'}
+              {submitting ? 'Publicerar...' : 'Publicera inlägg'}
             </button>
             <button type="button">Dela dokument</button>
             <button type="button">Skapa event</button>
@@ -289,7 +289,7 @@ const ForumPage = () => {
       <aside className="forum-right-column">
         <article className="forum-card" id="forum-groups">
           <div className="forum-card-heading">
-            <h3>Trendande amnen</h3>
+            <h3>Trendande ämnen</h3>
             <span>Denna vecka</span>
           </div>
           <div className="forum-topic-list">
@@ -305,7 +305,7 @@ const ForumPage = () => {
         <article className="forum-card" id="forum-events">
           <div className="forum-card-heading">
             <h3>Kommande event</h3>
-            <span>Narmast i natverket</span>
+            <span>Närmast i nätverket</span>
           </div>
           <div className="forum-event-list">
             {events.map((event) => (
@@ -319,9 +319,9 @@ const ForumPage = () => {
         </article>
 
         <article className="forum-card forum-promo-card">
-          <h3>Bygg ditt natverk</h3>
+          <h3>Bygg ditt nätverk</h3>
           <p>
-            Publicera insikter, bjud in till diskussioner och hall forumet levande med korta,
+            Publicera insikter, bjud in till diskussioner och håll forumet levande med korta,
             professionella uppdateringar.
           </p>
           <button type="button" className="btn primary">

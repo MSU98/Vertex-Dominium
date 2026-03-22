@@ -14,22 +14,22 @@ const PublicNavbar = () => (
 
       <nav className="public-nav-links">
         <NavLink to={routes.home} className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
-          Home
+          Hem
         </NavLink>
         <NavLink to={routes.about} className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
-          About
+          Om oss
         </NavLink>
         <NavLink to={routes.contact} className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
-          Contact
+          Kontakt
         </NavLink>
       </nav>
 
       <div className="actions" style={{ marginTop: 0 }}>
         <Link className="btn ghost" to={routes.login}>
-          Log in
+          Logga in
         </Link>
         <Link className="btn primary" to={routes.register}>
-          Become a member
+          Bli medlem
         </Link>
       </div>
     </div>

@@ -53,7 +53,7 @@ const AdminDnApplications2Page = () => {
       },
       (err) => {
         console.error(err)
-        setError('Failed to load applications.')
+        setError('Kunde inte ladda ansökningar.')
         setLoading(false)
       },
     )
@@ -88,11 +88,11 @@ const AdminDnApplications2Page = () => {
       if (userSnap.exists()) {
         await updateDoc(userRef, userUpdates)
       } else {
-        setError('Application updated, but user profile is missing.')
+        setError('Ansökan uppdaterad, men användarprofilen saknas.')
       }
     } catch (err) {
       console.error(err)
-      setError('Action failed. Try again.')
+      setError('Åtgärden misslyckades. Försök igen.')
     } finally {
       setActionId(null)
     }
@@ -100,10 +100,10 @@ const AdminDnApplications2Page = () => {
 
   if (!db) {
     return (
-      <BrandPageShell title="SECOND ONBOARDING REVIEWS" subtitle="Granska fullständig onboarding." memberNav>
+      <BrandPageShell title="STEG 2 GRANSKNINGAR" subtitle="Granska fullständig onboarding." memberNav>
         <article className="brand-panel">
-          <h3>Firebase not configured</h3>
-          <p>Add Firebase env keys to use the admin panel.</p>
+          <h3>Firebase inte konfigurerat</h3>
+          <p>Lägg till Firebase-nycklar i .env för att använda adminpanelen.</p>
         </article>
       </BrandPageShell>
     )
@@ -112,7 +112,7 @@ const AdminDnApplications2Page = () => {
   const pendingApplications = applications.filter((app) => app.status === 'pending')
 
   return (
-    <BrandPageShell title="SECOND ONBOARDING REVIEWS" subtitle="Granska fullständig onboarding" memberNav>
+    <BrandPageShell title="STEG 2 GRANSKNINGAR" subtitle="Granska fullständig onboarding" memberNav>
       <article className="brand-panel">
         <div style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
           <h3 style={{ margin: 0 }}>Steg 2: Fullständig onboarding</h3>
@@ -120,24 +120,24 @@ const AdminDnApplications2Page = () => {
             ← Gå tillbaka till Steg 1
           </Link>
         </div>
-        {loading && <p className="muted">Loading...</p>}
+        {loading && <p className="muted">Laddar...</p>}
         {error && <p className="error">{error}</p>}
         {!loading && pendingApplications.length === 0 && (
-          <p className="muted">No pending second onboarding applications.</p>
+          <p className="muted">Inga väntande steg 2-ansökningar.</p>
         )}
         <div className="brand-panel-grid">
           {pendingApplications.map((app) => (
             <div key={app.id} className="brand-panel-sub">
-              <h3>Second Onboarding Review</h3>
-              <p className="muted">Plan: {app.membershipPlan ?? 'dominus'}</p>
-              <p className="muted">Company Size: {app.companySize ?? '-'}</p>
-              <p className="muted">Revenue: {app.revenue ?? '-'}</p>
-              <p className="muted">Geographic Reach: {app.geographicReach ?? '-'}</p>
-              <p className="muted">Industry Focus: {app.industryFocus ?? '-'}</p>
+              <h3>Steg 2 Granskning</h3>
+              <p className="muted">Plan: {app.membershipPlan ?? 'Dominus'}</p>
+              <p className="muted">Företagsstorlek: {app.companySize ?? '-'}</p>
+              <p className="muted">Omsättning: {app.revenue ?? '-'}</p>
+              <p className="muted">Geografisk räckvidd: {app.geographicReach ?? '-'}</p>
+              <p className="muted">Bransch: {app.industryFocus ?? '-'}</p>
               <p className="muted">LinkedIn: {app.linkedin ?? '-'}</p>
-              <p className="muted">Status: pending</p>
+              <p className="muted">Status: Väntande</p>
               <div className="interests">
-                <p className="muted"><strong>Interests:</strong></p>
+                <p className="muted"><strong>Intressen:</strong></p>
                 <ul>
                   {app.interestNetworking && <li>Affärsnätverk</li>}
                   {app.interestMatchmaking && <li>Matchmaking</li>}
@@ -150,14 +150,14 @@ const AdminDnApplications2Page = () => {
                   onClick={() => handleDecision(app, 'approved')}
                   disabled={Boolean(actionId)}
                 >
-                  {actionId === app.id ? 'Working...' : 'Approve'}
+                  {actionId === app.id ? 'Hanterar...' : 'Godkänn'}
                 </button>
                 <button
                   className="btn ghost"
                   onClick={() => handleDecision(app, 'rejected')}
                   disabled={Boolean(actionId)}
                 >
-                  Reject
+                  Neka
                 </button>
               </div>
             </div>

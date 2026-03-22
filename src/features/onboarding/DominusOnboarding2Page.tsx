@@ -25,7 +25,7 @@ const DominusOnboarding2Page = () => {
     return (
       <BrandPageShell title="DOMINUS ONBOARDING - STEG 2" memberNav>
         <article className="brand-panel">
-          <p>Logga in och kontrollera att Firebase ar konfigurerat.</p>
+          <p>Logga in och kontrollera att Firebase är konfigurerat.</p>
         </article>
       </BrandPageShell>
     )
@@ -92,7 +92,7 @@ const DominusOnboarding2Page = () => {
       }, 500)
     } catch (err) {
       console.error('Error submitting second onboarding:', err)
-      setError('Kunde inte skicka ansokan. Försök igen. (Se konsol för detaljer)')
+      setError('Kunde inte skicka ansökan. Försök igen.')
     } finally {
       setSubmitting(false)
     }
@@ -103,7 +103,7 @@ const DominusOnboarding2Page = () => {
       <form className="brand-form" onSubmit={handleSubmit}>
         <article className="brand-panel-sub">
           <h3>Fullständig Onboarding</h3>
-          <p className="muted">Fortsätt med dina företagsinformation för att slutföra din medlemskap.</p>
+          <p className="muted">Fortsätt med din företagsinformation för att slutföra ditt medlemskap.</p>
         </article>
 
         <label className="field">
@@ -198,7 +198,7 @@ const DominusOnboarding2Page = () => {
 
         {error && <p className="error">{error}</p>}
         <button className="btn primary" type="submit" disabled={submitting}>
-          {submitting ? 'Skickar...' : 'Skicka fullständig ansokan'}
+          {submitting ? 'Skickar...' : 'Skicka fullständig ansökan'}
         </button>
       </form>
     </BrandPageShell>

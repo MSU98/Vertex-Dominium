@@ -535,9 +535,9 @@ const ProfilePage = () => {
         )}
       </article>
       <article className="brand-panel profile-feed-panel" style={{ marginTop: '16px' }}>
-        <h3>Ditt forumflode</h3>
+        <h3>Ditt forumflöde</h3>
         {loadingPosts ? (
-          <p className="muted">Laddar dina inlagg...</p>
+          <p className="muted">Laddar dina inlägg...</p>
         ) : profilePosts.length > 0 ? (
           <div className="forum-feed-list profile-feed-list">
             {profilePosts.map((post) => (
@@ -545,7 +545,7 @@ const ProfilePage = () => {
             ))}
           </div>
         ) : (
-          <p className="muted">Nar du publicerar i forumet visas dina inlagg har.</p>
+          <p className="muted">När du publicerar i forumet visas dina inlägg här.</p>
         )}
       </article>
     </BrandPageShell>

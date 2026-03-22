@@ -63,7 +63,7 @@ const AdminDnApplicationsPage = () => {
       },
       (err) => {
         console.error(err)
-        setError('Failed to load applications.')
+        setError('Kunde inte ladda ansökningar.')
         setLoading(false)
       },
     )
@@ -102,11 +102,11 @@ const AdminDnApplicationsPage = () => {
       if (userSnap.exists()) {
         await updateDoc(userRef, userUpdates)
       } else {
-        setError('Application updated, but user profile is missing.')
+        setError('Ansökan uppdaterad, men användarprofilen saknas.')
       }
     } catch (err) {
       console.error(err)
-      setError('Action failed. Try again.')
+      setError('Åtgärden misslyckades. Försök igen.')
     } finally {
       setActionId(null)
     }
@@ -114,10 +114,10 @@ const AdminDnApplicationsPage = () => {
 
   if (!db) {
     return (
-      <BrandPageShell title="REVIEWS" subtitle="Granska medlemsansokningar." memberNav>
+      <BrandPageShell title="GRANSKNINGAR" subtitle="Granska medlemsansökningar." memberNav>
         <article className="brand-panel">
-          <h3>Firebase not configured</h3>
-          <p>Add Firebase env keys to use the admin panel.</p>
+          <h3>Firebase inte konfigurerat</h3>
+          <p>Lägg till Firebase-nycklar i .env för att använda adminpanelen.</p>
         </article>
       </BrandPageShell>
     )
@@ -126,7 +126,7 @@ const AdminDnApplicationsPage = () => {
   const pendingApplications = applications.filter((app) => app.status === 'pending')
 
   return (
-    <BrandPageShell title="REVIEWS" subtitle="Membership applications" memberNav>
+    <BrandPageShell title="GRANSKNINGAR" subtitle="Medlemsansökningar" memberNav>
       <article className="brand-panel">
         <div style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
           <h3 style={{ margin: 0 }}>Steg 1: Första ansökningar</h3>
@@ -134,42 +134,42 @@ const AdminDnApplicationsPage = () => {
             → Gå till Steg 2
           </Link>
         </div>
-        {loading && <p className="muted">Loading...</p>}
+        {loading && <p className="muted">Laddar...</p>}
         {error && <p className="error">{error}</p>}
         {!loading && pendingApplications.length === 0 && (
-          <p className="muted">No pending applications.</p>
+          <p className="muted">Inga väntande ansökningar.</p>
         )}
         <div className="brand-panel-grid">
           {pendingApplications.map((app) => (
             <div key={app.id} className="brand-panel-sub">
               <h3>{app.fullName}</h3>
-              <p className="muted">Plan: {app.membershipPlan ?? 'dominus'}</p>
+              <p className="muted">Plan: {app.membershipPlan ?? 'Dominus'}</p>
               <p className="muted">
                 {app.title}
                 {app.companyName ? ` @ ${app.companyName}` : ''}
               </p>
-              <p className="muted">Org: {app.orgNumber ?? '-'}</p>
-              <p className="muted">City: {app.city ?? '-'}</p>
-              <p className="muted">Decision mandate: {app.decisionMandate ?? '-'}</p>
-              <p className="muted">Business email: {app.businessEmail ?? app.email ?? '-'}</p>
-              <p className="muted">Phone: {app.phone ?? '-'}</p>
-              <p className="muted">Interests: {app.interests?.join(', ') ?? '-'}</p>
-              <p className="muted">Motivation: {app.motivation ?? '-'}</p>
-              <p className="muted">Status: pending</p>
+              <p className="muted">Org.nr: {app.orgNumber ?? '-'}</p>
+              <p className="muted">Stad: {app.city ?? '-'}</p>
+              <p className="muted">Beslutsmandat: {app.decisionMandate ?? '-'}</p>
+              <p className="muted">Företagsmail: {app.businessEmail ?? app.email ?? '-'}</p>
+              <p className="muted">Telefon: {app.phone ?? '-'}</p>
+              <p className="muted">Intressen: {app.interests?.join(', ') ?? '-'}</p>
+              <p className="muted">Motivering: {app.motivation ?? '-'}</p>
+              <p className="muted">Status: Väntande</p>
               <div className="actions">
                 <button
                   className="btn primary"
                   onClick={() => handleDecision(app, 'approved')}
                   disabled={Boolean(actionId)}
                 >
-                  {actionId === app.id ? 'Working...' : 'Approve'}
+                  {actionId === app.id ? 'Hanterar...' : 'Godkänn'}
                 </button>
                 <button
                   className="btn ghost"
                   onClick={() => handleDecision(app, 'rejected')}
                   disabled={Boolean(actionId)}
                 >
-                  Reject
+                  Neka
                 </button>
               </div>
             </div>

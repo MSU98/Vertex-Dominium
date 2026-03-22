@@ -27,7 +27,7 @@ const DominusOnboardingPage = () => {
     return (
       <BrandPageShell title="DOMINUS ONBOARDING" memberNav>
         <article className="brand-panel">
-          <p>Logga in och kontrollera att Firebase ar konfigurerat.</p>
+          <p>Logga in och kontrollera att Firebase är konfigurerat.</p>
         </article>
       </BrandPageShell>
     )
@@ -73,7 +73,7 @@ const DominusOnboardingPage = () => {
       navigate(routes.applicationPending)
     } catch (err) {
       console.error(err)
-      setError('Kunde inte skicka ansokan. Forsok igen.')
+      setError('Kunde inte skicka ansökan. Försök igen.')
     } finally {
       setSubmitting(false)
     }
@@ -83,7 +83,7 @@ const DominusOnboardingPage = () => {
     <BrandPageShell title="DOMINUS ONBOARDING" memberNav>
       <form className="brand-form" onSubmit={handleSubmit}>
         <label className="field">
-          <span>Fornamn/efternamn</span>
+          <span>Förnamn/efternamn</span>
           <input value={fullName} onChange={(e) => setFullName(e.target.value)} required />
         </label>
         <label className="field">
@@ -103,7 +103,7 @@ const DominusOnboardingPage = () => {
           <input
             value={decisionMandate}
             onChange={(e) => setDecisionMandate(e.target.value)}
-            placeholder="Agare, VD, ledningsgrupp eller annat"
+            placeholder="Ägare, VD, ledningsgrupp eller annat"
             required
           />
         </label>
@@ -117,7 +117,7 @@ const DominusOnboardingPage = () => {
           />
         </label>
         <label className="field">
-          <span>Losenord</span>
+          <span>Lösenord</span>
           <input
             type="password"
             value={password}
@@ -131,25 +131,25 @@ const DominusOnboardingPage = () => {
           <input value={phone} onChange={(e) => setPhone(e.target.value)} required />
         </label>
         <label className="field">
-          <span>Kort ansokan (varfor vill du bli medlem?)</span>
+          <span>Kort ansökan (varför vill du bli medlem?)</span>
           <textarea value={motivation} onChange={(e) => setMotivation(e.target.value)} required />
         </label>
         <article className="brand-panel-sub">
-          <h3>Steg 2 (vid godkänd ansokan)</h3>
-          <p className="muted">Full onboarding samlar in följande:</p>
+          <h3>Steg 2 (vid godkänd ansökan)</h3>
+          <p className="muted">Fullständig onboarding samlar in följande:</p>
           <ul className="membership-benefits">
             <li>Faktureringsuppgifter</li>
-            <li>Foretagsstorlek (antal anställda)</li>
+            <li>Företagsstorlek (antal anställda)</li>
             <li>Omsättning</li>
             <li>Geografisk räckvidd</li>
             <li>Bransch/inriktning</li>
             <li>LinkedIn</li>
-            <li>Intresse for affärsnätverk, matchmaking och styrelse/rådgivande sammanhang</li>
+            <li>Intresse för affärsnätverk, matchmaking och styrelse/rådgivande sammanhang</li>
           </ul>
         </article>
         {error && <p className="error">{error}</p>}
         <button className="btn primary" type="submit" disabled={submitting}>
-          {submitting ? 'Skickar...' : 'Skicka ansokan'}
+          {submitting ? 'Skickar...' : 'Skicka ansökan'}
         </button>
       </form>
     </BrandPageShell>

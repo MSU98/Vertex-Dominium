@@ -42,13 +42,13 @@ const FeedPage = () => {
 
   return (
     <BrandPageShell
-      title="FLODE"
-      subtitle="Inlagg fran forumet visas har, sa allt du publicerar i forumet hamnar ocksa i ditt flode."
+      title="FLÖDE"
+      subtitle="Inlägg från forumet visas här, så allt du publicerar i forumet hamnar också i ditt flöde."
       memberNav
     >
       {loading ? (
         <article className="brand-panel">
-          <p>Laddar flodet...</p>
+          <p>Laddar flödet...</p>
         </article>
       ) : posts.length > 0 ? (
         <section className="forum-feed-list">
@@ -58,7 +58,7 @@ const FeedPage = () => {
         </section>
       ) : (
         <article className="brand-panel">
-          <p>Inga inlagg an. Publicera ett inlagg i forumet sa visas det har.</p>
+          <p>Inga inlägg än. Publicera ett inlägg i forumet så visas det här.</p>
         </article>
       )}
     </BrandPageShell>
