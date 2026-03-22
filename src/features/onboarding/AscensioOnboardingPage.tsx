@@ -35,7 +35,7 @@ const AscensioOnboardingPage = () => {
     return (
       <BrandPageShell title="ASCENSIO ONBOARDING" memberNav>
         <article className="brand-panel">
-          <p>Logga in och kontrollera att Firebase ar konfigurerat.</p>
+          <p>Logga in och kontrollera att Firebase är konfigurerat.</p>
         </article>
       </BrandPageShell>
     )
@@ -89,7 +89,7 @@ const AscensioOnboardingPage = () => {
       navigate(`${routes.payment}?planId=ascensio`)
     } catch (err) {
       console.error(err)
-      setError('Kunde inte spara onboarding. Forsok igen.')
+      setError('Kunde inte spara onboarding. Försök igen.')
     } finally {
       setSubmitting(false)
     }
@@ -99,7 +99,7 @@ const AscensioOnboardingPage = () => {
     <BrandPageShell title="ASCENSIO ONBOARDING" memberNav>
       <form className="brand-form" onSubmit={handleSubmit}>
         <label className="field">
-          <span>Fornamn & efternamn</span>
+          <span>Förnamn & efternamn</span>
           <input value={fullName} onChange={(e) => setFullName(e.target.value)} required />
         </label>
         <label className="field">
@@ -107,7 +107,7 @@ const AscensioOnboardingPage = () => {
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </label>
         <label className="field">
-          <span>Losenord</span>
+          <span>Lösenord</span>
           <input
             type="password"
             value={password}
@@ -141,7 +141,7 @@ const AscensioOnboardingPage = () => {
           <input
             value={currentBusiness}
             onChange={(e) => setCurrentBusiness(e.target.value)}
-            placeholder="Anstalld, egenforetagare, konsult eller ledare"
+            placeholder="Anställd, egenföretagare, konsult eller ledare"
             required
           />
         </label>
@@ -171,7 +171,7 @@ const AscensioOnboardingPage = () => {
         </label>
         {error && <p className="error">{error}</p>}
         <button className="btn primary" type="submit" disabled={submitting}>
-          {submitting ? 'Sparar...' : 'Slutfor onboarding'}
+          {submitting ? 'Sparar...' : 'Slutför onboarding'}
         </button>
       </form>
     </BrandPageShell>

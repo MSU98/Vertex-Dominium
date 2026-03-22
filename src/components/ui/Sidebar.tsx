@@ -63,7 +63,7 @@ const Sidebar = () => {
       <div className="brand">
         <img className="brand-mark" src="/vertex-logo.png" alt="Vertex Dominium" />
         <div>
-          <p className="eyebrow">Memberportal</p>
+          <p className="eyebrow">Medlemsportal</p>
           <strong>Vertex Dominium</strong>
         </div>
       </div>
@@ -100,7 +100,7 @@ const Sidebar = () => {
                 to={routes.adminReviews}
                 className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
               >
-                Reviews
+                Granskningar
               </NavLink>
             </nav>
           </div>

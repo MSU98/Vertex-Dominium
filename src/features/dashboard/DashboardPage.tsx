@@ -108,10 +108,17 @@ const DashboardPage = () => {
     }
 
     if (profile?.membershipStatus === 'inactive') {
+      if (profile?.membershipPlan) {
+        return {
+          to: routes.membership,
+          label: 'Förnya medlemskap',
+          hint: 'Ditt medlemskap är inaktivt. Välj en plan för att återaktivera.',
+        }
+      }
       return {
         to: routes.membership,
-        label: 'Förnya medlemskap',
-        hint: 'Ditt medlemskap är inaktivt. Välj en plan för att återaktivera.',
+        label: 'Välj medlemskap',
+        hint: 'Välj din nivå för att låsa upp rätt medlemsupplevelse.',
       }
     }
 
@@ -124,6 +131,14 @@ const DashboardPage = () => {
     }
 
     if (profile.membershipStatus !== 'active') {
+      if (profile.membershipPlan === 'dominus' && profile.membershipStatus === 'second pending' && profile.secondOnboardingComplete !== true) {
+        return {
+          to: routes.onboardingDominus2,
+          label: 'Slutför fullständig onboarding',
+          hint: 'Din första ansökan är godkänd! Slutför steg 2 för att fortsätta.',
+        }
+      }
+
       if (profile.membershipPlan === 'dominus' && profile.membershipStatus === 'pending') {
         return {
           to: routes.applicationPending,
@@ -132,13 +147,22 @@ const DashboardPage = () => {
         }
       }
 
-      if (profile.membershipPlan === 'dominus' && profile.membershipStatus === 'approved') {
+      if (profile.membershipPlan === 'dominus' && profile.membershipStatus === 'second pending') {
         return {
-          to: `${routes.payment}?planId=dominus`,
+          to: routes.applicationPending2,
+          label: 'Se onboarding-status',
+          hint: 'Din fullständiga onboarding väntar på granskning.',
+        }
+      }
+
+      if (profile.membershipStatus === 'approved') {
+        return {
+          to: `${routes.payment}?planId=${profile.membershipPlan}`,
           label: 'Slutför betalning',
           hint: 'Din ansökan är godkänd! Slutför betalningen för att aktivera ditt medlemskap.',
         }
       }
+
       if (profile.membershipStatus === 'pending' && profile.membershipPlan !== 'dominus') {
         return {
           to: `${routes.payment}?planId=${profile.membershipPlan}`,

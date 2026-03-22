@@ -66,8 +66,8 @@ const RegisterPage = () => {
       const baseProfile: UserProfile = {
         uid: credentials.user.uid,
         email,
-        role: 'initium',
-        membershipStatus: 'pending',
+        role: null,
+        membershipStatus: 'inactive',
         membershipPlan: null,
         onboardingComplete: false,
         createdAt: serverTimestamp() as unknown as UserProfile['createdAt'],
@@ -89,7 +89,7 @@ const RegisterPage = () => {
     <BrandPageShell title="BLI MEDLEM">
       <form className="brand-form" onSubmit={handleSubmit}>
         <label className="field">
-          <span>Email</span>
+          <span>E-post</span>
           <input
             type="email"
             value={email}
@@ -99,7 +99,7 @@ const RegisterPage = () => {
           />
         </label>
         <label className="field">
-          <span>Password</span>
+          <span>Lösenord</span>
           <input
             type="password"
             value={password}
@@ -111,10 +111,10 @@ const RegisterPage = () => {
         </label>
         {error && <p className="error">{error}</p>}
         <button className="btn primary" type="submit" disabled={submitting}>
-          {submitting ? 'Creating...' : 'Create account'}
+          {submitting ? 'Skapar...' : 'Skapa konto'}
         </button>
         <p className="muted">
-          Already a member? <Link to="/login">Sign in</Link>
+          Redan medlem? <Link to="/login">Logga in</Link>
         </p>
       </form>
     </BrandPageShell>

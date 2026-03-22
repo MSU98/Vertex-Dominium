@@ -1,8 +1,8 @@
 import { Timestamp } from 'firebase/firestore'
 
-export type UserRole = 'initium' | 'ascensio' | 'dominus' | 'admin'
+export type UserRole = 'initium' | 'ascensio' | 'dominus' | 'admin' | null
 export type MembershipPlan = 'initium' | 'ascensio' | 'dominus' | null
-export type MembershipStatus = 'pending' | 'active' | 'rejected' | 'inactive' | 'approved'
+export type MembershipStatus = 'pending' | 'second pending' | 'active' | 'rejected' | 'inactive' | 'approved'
 export interface UserProfile {
   uid: string
   email: string
@@ -12,6 +12,7 @@ export interface UserProfile {
   membershipPlan: MembershipPlan
   membershipStatus: MembershipStatus
   onboardingComplete: boolean
+  secondOnboardingComplete?: boolean
   createdAt: Timestamp
   updatedAt: Timestamp
   fullName?: string
@@ -33,4 +34,12 @@ export interface UserProfile {
   termsAccepted?: boolean
   privacyPolicyAccepted?: boolean
   communicationConsent?: boolean
+  // Second onboarding for Dominus
+  companySize?: string
+  revenue?: string
+  geographicReach?: string
+  industryFocus?: string
+  interestNetworking?: boolean
+  interestMatchmaking?: boolean
+  interestAdvisory?: boolean
 }
