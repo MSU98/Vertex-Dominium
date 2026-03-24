@@ -28,6 +28,9 @@ type ProfileFormState = {
   title: string
   linkedin: string
   professionalDescription: string
+  currentBusiness: string
+  developmentGoal: string
+  strengths: string
 }
 
 const ProfilePage = () => {
@@ -59,6 +62,9 @@ const ProfilePage = () => {
     title: '',
     linkedin: '',
     professionalDescription: '',
+    currentBusiness: '',
+    developmentGoal: '',
+    strengths: '',
   })
 
   const fileToDataUrl = (file: File, maxSize: number) =>
@@ -107,6 +113,9 @@ const ProfilePage = () => {
       title: profile?.title ?? '',
       linkedin: profile?.linkedin ?? '',
       professionalDescription: profile?.professionalDescription ?? '',
+      currentBusiness: profile?.currentBusiness ?? '',
+      developmentGoal: profile?.developmentGoal ?? '',
+      strengths: profile?.strengths ?? '',
     })
     setAvatarUrl(profile?.avatarUrl ?? '')
     setAvatarPreviewUrl(profile?.avatarUrl ?? '')
@@ -323,6 +332,9 @@ const ProfilePage = () => {
               title: form.title.trim(),
               linkedin: form.linkedin.trim(),
               professionalDescription: form.professionalDescription.trim(),
+              currentBusiness: form.currentBusiness.trim(),
+              developmentGoal: form.developmentGoal.trim(),
+              strengths: form.strengths.trim(),
             }
           : {}),
       }
@@ -455,6 +467,56 @@ const ProfilePage = () => {
           <input type="text" value={form.company} onChange={handleChange('company')} />
         </label>
 
+        {canAccess('dominusArea') && (profile?.companySize || profile?.revenue || profile?.geographicReach || profile?.industryFocus || profile?.interestNetworking || profile?.interestMatchmaking || profile?.interestAdvisory) && (
+          <>
+            <p className="eyebrow" style={{ marginTop: '8px' }}>Dominus – ansökningsuppgifter</p>
+            {profile?.companySize && (
+              <label className="field">
+                <span>Företagsstorlek</span>
+                <input className="dominus-readonly" type="text" value={`${profile.companySize} anställda`} disabled />
+              </label>
+            )}
+            {profile?.revenue && (
+              <label className="field">
+                <span>Omsättning</span>
+                <input className="dominus-readonly" type="text" value={`${profile.revenue} kr/år`} disabled />
+              </label>
+            )}
+            {profile?.geographicReach && (
+              <label className="field">
+                <span>Geografisk räckvidd</span>
+                <input
+                  className="dominus-readonly"
+                  type="text"
+                  value={({'local': 'Lokal/regional', 'national': 'Nationell', 'nordic': 'Nordisk', 'european': 'Europeisk', 'global': 'Global'} as Record<string, string>)[profile.geographicReach] ?? profile.geographicReach}
+                  disabled
+                />
+              </label>
+            )}
+            {profile?.industryFocus && (
+              <label className="field">
+                <span>Branschfokus</span>
+                <input className="dominus-readonly" type="text" value={profile.industryFocus} disabled />
+              </label>
+            )}
+            {(profile?.interestNetworking || profile?.interestMatchmaking || profile?.interestAdvisory) && (
+              <label className="field">
+                <span>Intressen</span>
+                <input
+                  className="dominus-readonly"
+                  type="text"
+                  value={[
+                    profile.interestNetworking && 'Affärsnätverk',
+                    profile.interestMatchmaking && 'Matchmaking',
+                    profile.interestAdvisory && 'Styrelse & rådgivning',
+                  ].filter(Boolean).join(', ')}
+                  disabled
+                />
+              </label>
+            )}
+          </>
+        )}
+
         {showExtendedProfile ? (
           <>
             <label className="field">
@@ -472,6 +534,35 @@ const ProfilePage = () => {
               <textarea
                 value={form.professionalDescription}
                 onChange={handleChange('professionalDescription')}
+              />
+            </label>
+
+            <label className="field">
+              <span>Vad arbetar du med just nu?</span>
+              <input
+                type="text"
+                value={form.currentBusiness}
+                onChange={handleChange('currentBusiness')}
+                placeholder="t.ex. Bygger SaaS-bolag inom HR-tech"
+              />
+            </label>
+
+            <label className="field">
+              <span>Vad vill du utveckla eller uppnå framåt?</span>
+              <textarea
+                value={form.developmentGoal}
+                onChange={handleChange('developmentGoal')}
+                placeholder="t.ex. Internationell expansion, styrelseuppdrag, ny kompetens"
+              />
+            </label>
+
+            <label className="field">
+              <span>2–3 styrkor eller fokusområden</span>
+              <input
+                type="text"
+                value={form.strengths}
+                onChange={handleChange('strengths')}
+                placeholder="t.ex. Försäljning, ledarskap, produktutveckling"
               />
             </label>
           </>

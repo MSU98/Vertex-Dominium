@@ -29,6 +29,8 @@ export interface UserProfile {
   orgNumber?: string
   linkedin?: string
   professionalDescription?: string
+  developmentGoal?: string
+  strengths?: string
   decisionMandate?: string
   businessEmail?: string
   termsAccepted?: boolean
