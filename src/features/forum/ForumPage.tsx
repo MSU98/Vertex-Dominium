@@ -8,11 +8,14 @@ import {
   query,
   serverTimestamp,
 } from 'firebase/firestore'
+import { Link } from 'react-router-dom'
 import ForumPostCard from '../../components/forum/ForumPostCard'
 import BrandPageShell from '../../components/ui/BrandPageShell'
 import useAuth from '../../hooks/useAuth'
 import { db } from '../../lib/firebase'
+import { routes } from '../../routes/paths'
 import type { ForumPost } from '../../types/ForumPost'
+import type { UserProfile } from '../../types/User'
 
 const quickFilters = ['Alla inlägg', 'Ledarskap', 'Affärer', 'Events']
 
@@ -64,17 +67,6 @@ const starterPosts: ForumPost[] = [
   },
 ]
 
-const trendingTopics = [
-  { name: 'Executive networking', count: '128 diskussioner' },
-  { name: 'Private dinners', count: '64 diskussioner' },
-  { name: 'Capital partners', count: '41 diskussioner' },
-]
-
-const events = [
-  { title: 'Stockholm Breakfast Circle', date: '22 mars', attendees: '18 anmälda' },
-  { title: 'Founder Roundtable', date: '29 mars', attendees: '12 anmälda' },
-]
-
 const getInitials = (name: string) =>
   name
     .split(' ')
@@ -83,12 +75,21 @@ const getInitials = (name: string) =>
     .map((part) => part.charAt(0).toUpperCase())
     .join('') || 'VD'
 
+const toDisplayName = (profile: Partial<UserProfile>) => {
+  if (profile.fullName?.trim()) return profile.fullName.trim()
+  return profile.email?.split('@')[0] ?? 'Medlem'
+}
+
+type SearchableProfile = Pick<UserProfile, 'uid' | 'fullName' | 'email' | 'avatarUrl' | 'title' | 'company'>
+
 const ForumPage = () => {
   const { profile } = useAuth()
   const dbClient = db
   const [posts, setPosts] = useState<ForumPost[]>(starterPosts)
+  const [directory, setDirectory] = useState<SearchableProfile[]>([])
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
+  const [searchTerm, setSearchTerm] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const isAdmin = profile?.role === 'admin'
@@ -105,6 +106,22 @@ const ForumPage = () => {
   }, [profile?.company, profile?.title])
 
   const authorInitials = useMemo(() => getInitials(authorName), [authorName])
+  const profileHeadline = useMemo(() => {
+    if (profile?.professionalHeadline?.trim()) return profile.professionalHeadline.trim()
+    if (profile?.title?.trim() && profile?.company?.trim()) {
+      return `${profile.title.trim()} @ ${profile.company.trim()}`
+    }
+    if (profile?.title?.trim()) return profile.title.trim()
+    if (profile?.company?.trim()) return profile.company.trim()
+    return 'Medlem i Vertex Dominium'
+  }, [profile?.company, profile?.professionalHeadline, profile?.title])
+
+  const membershipLabel = useMemo(() => {
+    if (profile?.membershipPlan === 'dominus') return 'Dominus'
+    if (profile?.membershipPlan === 'ascensio') return 'Ascensio'
+    if (profile?.membershipPlan === 'initium') return 'Initium'
+    return 'Medlem'
+  }, [profile?.membershipPlan])
 
   useEffect(() => {
     if (!dbClient) return
@@ -132,6 +149,38 @@ const ForumPage = () => {
 
     loadPosts()
   }, [dbClient])
+
+  useEffect(() => {
+    if (!dbClient) return
+
+    const loadDirectory = async () => {
+      try {
+        const snapshot = await getDocs(collection(dbClient, 'publicProfiles'))
+        const nextProfiles = snapshot.docs
+          .map((entry) => entry.data() as Partial<UserProfile>)
+          .filter((entry): entry is SearchableProfile => Boolean(entry.uid))
+          .sort((left, right) => toDisplayName(left).localeCompare(toDisplayName(right), 'sv'))
+
+        setDirectory(nextProfiles)
+      } catch (loadError) {
+        console.error('Failed to load public profiles', loadError)
+      }
+    }
+
+    loadDirectory()
+  }, [dbClient])
+
+  const filteredProfiles = useMemo(() => {
+    const queryValue = searchTerm.trim().toLocaleLowerCase('sv')
+    if (!queryValue) return []
+
+    return directory
+      .filter((entry) => {
+        const name = toDisplayName(entry).toLocaleLowerCase('sv')
+        return name.includes(queryValue)
+      })
+      .slice(0, 6)
+  }, [directory, searchTerm])
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -208,30 +257,92 @@ const ForumPage = () => {
     >
       <section className="forum-layout">
       <aside className="forum-sidebar-column">
-        <article className="forum-card forum-profile-card">
-          <div className="forum-profile-cover" />
+        <Link className="forum-card forum-profile-card forum-profile-link" to={routes.profile}>
+          <div
+            className="forum-profile-cover"
+            style={
+              profile?.avatarUrl
+                ? {
+                    backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.5)), url(${profile.avatarUrl})`,
+                  }
+                : undefined
+            }
+          />
           <div className="forum-profile-body">
-            <div className="forum-avatar">VD</div>
-            <h3>Vertex Dominium</h3>
-            <p className="forum-profile-role">Professionellt medlemsnätverk</p>
+            {profile?.avatarUrl ? (
+              <img className="forum-profile-avatar-image" src={profile.avatarUrl} alt={authorName} />
+            ) : (
+              <div className="forum-avatar">{authorInitials}</div>
+            )}
+            <h3>{authorName}</h3>
+            <p className="forum-profile-role">{profileHeadline}</p>
             <dl className="forum-profile-stats">
               <div>
-                <dt>Profilvisningar</dt>
-                <dd>148</dd>
+                <dt>Medlemsnivå</dt>
+                <dd>{membershipLabel}</dd>
               </div>
               <div>
-                <dt>Kontakter denna vecka</dt>
-                <dd>23</dd>
+                <dt>Profil</dt>
+                <dd>Visa</dd>
               </div>
             </dl>
           </div>
-        </article>
+        </Link>
 
         <article className="forum-card forum-menu-card">
           <h3>Snabbnavigering</h3>
           <a href="#forum-feed">Starta flöde</a>
-          <a href="#forum-groups">Mina grupper</a>
-          <a href="#forum-events">Kommande event</a>
+          <a href="#forum-member-search">Sök medlemmar</a>
+        </article>
+
+        <article className="forum-card forum-search-card" id="forum-member-search">
+          <div className="forum-card-heading">
+            <h3>Sök medlemmar</h3>
+            <span>Nätverket</span>
+          </div>
+          <label className="forum-search-field">
+            <span className="sr-only">Sök efter medlem</span>
+            <input
+              type="search"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              placeholder="Skriv ett namn"
+            />
+          </label>
+          {searchTerm.trim() ? (
+            filteredProfiles.length > 0 ? (
+              <div className="forum-search-results">
+                {filteredProfiles.map((entry) => {
+                  const displayName = toDisplayName(entry)
+                  const subtitle = [entry.title?.trim(), entry.company?.trim()].filter(Boolean).join(' @ ')
+
+                  return (
+                    <Link
+                      key={entry.uid}
+                      className="forum-search-result"
+                      to={routes.profileView(entry.uid)}
+                    >
+                      {entry.avatarUrl ? (
+                        <img className="forum-search-avatar" src={entry.avatarUrl} alt={displayName} />
+                      ) : (
+                        <div className="forum-avatar small forum-search-avatar">
+                          {getInitials(displayName)}
+                        </div>
+                      )}
+                      <div>
+                        <strong>{displayName}</strong>
+                        <span>{subtitle || 'Medlem i Vertex Dominium'}</span>
+                      </div>
+                    </Link>
+                  )
+                })}
+              </div>
+            ) : (
+              <p className="muted">Ingen medlem matchade sökningen.</p>
+            )
+          ) : (
+            <p className="muted">Börja skriva ett namn för att hitta andra medlemmar.</p>
+          )}
         </article>
       </aside>
 
@@ -285,50 +396,6 @@ const ForumPage = () => {
           ))}
         </div>
       </main>
-
-      <aside className="forum-right-column">
-        <article className="forum-card" id="forum-groups">
-          <div className="forum-card-heading">
-            <h3>Trendande ämnen</h3>
-            <span>Denna vecka</span>
-          </div>
-          <div className="forum-topic-list">
-            {trendingTopics.map((topic) => (
-              <div key={topic.name} className="forum-topic-item">
-                <strong>{topic.name}</strong>
-                <span>{topic.count}</span>
-              </div>
-            ))}
-          </div>
-        </article>
-
-        <article className="forum-card" id="forum-events">
-          <div className="forum-card-heading">
-            <h3>Kommande event</h3>
-            <span>Närmast i nätverket</span>
-          </div>
-          <div className="forum-event-list">
-            {events.map((event) => (
-              <div key={event.title} className="forum-event-item">
-                <strong>{event.title}</strong>
-                <span>{event.date}</span>
-                <p>{event.attendees}</p>
-              </div>
-            ))}
-          </div>
-        </article>
-
-        <article className="forum-card forum-promo-card">
-          <h3>Bygg ditt nätverk</h3>
-          <p>
-            Publicera insikter, bjud in till diskussioner och håll forumet levande med korta,
-            professionella uppdateringar.
-          </p>
-          <button type="button" className="btn primary">
-            Skapa ny diskussion
-          </button>
-        </article>
-      </aside>
       </section>
     </BrandPageShell>
   )
