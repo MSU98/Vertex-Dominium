@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore'
 import useAuth from '../../hooks/useAuth'
 import { db } from '../../lib/firebase'
+import { upsertPublicProfile } from '../../lib/publicProfile'
 import { routes } from '../../routes/paths'
 import BrandPageShell from '../../components/ui/BrandPageShell'
 
@@ -26,7 +27,7 @@ const InitiumOnboardingPage = () => {
     return (
       <BrandPageShell title="INITIUM ONBOARDING" memberNav>
         <article className="brand-panel">
-          <p>Logga in och kontrollera att Firebase ar konfigurerat.</p>
+          <p>Logga in och kontrollera att Firebase är konfigurerat.</p>
         </article>
       </BrandPageShell>
     )
@@ -56,7 +57,7 @@ const InitiumOnboardingPage = () => {
         createdAt: serverTimestamp(),
       })
 
-      await updateDoc(doc(dbClient, 'users', profile.uid), {
+      const updates = {
         fullName,
         email,
         city,
@@ -70,11 +71,13 @@ const InitiumOnboardingPage = () => {
         membershipStatus: 'pending',
         onboardingComplete: true,
         updatedAt: serverTimestamp(),
-      })
+      }
+      await updateDoc(doc(dbClient, 'users', profile.uid), updates)
+      await upsertPublicProfile(dbClient, profile.uid, { ...profile, ...updates })
       navigate(`${routes.payment}?planId=initium`)
     } catch (err) {
       console.error(err)
-      setError('Could not save onboarding. Try again.')
+      setError('Kunde inte spara onboarding. Försök igen.')
     } finally {
       setSubmitting(false)
     }
@@ -84,7 +87,7 @@ const InitiumOnboardingPage = () => {
     <BrandPageShell title="INITIUM ONBOARDING" memberNav>
       <form className="brand-form" onSubmit={handleSubmit}>
         <label className="field">
-          <span>Fornamn & efternamn</span>
+          <span>Förnamn & efternamn</span>
           <input value={fullName} onChange={(e) => setFullName(e.target.value)} required />
         </label>
         <label className="field">
@@ -92,7 +95,7 @@ const InitiumOnboardingPage = () => {
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </label>
         <label className="field">
-          <span>Losenord</span>
+          <span>Lösenord</span>
           <input
             type="password"
             value={password}
@@ -118,7 +121,7 @@ const InitiumOnboardingPage = () => {
           />
         </label>
         <fieldset className="consent-group">
-          <legend>Godkannande av:</legend>
+          <legend>Godkännande av:</legend>
           <label className="consent-item">
             <input
               type="checkbox"
@@ -126,7 +129,7 @@ const InitiumOnboardingPage = () => {
               onChange={(e) => setAcceptTerms(e.target.checked)}
               required
             />
-            <span>Anvandarvillkor</span>
+            <span>Användarvillkor</span>
           </label>
           <label className="consent-item">
             <input
@@ -149,7 +152,7 @@ const InitiumOnboardingPage = () => {
         </fieldset>
         {error && <p className="error">{error}</p>}
         <button className="btn primary" type="submit" disabled={submitting}>
-          {submitting ? 'Sparar...' : 'Slutfor onboarding'}
+          {submitting ? 'Sparar...' : 'Slutför onboarding'}
         </button>
       </form>
     </BrandPageShell>

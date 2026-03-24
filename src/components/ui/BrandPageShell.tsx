@@ -29,13 +29,13 @@ const BrandPageShell = ({ title, subtitle, memberNav = false, children }: BrandP
           {showMemberNav ? (
             <>
               <Link to={routes.hem}>HEM</Link>
-              <Link to={routes.dashboard}>DASHBOARD</Link>
-              <Link to={routes.membership}>MEMBERSHIP</Link>
-              <Link to={routes.courses}>COURSES</Link>
-              <Link to={routes.feed}>FEED</Link>
+              <Link to={routes.dashboard}>ÖVERSIKT</Link>
+              <Link to={routes.membership}>MEDLEMSKAP</Link>
+              <Link to={routes.courses}>KURSER</Link>
+              <Link to={routes.feed}>FLÖDE</Link>
               <Link to={routes.forum}>FORUM</Link>
-              <Link to={routes.profile}>PROFILE</Link>
-              {isAdmin && <Link to={routes.adminReviews}>REVIEWS</Link>}
+              <Link to={routes.profile}>PROFIL</Link>
+              {isAdmin && <Link to={routes.adminReviews}>GRANSKNINGAR</Link>}
             </>
           ) : (
             <>

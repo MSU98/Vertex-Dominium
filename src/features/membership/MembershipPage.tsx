@@ -1,8 +1,5 @@
-import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { doc, serverTimestamp, updateDoc } from 'firebase/firestore'
 import useAuth from '../../hooks/useAuth'
-import { db } from '../../lib/firebase'
 import { routes } from '../../routes/paths'
 import type { MembershipPlan } from '../../types/User'
 import HeaderAccountMenu from '../../components/ui/HeaderAccountMenu'
@@ -21,91 +18,70 @@ const plans: MembershipTier[] = [
   {
     id: 'initium',
     title: 'INITIUM I',
-    subtitle: 'Betydelse: "Borjan/intradet"',
+    subtitle: 'Betydelse: "Början/inträdet"',
     benefits: [
-      'Tillgang till kop av utbildningar och coaching/vagledning.',
-      'Flode (enbart inlagg fran ledning) och forum.',
-      'Digitalt medlemsmarke (INITIUM-marke) att anvanda i sin biografi pa LinkedIn och sociala medier.',
+      'Tillgång till köp av utbildningar och coaching/vägledning.',
+      'Flöde (enbart inlägg från ledning) och forum.',
+      'Digitalt medlemsmärke (INITIUM-märke) att använda i sin biografi på LinkedIn och sociala medier.',
       'Shop.',
-      'Valkomstmail.',
+      'Välkomstmail.',
     ],
-    price: '199 kr/manad',
+    price: '199 kr/månad',
   },
   {
     id: 'ascensio',
     title: 'ASCENSIO II',
     subtitle: 'Betydelse: "Uppstigning/avancemang"',
     benefits: [
-      'Samtliga delar fran INITIUM.',
+      'Samtliga delar från INITIUM.',
       'Profil med biografi.',
-      'Profilbild med ASCENSIO-stampel som kan anvandas pa LinkedIn och sociala medier.',
+      'Profilbild med ASCENSIO-stämpel som kan användas på LinkedIn och sociala medier.',
     ],
-    price: '799 kr/manad',
+    price: '799 kr/månad',
   },
   {
     id: 'dominus',
     title: 'DOMINUS NEGOTIUM III',
     subtitle: 'Betydelse: "Herre/den som har kontroll, verksamhet"',
     benefits: [
-      'Enbart for beslutsfattare fran foretag.',
-      'Samtliga delar fran INITIUM och ASCENSIO.',
-      'DOMINUS NEGOTIUM-stampel.',
-      'Valkomstvideo fran grundare.',
-      'Uppstartsmote.',
+      'Enbart för beslutsfattare från företag.',
+      'Samtliga delar från INITIUM och ASCENSIO.',
+      'DOMINUS NEGOTIUM-stämpel.',
+      'Välkomstvideo från grundare.',
+      'Uppstartsmöte.',
     ],
-    price: '3999 kr/manad',
+    price: '3999 kr/månad',
   },
 ]
 
 const MembershipPage = () => {
   const { profile } = useAuth()
   const navigate = useNavigate()
-  const [submitting, setSubmitting] = useState<SelectableMembershipPlan | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [toast, setToast] = useState<string | null>(null)
-  const dbClient = db
   const isAdmin = profile?.role === 'admin'
 
-  if (!dbClient || !profile) {
+  if (!profile) {
     return (
       <div className="membership-hero page-centered">
         <div className="card" style={{ width: 'min(480px, 92vw)' }}>
-          <p className="eyebrow">Membership</p>
-          <h2>Loading...</h2>
-          <p className="muted">Log in and confirm Firebase configuration.</p>
+          <p className="eyebrow">Medlemskap</p>
+          <h2>Laddar...</h2>
+          <p className="muted">Logga in och kontrollera att Firebase är konfigurerat.</p>
         </div>
       </div>
     )
   }
 
-  const handleSelect = async (plan: SelectableMembershipPlan) => {
-    if (!profile.uid) return
-    setSubmitting(plan)
-    setError(null)
-    setToast(null)
-    try {
-      await updateDoc(doc(dbClient, 'users', profile.uid), {
-        membershipPlan: plan,
-        membershipStatus: 'pending',
-        onboardingComplete: false,
-        updatedAt: serverTimestamp(),
-      })
+  const handleSelect = (plan: SelectableMembershipPlan) => {
+    const target =
+      plan === 'dominus'
+        ? routes.onboardingDominus
+        : profile?.onboardingComplete
+          ? `${routes.payment}?planId=${plan}`
+          : plan === 'initium'
+            ? routes.onboardingInitium
+            : routes.onboardingAscensio
 
-      const target =
-        plan === 'initium'
-          ? routes.onboardingInitium
-          : plan === 'ascensio'
-            ? routes.onboardingAscensio
-            : routes.onboardingDominus
-
-      navigate(target)
-    } catch (err) {
-      console.error(err)
-      setError('Could not save membership choice. Try again.')
-      setToast('Could not save membership choice.')
-    } finally {
-      setSubmitting(null)
-    }
+    navigate(target)
   }
 
   return (
@@ -131,7 +107,7 @@ const MembershipPage = () => {
 
       <section className="membership-intro">
         <h1>VERTEX DOMINIUM</h1>
-        <h2>VARA MEDLEMSNIVAER</h2>
+        <h2>VÅRA MEDLEMSNIVÅER</h2>
       </section>
 
       <section className="membership-grid">
@@ -148,16 +124,22 @@ const MembershipPage = () => {
             <button
               className="membership-select"
               onClick={() => handleSelect(plan.id)}
-              disabled={Boolean(submitting)}
+              disabled={
+                profile?.membershipPlan === plan.id && profile?.membershipStatus === 'active'
+              }
+              style={
+                profile?.membershipPlan === plan.id && profile?.membershipStatus === 'active'
+                  ? { opacity: 0.5, cursor: 'default' }
+                  : {}
+              }
             >
-              {submitting === plan.id ? 'SPARAR...' : 'VALJ NIVA'}
+              {profile?.membershipPlan === plan.id && profile?.membershipStatus === 'active'
+                ? 'DIN PLAN'
+                : 'VÄLJ NIVÅ'}{' '}
             </button>
           </article>
         ))}
       </section>
-
-      {error && <p className="membership-error">{error}</p>}
-      {toast && <div className="toast toast-error">{toast}</div>}
     </div>
   )
 }

@@ -39,7 +39,8 @@ const LoginPage = () => {
         <article className="brand-panel">
           <h3>Connect Firebase</h3>
           <p className="muted">
-            Add the following keys to your <code>.env</code> file and restart <code>npm run dev</code>.
+            Add the following keys to your <code>.env</code> file and restart{' '}
+            <code>npm run dev</code>.
           </p>
           <ul className="muted" style={{ paddingLeft: '20px', margin: '8px 0' }}>
             {missingFirebaseKeys.map((key) => (
@@ -57,7 +58,7 @@ const LoginPage = () => {
     setError(null)
     try {
       await signInWithEmailAndPassword(authClient, email, password)
-      navigate(routes.home, { replace: true })
+      navigate(routes.splash, { replace: true })
     } catch (err) {
       setError(getLoginErrorMessage(err))
       console.error(err)
@@ -70,7 +71,7 @@ const LoginPage = () => {
     <BrandPageShell title="LOGGA IN">
       <form className="brand-form" onSubmit={handleSubmit}>
         <label className="field">
-          <span>Email</span>
+          <span>E-post</span>
           <input
             type="email"
             value={email}
@@ -80,7 +81,7 @@ const LoginPage = () => {
           />
         </label>
         <label className="field">
-          <span>Password</span>
+          <span>Lösenord</span>
           <input
             type="password"
             value={password}
@@ -91,10 +92,10 @@ const LoginPage = () => {
         </label>
         {error && <p className="error">{error}</p>}
         <button className="btn primary" type="submit" disabled={submitting}>
-          {submitting ? 'Signing in...' : 'Sign in'}
+          {submitting ? 'Loggar in...' : 'Logga in'}
         </button>
         <p className="muted">
-          No account? <Link to="/register">Create one</Link>
+          Inget konto? <Link to="/register">Skapa ett</Link>
         </p>
       </form>
     </BrandPageShell>

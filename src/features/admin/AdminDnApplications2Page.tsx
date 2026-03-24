@@ -13,36 +13,26 @@ import {
 import { db } from '../../lib/firebase'
 import { routes } from '../../routes/paths'
 import BrandPageShell from '../../components/ui/BrandPageShell'
-import type { MembershipPlan, UserRole } from '../../types/User'
 
 type ApplicationStatus = 'pending' | 'approved' | 'rejected'
 
-type DnApplication = {
+type DnApplication2 = {
   id: string
   uid: string
-  membershipPlan?: MembershipPlan
-  fullName: string
-  companyName?: string
-  orgNumber?: string
-  title: string
-  decisionMandate?: string
-  businessEmail?: string
-  email?: string
-  phone?: string
-  motivation?: string
-  city?: string
-  interests?: string[]
+  membershipPlan?: string
+  companySize?: string
+  revenue?: string
+  geographicReach?: string
+  industryFocus?: string
+  linkedin?: string
+  interestNetworking?: boolean
+  interestMatchmaking?: boolean
+  interestAdvisory?: boolean
   status: ApplicationStatus
 }
 
-const resolveRoleFromPlan = (plan: MembershipPlan | undefined): UserRole => {
-  if (plan === 'dominus') return 'dominus'
-  if (plan === 'ascensio') return 'ascensio'
-  return 'initium'
-}
-
-const AdminDnApplicationsPage = () => {
-  const [applications, setApplications] = useState<DnApplication[]>([])
+const AdminDnApplications2Page = () => {
+  const [applications, setApplications] = useState<DnApplication2[]>([])
   const [loading, setLoading] = useState(true)
   const [actionId, setActionId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -50,13 +40,13 @@ const AdminDnApplicationsPage = () => {
   useEffect(() => {
     const dbClient = db
     if (!dbClient) return
-    const q = query(collection(dbClient, 'dnApplications'), orderBy('createdAt', 'desc'))
+    const q = query(collection(dbClient, 'dnApplications2'), orderBy('createdAt', 'desc'))
     const unsub = onSnapshot(
       q,
       (snapshot) => {
         const data = snapshot.docs.map((docSnap) => ({
           id: docSnap.id,
-          ...(docSnap.data() as Omit<DnApplication, 'id'>),
+          ...(docSnap.data() as Omit<DnApplication2, 'id'>),
         }))
         setApplications(data)
         setLoading(false)
@@ -71,29 +61,25 @@ const AdminDnApplicationsPage = () => {
     return () => unsub()
   }, [])
 
-  const handleDecision = async (application: DnApplication, status: ApplicationStatus) => {
+  const handleDecision = async (application: DnApplication2, status: ApplicationStatus) => {
     if (!db) return
     setActionId(application.id)
     setError(null)
     try {
-      await updateDoc(doc(db, 'dnApplications', application.id), {
+      await updateDoc(doc(db, 'dnApplications2', application.id), {
         status,
         updatedAt: serverTimestamp(),
       })
 
-      const plan = application.membershipPlan ?? 'dominus'
       const userUpdates =
         status === 'approved'
           ? {
-              role: resolveRoleFromPlan(plan),
-              membershipPlan: plan,
-              membershipStatus: plan === 'dominus' ? 'second pending' : 'approved',
-              onboardingComplete: true,
+              membershipStatus: 'approved',
+              secondOnboardingComplete: true,
               updatedAt: serverTimestamp(),
             }
           : {
-              membershipPlan: plan,
-              membershipStatus: 'rejected',
+              membershipStatus: 'pending',
               updatedAt: serverTimestamp(),
             }
 
@@ -114,7 +100,7 @@ const AdminDnApplicationsPage = () => {
 
   if (!db) {
     return (
-      <BrandPageShell title="GRANSKNINGAR" subtitle="Granska medlemsansökningar." memberNav>
+      <BrandPageShell title="STEG 2 GRANSKNINGAR" subtitle="Granska fullständig onboarding." memberNav>
         <article className="brand-panel">
           <h3>Firebase inte konfigurerat</h3>
           <p>Lägg till Firebase-nycklar i .env för att använda adminpanelen.</p>
@@ -126,36 +112,38 @@ const AdminDnApplicationsPage = () => {
   const pendingApplications = applications.filter((app) => app.status === 'pending')
 
   return (
-    <BrandPageShell title="GRANSKNINGAR" subtitle="Medlemsansökningar" memberNav>
+    <BrandPageShell title="STEG 2 GRANSKNINGAR" subtitle="Granska fullständig onboarding" memberNav>
       <article className="brand-panel">
         <div style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
-          <h3 style={{ margin: 0 }}>Steg 1: Första ansökningar</h3>
-          <Link to={routes.adminDnApplications2} className="btn ghost" style={{ marginLeft: 'auto' }}>
-            → Gå till Steg 2
+          <h3 style={{ margin: 0 }}>Steg 2: Fullständig onboarding</h3>
+          <Link to={routes.adminDnApplications} className="btn ghost" style={{ marginLeft: 'auto' }}>
+            ← Gå tillbaka till Steg 1
           </Link>
         </div>
         {loading && <p className="muted">Laddar...</p>}
         {error && <p className="error">{error}</p>}
         {!loading && pendingApplications.length === 0 && (
-          <p className="muted">Inga väntande ansökningar.</p>
+          <p className="muted">Inga väntande steg 2-ansökningar.</p>
         )}
         <div className="brand-panel-grid">
           {pendingApplications.map((app) => (
             <div key={app.id} className="brand-panel-sub">
-              <h3>{app.fullName}</h3>
+              <h3>Steg 2 Granskning</h3>
               <p className="muted">Plan: {app.membershipPlan ?? 'Dominus'}</p>
-              <p className="muted">
-                {app.title}
-                {app.companyName ? ` @ ${app.companyName}` : ''}
-              </p>
-              <p className="muted">Org.nr: {app.orgNumber ?? '-'}</p>
-              <p className="muted">Stad: {app.city ?? '-'}</p>
-              <p className="muted">Beslutsmandat: {app.decisionMandate ?? '-'}</p>
-              <p className="muted">Företagsmail: {app.businessEmail ?? app.email ?? '-'}</p>
-              <p className="muted">Telefon: {app.phone ?? '-'}</p>
-              <p className="muted">Intressen: {app.interests?.join(', ') ?? '-'}</p>
-              <p className="muted">Motivering: {app.motivation ?? '-'}</p>
+              <p className="muted">Företagsstorlek: {app.companySize ?? '-'}</p>
+              <p className="muted">Omsättning: {app.revenue ?? '-'}</p>
+              <p className="muted">Geografisk räckvidd: {app.geographicReach ?? '-'}</p>
+              <p className="muted">Bransch: {app.industryFocus ?? '-'}</p>
+              <p className="muted">LinkedIn: {app.linkedin ?? '-'}</p>
               <p className="muted">Status: Väntande</p>
+              <div className="interests">
+                <p className="muted"><strong>Intressen:</strong></p>
+                <ul>
+                  {app.interestNetworking && <li>Affärsnätverk</li>}
+                  {app.interestMatchmaking && <li>Matchmaking</li>}
+                  {app.interestAdvisory && <li>Styrelse/rådgivande sammanhang</li>}
+                </ul>
+              </div>
               <div className="actions">
                 <button
                   className="btn primary"
@@ -180,4 +168,4 @@ const AdminDnApplicationsPage = () => {
   )
 }
 
-export default AdminDnApplicationsPage
+export default AdminDnApplications2Page

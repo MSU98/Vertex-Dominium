@@ -13,20 +13,58 @@ service cloud.firestore {
     match /users/{uid} {
       allow get: if isSignedIn() && (request.auth.uid == uid || isAdmin());
       allow create: if isSignedIn() && request.auth.uid == uid;
-      allow update: if isSignedIn() && request.auth.uid == uid && !isChangingRole();
+      allow update: if isSignedIn() && request.auth.uid == uid && (
+        !request.resource.data.role || 
+        request.resource.data.role == resource.data.role
+      );
       allow update, delete: if isAdmin();
+    }
 
-      function isChangingRole() {
-        return resource.data.role != null
-          && request.resource.data.role != resource.data.role
-          && !isAdmin();
-      }
+    match /publicProfiles/{uid} {
+      allow get, list: if isSignedIn();
+      allow create, update: if isSignedIn() && request.auth.uid == uid;
+      allow delete: if isAdmin();
     }
 
     match /dnApplications/{applicationId} {
       allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
-      allow get, list: if isSignedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow get: if isSignedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow list: if isAdmin();
       allow update, delete: if isAdmin();
+    }
+
+    match /dnApplications2/{applicationId} {
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      allow get: if isSignedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow list: if isAdmin();
+      allow update, delete: if isAdmin();
+    }
+
+
+    match /subscriptions/{subscriptionId} {
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow get, list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow update: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    match /forumPosts/{postId} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /forumPostLikes/{likeId} {
+      allow get, list: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.uid == request.auth.uid;
+    }
+
+    match /forumPostComments/{commentId} {
+      allow get, list: if isSignedIn();
+      allow create: if isSignedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.body is string;
+      allow delete: if isSignedIn() && resource.data.uid == request.auth.uid;
     }
   }
 }

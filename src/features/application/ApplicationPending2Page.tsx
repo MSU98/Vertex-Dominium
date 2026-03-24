@@ -1,16 +1,16 @@
 import BrandPageShell from '../../components/ui/BrandPageShell'
 
-const ApplicationPendingPage = () => (
+const ApplicationPending2Page = () => (
   <BrandPageShell
     title="ANSÖKAN PÅGÅR"
-    subtitle="Din Dominus Negotium-ansökan granskas just nu."
+    subtitle="Din fullständiga onboarding granskas just nu."
     memberNav
   >
     <article className="brand-panel">
       <h3>Din ansökan granskas.</h3>
-      <p>Vi meddelar dig när ett beslut har fattats.</p>
+      <p>Vi meddelar dig när ett beslut har fattats och du kan slutföra din betalning.</p>
     </article>
   </BrandPageShell>
 )
 
-export default ApplicationPendingPage
+export default ApplicationPending2Page

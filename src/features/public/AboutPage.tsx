@@ -3,16 +3,16 @@ import BrandPageShell from '../../components/ui/BrandPageShell'
 const AboutPage = () => (
   <BrandPageShell
     title="OM VERTEX DOMINIUM"
-    subtitle="Strategi, kvalitet och langsiktigt inflytande i ett privat natverk."
+    subtitle="Strategi, kvalitet och långsiktigt inflytande i ett privat nätverk."
   >
     <article className="brand-panel">
       <p>
-        Vertex Dominium samlar entreprenorer, investerare och beslutsfattare i ett privat sammanhang
-        med fokus pa strategi, omdome och tillvaxt.
+        Vertex Dominium samlar entreprenörer, investerare och beslutsfattare i ett privat sammanhang
+        med fokus på strategi, omdöme och tillväxt.
       </p>
       <p>
-        Medlemskapet ar byggt i tydliga nivaer dar varje medlem far tillgang till relevanta moduler,
-        relationer och verktyg for att fatta battre beslut.
+        Medlemskapet är byggt i tydliga nivåer där varje medlem får tillgång till relevanta moduler,
+        relationer och verktyg för att fatta bättre beslut.
       </p>
     </article>
   </BrandPageShell>

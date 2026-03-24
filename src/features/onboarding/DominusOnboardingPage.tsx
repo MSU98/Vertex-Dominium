@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore'
 import useAuth from '../../hooks/useAuth'
 import { db } from '../../lib/firebase'
+import { upsertPublicProfile } from '../../lib/publicProfile'
 import { routes } from '../../routes/paths'
 import BrandPageShell from '../../components/ui/BrandPageShell'
 
@@ -26,7 +27,7 @@ const DominusOnboardingPage = () => {
     return (
       <BrandPageShell title="DOMINUS ONBOARDING" memberNav>
         <article className="brand-panel">
-          <p>Logga in och kontrollera att Firebase ar konfigurerat.</p>
+          <p>Logga in och kontrollera att Firebase är konfigurerat.</p>
         </article>
       </BrandPageShell>
     )
@@ -53,7 +54,7 @@ const DominusOnboardingPage = () => {
         createdAt: serverTimestamp(),
       })
 
-      await updateDoc(doc(dbClient, 'users', profile.uid), {
+      const updates = {
         fullName,
         company: companyName,
         orgNumber,
@@ -64,14 +65,15 @@ const DominusOnboardingPage = () => {
         membershipPlan: 'dominus',
         membershipStatus: 'pending',
         onboardingComplete: true,
-        role: 'initium',
         updatedAt: serverTimestamp(),
-      })
+      }
+      await updateDoc(doc(dbClient, 'users', profile.uid), updates)
+      await upsertPublicProfile(dbClient, profile.uid, { ...profile, ...updates })
 
       navigate(routes.applicationPending)
     } catch (err) {
       console.error(err)
-      setError('Kunde inte skicka ansokan. Forsok igen.')
+      setError('Kunde inte skicka ansökan. Försök igen.')
     } finally {
       setSubmitting(false)
     }
@@ -81,11 +83,11 @@ const DominusOnboardingPage = () => {
     <BrandPageShell title="DOMINUS ONBOARDING" memberNav>
       <form className="brand-form" onSubmit={handleSubmit}>
         <label className="field">
-          <span>Fornamn/efternamn</span>
+          <span>Förnamn/efternamn</span>
           <input value={fullName} onChange={(e) => setFullName(e.target.value)} required />
         </label>
         <label className="field">
-          <span>Foretagsnamn</span>
+          <span>Företagsnamn</span>
           <input value={companyName} onChange={(e) => setCompanyName(e.target.value)} required />
         </label>
         <label className="field">
@@ -101,12 +103,12 @@ const DominusOnboardingPage = () => {
           <input
             value={decisionMandate}
             onChange={(e) => setDecisionMandate(e.target.value)}
-            placeholder="Agare, VD, ledningsgrupp eller annat"
+            placeholder="Ägare, VD, ledningsgrupp eller annat"
             required
           />
         </label>
         <label className="field">
-          <span>E-post (foretagsdoman)</span>
+          <span>E-post (företagsdomän)</span>
           <input
             type="email"
             value={businessEmail}
@@ -115,7 +117,7 @@ const DominusOnboardingPage = () => {
           />
         </label>
         <label className="field">
-          <span>Losenord</span>
+          <span>Lösenord</span>
           <input
             type="password"
             value={password}
@@ -129,25 +131,25 @@ const DominusOnboardingPage = () => {
           <input value={phone} onChange={(e) => setPhone(e.target.value)} required />
         </label>
         <label className="field">
-          <span>Kort ansokan (varfor vill du bli medlem?)</span>
+          <span>Kort ansökan (varför vill du bli medlem?)</span>
           <textarea value={motivation} onChange={(e) => setMotivation(e.target.value)} required />
         </label>
         <article className="brand-panel-sub">
-          <h3>Steg 2 (vid godkand ansokan)</h3>
-          <p className="muted">Full onboarding samlar in foljande:</p>
+          <h3>Steg 2 (vid godkänd ansökan)</h3>
+          <p className="muted">Fullständig onboarding samlar in följande:</p>
           <ul className="membership-benefits">
             <li>Faktureringsuppgifter</li>
-            <li>Foretagsstorlek (antal anstallda)</li>
-            <li>Omsattning</li>
-            <li>Geografisk rackvidd</li>
+            <li>Företagsstorlek (antal anställda)</li>
+            <li>Omsättning</li>
+            <li>Geografisk räckvidd</li>
             <li>Bransch/inriktning</li>
             <li>LinkedIn</li>
-            <li>Intresse for affarsnatverk, matchmaking och styrelse/radgivande sammanhang</li>
+            <li>Intresse för affärsnätverk, matchmaking och styrelse/rådgivande sammanhang</li>
           </ul>
         </article>
         {error && <p className="error">{error}</p>}
         <button className="btn primary" type="submit" disabled={submitting}>
-          {submitting ? 'Skickar...' : 'Skicka ansokan'}
+          {submitting ? 'Skickar...' : 'Skicka ansökan'}
         </button>
       </form>
     </BrandPageShell>

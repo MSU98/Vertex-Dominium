@@ -9,6 +9,8 @@ import {
   where,
   getDocs,
   limit,
+  updateDoc,
+  doc,
 } from 'firebase/firestore'
 import { db } from '../../lib/firebase'
 import useAuth from '../../hooks/useAuth'
@@ -49,12 +51,13 @@ const PaymentPage = () => {
   const [error, setError] = useState<string | null>(null)
   const [billing, setBilling] = useState<'month' | 'year'>('month')
   const [existingSub, setExistingSub] = useState(false)
+  const dbClient = db
 
   useEffect(() => {
-    if (!profile?.uid || !db) return
+    if (!profile?.uid || !dbClient) return
     const checkSub = async () => {
       const q = query(
-        collection(db, 'subscriptions'),
+        collection(dbClient, 'subscriptions'),
         where('userId', '==', profile.uid),
         where('status', '==', 'active'),
         limit(1),
@@ -63,7 +66,7 @@ const PaymentPage = () => {
       if (!snap.empty) setExistingSub(true)
     }
     checkSub()
-  }, [profile?.uid])
+  }, [dbClient, profile?.uid])
 
   if (!planId || !planDetails[planId]) {
     return (
@@ -89,7 +92,7 @@ const PaymentPage = () => {
       setError('Välj en betalningsmetod.')
       return
     }
-    if (!profile?.uid || !db) return
+    if (!profile?.uid || !dbClient) return
 
     setSubmitting(true)
     setError(null)
@@ -100,7 +103,7 @@ const PaymentPage = () => {
         new Date(Date.now() + (billing === 'year' ? 365 : 30) * 24 * 60 * 60 * 1000),
       )
 
-      await addDoc(collection(db, 'subscriptions'), {
+      await addDoc(collection(dbClient, 'subscriptions'), {
         userId: profile.uid,
         planId,
         billing,
@@ -111,9 +114,17 @@ const PaymentPage = () => {
         createdAt: serverTimestamp(),
       })
 
-      navigate(routes.profile, { replace: true })
+      await updateDoc(doc(dbClient, 'users', profile.uid), {
+        membershipStatus: 'active',
+        updatedAt: serverTimestamp(),
+      })
+
+      // Refresh profile and navigate
+      setTimeout(() => {
+        window.location.href = routes.dashboard
+      }, 500)
     } catch (err) {
-      console.error(err)
+      console.error('Payment error:', err)
       setError('Betalningen misslyckades. Försök igen.')
     } finally {
       setSubmitting(false)
@@ -147,8 +158,6 @@ const PaymentPage = () => {
           <p style={{ marginTop: '12px' }}>
             Pris:{' '}
             <strong style={{ color: '#c9a84c' }}>
-
-
               {billing === 'month' ? plan.priceMonth : plan.priceYear}
             </strong>
           </p>

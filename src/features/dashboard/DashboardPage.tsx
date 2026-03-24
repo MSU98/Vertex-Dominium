@@ -88,6 +88,8 @@ const DashboardPage = () => {
   const displayName = toDisplayName(profile?.fullName, profile?.email)
   const planKey = profile?.membershipPlan ?? 'none'
   const planClass = planToneMap[planKey] ?? 'tier-none'
+  const professionalHeadline = profile?.professionalHeadline?.trim() || profile?.title?.trim()
+  const companyName = profile?.company?.trim()
 
   const contactRows = [
     { label: 'E-post', value: profile?.email ?? 'Inte tillagd än' },
@@ -97,6 +99,29 @@ const DashboardPage = () => {
   ]
 
   const nextStep = (() => {
+    if (profile?.role === 'admin') {
+      return {
+        to: routes.adminReviews,
+        label: 'Granska ansökningar',
+        hint: 'Se och hantera inkommande medlemsansökningar.',
+      }
+    }
+
+    if (profile?.membershipStatus === 'inactive') {
+      if (profile?.membershipPlan) {
+        return {
+          to: routes.membership,
+          label: 'Förnya medlemskap',
+          hint: 'Ditt medlemskap är inaktivt. Välj en plan för att återaktivera.',
+        }
+      }
+      return {
+        to: routes.membership,
+        label: 'Välj medlemskap',
+        hint: 'Välj din nivå för att låsa upp rätt medlemsupplevelse.',
+      }
+    }
+
     if (!profile?.membershipPlan) {
       return {
         to: routes.membership,
@@ -106,11 +131,43 @@ const DashboardPage = () => {
     }
 
     if (profile.membershipStatus !== 'active') {
+      if (profile.membershipPlan === 'dominus' && profile.membershipStatus === 'second pending' && profile.secondOnboardingComplete !== true) {
+        return {
+          to: routes.onboardingDominus2,
+          label: 'Slutför fullständig onboarding',
+          hint: 'Din första ansökan är godkänd! Slutför steg 2 för att fortsätta.',
+        }
+      }
+
       if (profile.membershipPlan === 'dominus' && profile.membershipStatus === 'pending') {
         return {
           to: routes.applicationPending,
           label: 'Se ansökningsstatus',
           hint: 'Din Dominus-ansökan väntar på granskning.',
+        }
+      }
+
+      if (profile.membershipPlan === 'dominus' && profile.membershipStatus === 'second pending') {
+        return {
+          to: routes.applicationPending2,
+          label: 'Se onboarding-status',
+          hint: 'Din fullständiga onboarding väntar på granskning.',
+        }
+      }
+
+      if (profile.membershipStatus === 'approved') {
+        return {
+          to: `${routes.payment}?planId=${profile.membershipPlan}`,
+          label: 'Slutför betalning',
+          hint: 'Din ansökan är godkänd! Slutför betalningen för att aktivera ditt medlemskap.',
+        }
+      }
+
+      if (profile.membershipStatus === 'pending' && profile.membershipPlan !== 'dominus') {
+        return {
+          to: `${routes.payment}?planId=${profile.membershipPlan}`,
+          label: 'Slutför betalning',
+          hint: 'Slutför betalningen för att aktivera ditt medlemskap.',
         }
       }
 
@@ -154,12 +211,23 @@ const DashboardPage = () => {
             </p>
           </div>
 
-        <div className="hero-meta">
-          <p className="eyebrow">Medlem</p>
-          {profile?.avatarUrl ? (
-            <img className="hero-avatar" src={profile.avatarUrl} alt={displayName} />
-          ) : null}
-          <h1 className="dashboard-title">{displayName}</h1>
+          <div className="hero-professional">
+            <p className="eyebrow">Yrkesprofil</p>
+            {profile?.companyLogoUrl ? (
+              <img className="hero-company-logo" src={profile.companyLogoUrl} alt="Företagslogga" />
+            ) : (
+              <div className="hero-company-logo hero-company-logo-fallback">Ingen logga</div>
+            )}
+            <h3>{professionalHeadline || 'Lägg till yrkesrubrik i profil'}</h3>
+            <p>{companyName || 'Lägg till företagsnamn i profil'}</p>
+          </div>
+
+          <div className="hero-meta">
+            <p className="eyebrow">Medlem</p>
+            {profile?.avatarUrl ? (
+              <img className="hero-avatar" src={profile.avatarUrl} alt={displayName} />
+            ) : null}
+            <h1 className="dashboard-title">{displayName}</h1>
             <span className={`tier-badge ${planClass}`}>{toLabel(profile?.membershipPlan)}</span>
             <p className="hero-email">{profile?.email ?? 'Ingen e-post kopplad'}</p>
           </div>
@@ -226,20 +294,7 @@ const DashboardPage = () => {
             </div>
           </div>
         </div>
-        {profile?.membershipPlan === 'dominus' && profile?.membershipStatus === 'active' && (
-          <div className="card spotlight-card" style={{ marginTop: '16px' }}>
-            <p className="eyebrow">Betalning</p>
-            <h3>Slutför din Dominus-betalning</h3>
-            <p className="muted">
-              Din ansökan är godkänd! Slutför betalningen för att aktivera ditt medlemskap.
-            </p>
-            <div className="actions">
-              <Link className="btn primary" to={`${routes.payment}?planId=dominus`}>
-                Gå till betalning
-              </Link>
-            </div>
-          </div>
-        )}
+
         <div className="card membership-card">
           <div className="section-heading">
             <div>
