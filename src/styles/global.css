@@ -702,6 +702,15 @@ a {
   font-weight: 600;
 }
 
+.forum-composer-actions {
+  justify-content: flex-start;
+}
+
+.forum-composer-actions button {
+  flex: 0 0 auto;
+  min-width: 240px;
+}
+
 .forum-composer-actions button[type='submit'] {
   border-color: rgba(209, 173, 104, 0.32);
   background: linear-gradient(90deg, #8c6838, var(--accent-strong));
@@ -789,6 +798,7 @@ a {
   gap: 10px;
   flex-wrap: wrap;
   padding: 0 4px;
+  margin-top: -4px;
 }
 
 .forum-filter {
@@ -990,6 +1000,15 @@ a {
   border: 1px solid rgba(255, 255, 255, 0.16);
   background: rgba(20, 20, 20, 0.75);
   padding: 16px;
+}
+
+
+.dominus-readonly {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 6px rgba(201, 168, 76, 0.2);
+  opacity: 1 !important;
+  color: var(--text) !important;
+  cursor: default;
 }
 
 .profile-avatar-editor {

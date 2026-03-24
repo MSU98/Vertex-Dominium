@@ -17,7 +17,7 @@ import { routes } from '../../routes/paths'
 import type { ForumPost } from '../../types/ForumPost'
 import type { UserProfile } from '../../types/User'
 
-const quickFilters = ['Alla inlägg', 'Ledarskap', 'Affärer', 'Events']
+const quickFilters = ['Alla inlägg']
 
 const starterPosts: ForumPost[] = [
   {
@@ -122,6 +122,7 @@ const ForumPage = () => {
     if (profile?.membershipPlan === 'initium') return 'Initium'
     return 'Medlem'
   }, [profile?.membershipPlan])
+  const profileCoverImage = profile?.companyLogoUrl?.trim() || profile?.avatarUrl?.trim() || ''
 
   useEffect(() => {
     if (!dbClient) return
@@ -261,9 +262,9 @@ const ForumPage = () => {
           <div
             className="forum-profile-cover"
             style={
-              profile?.avatarUrl
+              profileCoverImage
                 ? {
-                    backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.5)), url(${profile.avatarUrl})`,
+                    backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.5)), url(${profileCoverImage})`,
                   }
                 : undefined
             }
@@ -372,8 +373,6 @@ const ForumPage = () => {
             <button type="submit" disabled={submitting}>
               {submitting ? 'Publicerar...' : 'Publicera inlägg'}
             </button>
-            <button type="button">Dela dokument</button>
-            <button type="button">Skapa event</button>
           </div>
           {error && <p className="error forum-composer-error">{error}</p>}
         </form>

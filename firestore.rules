@@ -66,5 +66,10 @@ service cloud.firestore {
         && request.resource.data.body is string;
       allow delete: if isSignedIn() && resource.data.uid == request.auth.uid;
     }
+
+    match /courses/{courseId} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if isAdmin();
+    }
   }
 }
