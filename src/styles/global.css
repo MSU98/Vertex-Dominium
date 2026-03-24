@@ -2220,6 +2220,135 @@ h2 {
   }
 }
 
+.courses-toolbar-panel {
+  padding: 14px;
+}
+
+.courses-toolbar-inner {
+  display: grid;
+  gap: 10px;
+}
+
+.courses-search-input {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  padding: 12px 16px;
+  font: inherit;
+}
+
+.courses-filter-chips {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.courses-filter-chip {
+  border-radius: 999px;
+  min-width: 82px;
+  justify-content: center;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.courses-filter-chip.active {
+  background: #f2f2f2;
+  color: #111;
+}
+
+.courses-catalog-section {
+  margin-top: 16px;
+}
+
+.courses-catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.courses-catalog-card {
+  overflow: hidden;
+  border: 1px solid rgba(183, 146, 82, 0.34);
+  border-radius: 20px;
+  background: rgba(20, 20, 20, 0.9);
+  min-height: 100%;
+}
+
+.courses-catalog-image {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+}
+
+.courses-catalog-image-fallback {
+  background: linear-gradient(135deg, rgba(183, 146, 82, 0.14), rgba(255, 255, 255, 0.04));
+}
+
+.courses-catalog-body {
+  padding: 14px;
+  display: grid;
+  gap: 8px;
+}
+
+.courses-catalog-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.courses-catalog-pill {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.courses-catalog-date {
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.courses-catalog-card h3 {
+  margin: 0 0 10px;
+  font-size: 1.03rem;
+  letter-spacing: 0.06em;
+}
+
+.courses-catalog-card p {
+  margin: 0;
+}
+
+.courses-catalog-video {
+  padding: 0 14px 14px;
+}
+
+.courses-catalog-embed {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 12px;
+  background: #000;
+}
+
+@media (max-width: 1200px) {
+  .courses-catalog-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .courses-catalog-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .forum-comments-toggle-link {
   border: 0;
   background: transparent;

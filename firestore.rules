@@ -71,5 +71,10 @@ service cloud.firestore {
       allow get, list: if isSignedIn();
       allow create, update, delete: if isAdmin();
     }
+
+    match /courseLibraries/{libraryId} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if isAdmin();
+    }
   }
 }
