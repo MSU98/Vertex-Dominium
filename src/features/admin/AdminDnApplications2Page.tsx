@@ -114,9 +114,9 @@ const AdminDnApplications2Page = () => {
   return (
     <BrandPageShell title="STEG 2 GRANSKNINGAR" subtitle="Granska fullständig onboarding" memberNav>
       <article className="brand-panel">
-        <div style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
+        <div className="panel-toolbar">
           <h3 style={{ margin: 0 }}>Steg 2: Fullständig onboarding</h3>
-          <Link to={routes.adminDnApplications} className="btn ghost" style={{ marginLeft: 'auto' }}>
+          <Link to={routes.adminDnApplications} className="btn ghost">
             ← Gå tillbaka till Steg 1
           </Link>
         </div>
