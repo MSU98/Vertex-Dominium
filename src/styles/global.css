@@ -2239,23 +2239,68 @@ h2 {
   font: inherit;
 }
 
-.courses-filter-chips {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+.courses-library-section {
+  margin-top: 16px;
 }
 
-.courses-filter-chip {
-  border-radius: 999px;
-  min-width: 82px;
-  justify-content: center;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.courses-library-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
 }
 
-.courses-filter-chip.active {
-  background: #f2f2f2;
-  color: #111;
+.courses-library-card,
+.courses-catalog-card {
+  overflow: hidden;
+  border: 1px solid rgba(183, 146, 82, 0.34);
+  border-radius: 20px;
+  background: rgba(20, 20, 20, 0.92);
+  min-height: 100%;
+}
+
+.courses-library-card {
+  display: block;
+  width: 100%;
+  padding: 0;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.courses-library-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(209, 173, 104, 0.56);
+}
+
+.courses-library-card.active {
+  border-color: rgba(209, 173, 104, 0.74);
+  box-shadow: 0 0 0 1px rgba(209, 173, 104, 0.2);
+}
+
+.courses-library-image,
+.courses-catalog-image {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+}
+
+.courses-library-image-fallback,
+.courses-catalog-image-fallback {
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.09), transparent 52%),
+    linear-gradient(135deg, rgba(183, 146, 82, 0.2), rgba(22, 20, 17, 0.92));
+}
+
+.courses-library-body,
+.courses-catalog-body {
+  padding: 16px;
+  display: grid;
+  gap: 8px;
 }
 
 .courses-catalog-section {
@@ -2266,31 +2311,6 @@ h2 {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
-}
-
-.courses-catalog-card {
-  overflow: hidden;
-  border: 1px solid rgba(183, 146, 82, 0.34);
-  border-radius: 20px;
-  background: rgba(20, 20, 20, 0.9);
-  min-height: 100%;
-}
-
-.courses-catalog-image {
-  width: 100%;
-  height: 220px;
-  object-fit: cover;
-  display: block;
-}
-
-.courses-catalog-image-fallback {
-  background: linear-gradient(135deg, rgba(183, 146, 82, 0.14), rgba(255, 255, 255, 0.04));
-}
-
-.courses-catalog-body {
-  padding: 14px;
-  display: grid;
-  gap: 8px;
 }
 
 .courses-catalog-meta-row {
@@ -2326,7 +2346,7 @@ h2 {
 }
 
 .courses-catalog-video {
-  padding: 0 14px 14px;
+  padding: 0 16px 16px;
 }
 
 .courses-catalog-embed {
@@ -2338,12 +2358,14 @@ h2 {
 }
 
 @media (max-width: 1200px) {
+  .courses-library-grid,
   .courses-catalog-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 760px) {
+  .courses-library-grid,
   .courses-catalog-grid {
     grid-template-columns: 1fr;
   }

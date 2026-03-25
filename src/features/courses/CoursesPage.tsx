@@ -32,12 +32,9 @@ type CourseLibrary = {
   createdAt?: Timestamp | null
 }
 
-const formatCourseDate = (value?: Timestamp | null) => {
-  if (!value) return 'Nyss publicerad'
-  return value.toDate().toLocaleString('sv-SE', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
+const formatCatalogTime = (value?: Timestamp | null) => {
+  if (!value) return 'Ny'
+  return value.toDate().toLocaleTimeString('sv-SE', {
     hour: '2-digit',
     minute: '2-digit',
   })
@@ -160,15 +157,16 @@ const CoursesPage = () => {
   const fallbackToAllCourses = filteredCourses.length === 0 && courses.length > 0
   const visibleCatalogCourses = fallbackToAllCourses ? courses : filteredCourses
 
-  const libraryCourseCounts = useMemo(() => {
-    const counts: Record<string, number> = {}
-    for (const library of libraries) counts[library.id] = 0
-    for (const course of courses) {
-      if (course.libraryId && counts[course.libraryId] !== undefined) {
-        counts[course.libraryId] += 1
+  const libraryCards = useMemo(() => {
+    return libraries.map((library) => {
+      const libraryCourses = courses.filter((course) => course.libraryId === library.id)
+      return {
+        ...library,
+        count: libraryCourses.length,
+        coverImageUrl: libraryCourses.find((course) => course.imageUrl)?.imageUrl ?? '',
+        latestCreatedAt: libraryCourses[0]?.createdAt ?? null,
       }
-    }
-    return counts
+    })
   }, [courses, libraries])
 
   const handleCreateLibrary = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -293,7 +291,7 @@ const CoursesPage = () => {
   }
 
   return (
-    <BrandPageShell title="KURSER" subtitle="Välj bibliotek och utforska kurser." memberNav>
+    <BrandPageShell title="KURSER" subtitle="Valj bibliotek och utforska kurser." memberNav>
       <article className="brand-panel courses-toolbar-panel">
         <div className="courses-toolbar-inner">
           <input
@@ -304,22 +302,21 @@ const CoursesPage = () => {
             placeholder="Search training..."
           />
 
-          <div className="courses-filter-chips">
-            <button
-              type="button"
-              className={`btn ghost courses-filter-chip ${selectedLibraryFilter === 'all' ? 'active' : ''}`}
-              onClick={() => {
-                setSelectedLibraryFilter('all')
-                setSearchQuery('')
-              }}
-            >
-              Alla ({courses.length})
-            </button>
-            {libraries.map((library) => (
+          <p className="muted">Valkort nedan filtrerar vilka kurser som visas.</p>
+        </div>
+      </article>
+      <section className="courses-library-section">
+        {loadingCourses || loadingLibraries ? (
+          <article className="brand-panel">
+            <p className="muted">Laddar bibliotek...</p>
+          </article>
+        ) : (
+          <div className="courses-library-grid">
+            {libraryCards.map((library) => (
               <button
                 key={library.id}
                 type="button"
-                className={`btn ghost courses-filter-chip ${
+                className={`courses-library-card ${
                   selectedLibraryFilter === library.id ? 'active' : ''
                 }`}
                 onClick={() => {
@@ -327,12 +324,26 @@ const CoursesPage = () => {
                   setSearchQuery('')
                 }}
               >
-                {library.name} ({libraryCourseCounts[library.id] ?? 0})
+                {library.coverImageUrl ? (
+                  <img src={library.coverImageUrl} alt={library.name} className="courses-library-image" />
+                ) : (
+                  <div className="courses-library-image courses-library-image-fallback" />
+                )}
+                <div className="courses-library-body">
+                  <div className="courses-catalog-meta-row">
+                    <span className="courses-catalog-pill">{library.name}</span>
+                    <span className="courses-catalog-date">
+                      {library.count > 0 ? formatCatalogTime(library.latestCreatedAt) : 'Tomt'}
+                    </span>
+                  </div>
+                  <h3>{library.name}</h3>
+                  <p>{library.count} kurs(er)</p>
+                </div>
               </button>
             ))}
           </div>
-        </div>
-      </article>
+        )}
+      </section>
 
       <section className="courses-catalog-section">
         {loadingCourses || loadingLibraries ? (
@@ -366,7 +377,7 @@ const CoursesPage = () => {
                   <div className="courses-catalog-body">
                     <div className="courses-catalog-meta-row">
                       <span className="courses-catalog-pill">{course.libraryName ?? 'Bibliotek'}</span>
-                      <span className="courses-catalog-date">{formatCourseDate(course.createdAt)}</span>
+                      <span className="courses-catalog-date">{formatCatalogTime(course.createdAt)}</span>
                     </div>
                     <h3>{course.title}</h3>
                     <p>{course.description}</p>
@@ -410,9 +421,7 @@ const CoursesPage = () => {
             </div>
           </article>
         ) : (
-          <article className="brand-panel">
-            <p className="muted">Inga kurser matchar valt bibliotek/sokning.</p>
-          </article>
+          null
         )}
       </section>
 
@@ -595,3 +604,4 @@ const CoursesPage = () => {
 }
 
 export default CoursesPage
+
