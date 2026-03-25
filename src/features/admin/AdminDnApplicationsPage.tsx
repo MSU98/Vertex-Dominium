@@ -128,9 +128,9 @@ const AdminDnApplicationsPage = () => {
   return (
     <BrandPageShell title="GRANSKNINGAR" subtitle="Medlemsansökningar" memberNav>
       <article className="brand-panel">
-        <div style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
+        <div className="panel-toolbar">
           <h3 style={{ margin: 0 }}>Steg 1: Första ansökningar</h3>
-          <Link to={routes.adminDnApplications2} className="btn ghost" style={{ marginLeft: 'auto' }}>
+          <Link to={routes.adminDnApplications2} className="btn ghost">
             → Gå till Steg 2
           </Link>
         </div>
