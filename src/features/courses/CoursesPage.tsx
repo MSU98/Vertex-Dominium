@@ -140,22 +140,7 @@ const CoursesPage = () => {
     return () => unsubscribe()
   }, [dbClient])
 
-  const filteredCourses = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase()
-    return courses.filter((course) => {
-      const matchesLibrary =
-        selectedLibraryFilter === 'all' ? true : course.libraryId === selectedLibraryFilter
-
-      if (!matchesLibrary) return false
-      if (!q) return true
-
-      const haystack = `${course.title} ${course.description} ${course.libraryName ?? ''}`.toLowerCase()
-      return haystack.includes(q)
-    })
-  }, [courses, searchQuery, selectedLibraryFilter])
-
-  const fallbackToAllCourses = filteredCourses.length === 0 && courses.length > 0
-  const visibleCatalogCourses = fallbackToAllCourses ? courses : filteredCourses
+  const normalizedLibraryQuery = searchQuery.trim().toLowerCase()
 
   const libraryCards = useMemo(() => {
     return libraries.map((library) => {
@@ -168,6 +153,27 @@ const CoursesPage = () => {
       }
     })
   }, [courses, libraries])
+
+  const visibleLibraryCards = useMemo(() => {
+    if (!normalizedLibraryQuery) return libraryCards
+    return libraryCards.filter((library) =>
+      `${library.name} ${library.description ?? ''}`.toLowerCase().includes(normalizedLibraryQuery),
+    )
+  }, [libraryCards, normalizedLibraryQuery])
+
+  const visibleCatalogCourses = useMemo(() => {
+    let next = courses
+
+    if (selectedLibraryFilter !== 'all') {
+      next = next.filter((course) => course.libraryId === selectedLibraryFilter)
+      return next
+    }
+
+    if (!normalizedLibraryQuery) return next
+
+    const visibleLibraryIds = new Set(visibleLibraryCards.map((library) => library.id))
+    return next.filter((course) => (course.libraryId ? visibleLibraryIds.has(course.libraryId) : false))
+  }, [courses, normalizedLibraryQuery, selectedLibraryFilter, visibleLibraryCards])
 
   const handleCreateLibrary = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -299,7 +305,7 @@ const CoursesPage = () => {
             type="text"
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="Search training..."
+            placeholder="Sok bibliotek..."
           />
 
           <p className="muted">Valkort nedan filtrerar vilka kurser som visas.</p>
@@ -312,7 +318,7 @@ const CoursesPage = () => {
           </article>
         ) : (
           <div className="courses-library-grid">
-            {libraryCards.map((library) => (
+            {visibleLibraryCards.map((library) => (
               <button
                 key={library.id}
                 type="button"
@@ -343,6 +349,11 @@ const CoursesPage = () => {
             ))}
           </div>
         )}
+        {!loadingLibraries && !loadingCourses && visibleLibraryCards.length === 0 && (
+          <article className="brand-panel" style={{ marginTop: '12px' }}>
+            <p className="muted">Inga bibliotek matchar din sokning.</p>
+          </article>
+        )}
       </section>
 
       <section className="courses-catalog-section">
@@ -352,13 +363,6 @@ const CoursesPage = () => {
           </article>
         ) : visibleCatalogCourses.length > 0 ? (
           <>
-            {fallbackToAllCourses && (
-              <article className="brand-panel" style={{ marginBottom: '12px' }}>
-                <p className="muted">
-                  Inga kurser matchade valt bibliotek/sokning. Visar alla kurser istallet.
-                </p>
-              </article>
-            )}
           <div className="courses-catalog-grid">
             {visibleCatalogCourses.map((course) => {
               const embeddedUrl = course.videoUrl ? toYouTubeEmbed(course.videoUrl) : null
