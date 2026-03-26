@@ -25,9 +25,9 @@ const BrandPageShell = ({ title, subtitle, memberNav = false, children }: BrandP
         <div className="landing-nav-left">
           <HeaderAccountMenu showMemberNav={showMemberNav} />
         </div>
-        <div className="landing-nav-logo">
+        <NavLink to={routes.hem} className="landing-nav-logo">
           <img src="/vertex-logo.png" alt="Vertex Dominium" />
-        </div>
+        </NavLink>
         <nav className="landing-nav-right membership-top-links">
           {showMemberNav ? (
             <>
