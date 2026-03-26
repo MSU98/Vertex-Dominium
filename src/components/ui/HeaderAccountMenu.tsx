@@ -36,7 +36,7 @@ const HeaderAccountMenu = ({ showMemberNav }: HeaderAccountMenuProps) => {
   }
 
   if (!showMemberNav) {
-    return 'MENY'
+    return null
   }
 
   return (
