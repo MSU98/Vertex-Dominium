@@ -2394,6 +2394,84 @@ h2 {
   padding: 0 16px 16px;
 }
 
+.courses-course-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 0 16px 16px;
+}
+
+.courses-steps-panel {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.courses-steps-panel h4 {
+  margin: 0;
+  letter-spacing: 0.06em;
+}
+
+.courses-step-list {
+  display: grid;
+  gap: 12px;
+}
+
+.courses-step-card {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  display: grid;
+  gap: 10px;
+}
+
+.courses-step-card input,
+.courses-step-card textarea {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  padding: 10px 12px;
+  font: inherit;
+}
+
+.courses-step-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.courses-step-link {
+  color: var(--accent-strong);
+  text-decoration: underline;
+}
+
+.courses-quiz-block {
+  display: grid;
+  gap: 10px;
+}
+
+.courses-quiz-item {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.courses-quiz-block input {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  padding: 10px 12px;
+  font: inherit;
+}
+
 .courses-catalog-embed {
   width: 100%;
   aspect-ratio: 16/9;

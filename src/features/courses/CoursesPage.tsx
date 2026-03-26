@@ -2,11 +2,14 @@ import { useEffect, useMemo, useState } from 'react'
 import {
   addDoc,
   collection,
+  doc,
   onSnapshot,
   orderBy,
   query,
   serverTimestamp,
+  setDoc,
   type Timestamp,
+  where,
 } from 'firebase/firestore'
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
 import BrandPageShell from '../../components/ui/BrandPageShell'
@@ -22,7 +25,24 @@ type CourseItem = {
   imageUrl?: string
   videoUrl?: string
   authorName?: string
+  price?: number
+  availability?: 'all' | 'members' | 'initium' | 'ascensio' | 'dominus'
+  steps?: CourseStep[]
   createdAt?: Timestamp | null
+}
+
+type CourseStep = {
+  title: string
+  videoUrl?: string
+  pdfUrl?: string
+  quizzes?: CourseQuiz[]
+  quizQuestion?: string
+  quizAnswer?: string
+}
+
+type CourseQuiz = {
+  question: string
+  answer: string
 }
 
 type CourseLibrary = {
@@ -30,6 +50,14 @@ type CourseLibrary = {
   name: string
   description?: string
   createdAt?: Timestamp | null
+}
+
+type CourseProgressItem = {
+  id: string
+  uid: string
+  courseId: string
+  lastStepIndex?: number
+  completedStepIndexes?: number[]
 }
 
 const formatCatalogTime = (value?: Timestamp | null) => {
@@ -54,6 +82,14 @@ const toYouTubeEmbed = (url: string) => {
   return null
 }
 
+const availabilityLabel = (value?: 'all' | 'members' | 'initium' | 'ascensio' | 'dominus') => {
+  if (value === 'initium') return 'Initium+'
+  if (value === 'ascensio') return 'Ascensio+'
+  if (value === 'members') return 'Medlemmar'
+  if (value === 'dominus') return 'Dominus'
+  return 'Alla'
+}
+
 const CoursesPage = () => {
   const { profile } = useAuth()
   const dbClient = db
@@ -72,6 +108,13 @@ const CoursesPage = () => {
   const [selectedVideoFile, setSelectedVideoFile] = useState<File | null>(null)
   const [newLibraryName, setNewLibraryName] = useState('')
   const [newLibraryDescription, setNewLibraryDescription] = useState('')
+  const [coursePrice, setCoursePrice] = useState('0')
+  const [courseAvailability, setCourseAvailability] = useState<
+    'all' | 'members' | 'initium' | 'ascensio' | 'dominus'
+  >('all')
+  const [draftSteps, setDraftSteps] = useState<CourseStep[]>([
+    { title: '', videoUrl: '', pdfUrl: '', quizzes: [{ question: '', answer: '' }] },
+  ])
   const [librarySubmitting, setLibrarySubmitting] = useState(false)
 
   const [submitting, setSubmitting] = useState(false)
@@ -80,6 +123,12 @@ const CoursesPage = () => {
   const [libraryMessage, setLibraryMessage] = useState<string | null>(null)
   const [courses, setCourses] = useState<CourseItem[]>([])
   const [libraries, setLibraries] = useState<CourseLibrary[]>([])
+  const [ownedCourseIds, setOwnedCourseIds] = useState<string[]>([])
+  const [expandedCourseId, setExpandedCourseId] = useState<string | null>(null)
+  const [purchaseSubmittingId, setPurchaseSubmittingId] = useState<string | null>(null)
+  const [progressByCourseId, setProgressByCourseId] = useState<Record<string, CourseProgressItem>>({})
+  const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({})
+  const [purchaseCountByCourseId, setPurchaseCountByCourseId] = useState<Record<string, number>>({})
   const [loadingCourses, setLoadingCourses] = useState(true)
   const [loadingLibraries, setLoadingLibraries] = useState(true)
 
@@ -113,6 +162,68 @@ const CoursesPage = () => {
 
     return () => unsubscribe()
   }, [dbClient])
+
+  useEffect(() => {
+    if (!dbClient || !profile?.uid) {
+      setOwnedCourseIds([])
+      setProgressByCourseId({})
+      return
+    }
+
+    const purchasesQuery = query(
+      collection(dbClient, 'coursePurchases'),
+      where('uid', '==', profile.uid),
+      orderBy('createdAt', 'desc'),
+    )
+    const unsubscribePurchases = onSnapshot(purchasesQuery, (snapshot) => {
+      const nextOwned = new Set<string>()
+      snapshot.docs.forEach((entry) => {
+        const data = entry.data() as { courseId?: string }
+        if (data.courseId) nextOwned.add(data.courseId)
+      })
+      setOwnedCourseIds(Array.from(nextOwned))
+    })
+
+    const progressQuery = query(collection(dbClient, 'courseProgress'), where('uid', '==', profile.uid))
+    const unsubscribeProgress = onSnapshot(progressQuery, (snapshot) => {
+      const nextProgress: Record<string, CourseProgressItem> = {}
+      snapshot.docs.forEach((entry) => {
+        const data = entry.data() as Omit<CourseProgressItem, 'id'>
+        if (data.courseId) {
+          nextProgress[data.courseId] = {
+            id: entry.id,
+            ...data,
+          }
+        }
+      })
+      setProgressByCourseId(nextProgress)
+    })
+
+    return () => {
+      unsubscribePurchases()
+      unsubscribeProgress()
+    }
+  }, [dbClient, profile?.uid])
+
+  useEffect(() => {
+    if (!dbClient || !isAdmin) {
+      setPurchaseCountByCourseId({})
+      return
+    }
+
+    const purchasesQuery = query(collection(dbClient, 'coursePurchases'))
+    const unsubscribe = onSnapshot(purchasesQuery, (snapshot) => {
+      const counts: Record<string, number> = {}
+      snapshot.docs.forEach((entry) => {
+        const data = entry.data() as { courseId?: string }
+        if (!data.courseId) return
+        counts[data.courseId] = (counts[data.courseId] ?? 0) + 1
+      })
+      setPurchaseCountByCourseId(counts)
+    })
+
+    return () => unsubscribe()
+  }, [dbClient, isAdmin])
 
   useEffect(() => {
     if (!dbClient) {
@@ -175,6 +286,21 @@ const CoursesPage = () => {
     return next.filter((course) => (course.libraryId ? visibleLibraryIds.has(course.libraryId) : false))
   }, [courses, normalizedLibraryQuery, selectedLibraryFilter, visibleLibraryCards])
 
+  const ownedCourseSet = useMemo(() => new Set(ownedCourseIds), [ownedCourseIds])
+
+  const hasMembership = Boolean(profile?.membershipPlan)
+  const hasDominus = profile?.membershipPlan === 'dominus'
+
+  const canAccessByAvailability = (
+    availability?: 'all' | 'members' | 'initium' | 'ascensio' | 'dominus',
+  ) => {
+    if (availability === 'dominus') return hasDominus
+    if (availability === 'ascensio') return profile?.membershipPlan === 'ascensio' || hasDominus
+    if (availability === 'initium') return hasMembership
+    if (availability === 'members') return hasMembership
+    return true
+  }
+
   const handleCreateLibrary = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!dbClient || !isAdmin || librarySubmitting) return
@@ -235,6 +361,29 @@ const CoursesPage = () => {
     try {
       let nextImageUrl = imageUrl.trim()
       let nextVideoUrl = videoUrl.trim()
+      const parsedSteps = draftSteps
+        .map((step) => {
+          const nextTitle = step.title?.trim() || 'Steg'
+          const nextVideoUrl = step.videoUrl?.trim()
+          const nextPdfUrl = step.pdfUrl?.trim()
+          const nextQuizzes = (step.quizzes ?? [])
+            .map((quiz) => ({
+              question: quiz.question.trim(),
+              answer: quiz.answer.trim(),
+            }))
+            .filter((quiz) => quiz.question && quiz.answer)
+
+          const hasAnyContent = Boolean(nextTitle.trim() || nextVideoUrl || nextPdfUrl || nextQuizzes.length > 0)
+          if (!hasAnyContent) return null
+
+          const nextStep: CourseStep = { title: nextTitle }
+          if (nextVideoUrl) nextStep.videoUrl = nextVideoUrl
+          if (nextPdfUrl) nextStep.pdfUrl = nextPdfUrl
+          if (nextQuizzes.length > 0) nextStep.quizzes = nextQuizzes
+          return nextStep
+        })
+        .filter((step): step is CourseStep => Boolean(step))
+      const parsedPrice = Number.parseFloat(coursePrice)
 
       if (selectedImageFile) {
         if (!storageClient || !profile?.uid) {
@@ -273,6 +422,9 @@ const CoursesPage = () => {
         libraryName: selectedLibrary.name,
         imageUrl: nextImageUrl,
         videoUrl: nextVideoUrl,
+        price: Number.isFinite(parsedPrice) && parsedPrice >= 0 ? parsedPrice : 0,
+        availability: courseAvailability,
+        steps: parsedSteps,
         authorName,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
@@ -285,15 +437,137 @@ const CoursesPage = () => {
       setVideoUrl('')
       setSelectedImageFile(null)
       setSelectedVideoFile(null)
+      setCoursePrice('0')
+      setCourseAvailability('all')
+      setDraftSteps([{ title: '', videoUrl: '', pdfUrl: '', quizzes: [{ question: '', answer: '' }] }])
       setMessage('Kursen har publicerats.')
     } catch (submitError) {
       console.error('Failed to create course', submitError)
-      setError(
-        'Det gick inte att publicera kursen. Kontrollera Firestore/Storage-rattigheter och forsok igen.',
-      )
+      const reason =
+        submitError instanceof Error ? submitError.message : 'okant fel'
+      setError(`Det gick inte att publicera kursen. Fel: ${reason}`)
     } finally {
       setSubmitting(false)
     }
+  }
+
+  const handleBuyCourse = async (course: CourseItem) => {
+    if (!dbClient || !profile?.uid) return
+    if (ownedCourseSet.has(course.id)) return
+
+    setPurchaseSubmittingId(course.id)
+    setError(null)
+    setMessage(null)
+
+    try {
+      await addDoc(collection(dbClient, 'coursePurchases'), {
+        courseId: course.id,
+        courseTitle: course.title,
+        uid: profile.uid,
+        amount: course.price ?? 0,
+        createdAt: serverTimestamp(),
+      })
+      setMessage(`Du ager nu kursen "${course.title}".`)
+    } catch (purchaseError) {
+      console.error('Failed to purchase course', purchaseError)
+      setError('Det gick inte att kopa kursen just nu. Forsok igen.')
+    } finally {
+      setPurchaseSubmittingId(null)
+    }
+  }
+
+  const handleCompleteStep = async (course: CourseItem, stepIndex: number) => {
+    if (!dbClient || !profile?.uid) return
+
+    const current = progressByCourseId[course.id]
+    const completed = new Set(current?.completedStepIndexes ?? [])
+    completed.add(stepIndex)
+    const completedStepIndexes = Array.from(completed).sort((a, b) => a - b)
+    const lastStepIndex = Math.max(current?.lastStepIndex ?? -1, stepIndex)
+
+    try {
+      await setDoc(
+        doc(dbClient, 'courseProgress', `${profile.uid}_${course.id}`),
+        {
+          uid: profile.uid,
+          courseId: course.id,
+          lastStepIndex,
+          completedStepIndexes,
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      )
+    } catch (progressError) {
+      console.error('Failed to update course progress', progressError)
+      setError('Det gick inte att spara progressionen. Forsok igen.')
+    }
+  }
+
+  const updateDraftStep = (index: number, key: keyof CourseStep, value: string) => {
+    setDraftSteps((current) =>
+      current.map((step, stepIndex) =>
+        stepIndex === index ? { ...step, [key]: value } : step,
+      ),
+    )
+  }
+
+  const updateDraftQuiz = (stepIndex: number, quizIndex: number, key: keyof CourseQuiz, value: string) => {
+    setDraftSteps((current) =>
+      current.map((step, sIndex) => {
+        if (sIndex !== stepIndex) return step
+        const nextQuizzes = [...(step.quizzes ?? [{ question: '', answer: '' }])]
+        nextQuizzes[quizIndex] = {
+          ...(nextQuizzes[quizIndex] ?? { question: '', answer: '' }),
+          [key]: value,
+        }
+        return { ...step, quizzes: nextQuizzes }
+      }),
+    )
+  }
+
+  const addDraftQuiz = (stepIndex: number) => {
+    setDraftSteps((current) =>
+      current.map((step, sIndex) =>
+        sIndex === stepIndex
+          ? {
+              ...step,
+              quizzes: [...(step.quizzes ?? []), { question: '', answer: '' }],
+            }
+          : step,
+      ),
+    )
+  }
+
+  const removeDraftQuiz = (stepIndex: number, quizIndex: number) => {
+    setDraftSteps((current) =>
+      current.map((step, sIndex) => {
+        if (sIndex !== stepIndex) return step
+        const currentQuizzes = step.quizzes ?? []
+        if (currentQuizzes.length <= 1) {
+          return { ...step, quizzes: [{ question: '', answer: '' }] }
+        }
+        return {
+          ...step,
+          quizzes: currentQuizzes.filter((_, qIndex) => qIndex !== quizIndex),
+        }
+      }),
+    )
+  }
+
+  const addDraftStep = () => {
+    setDraftSteps((current) => [
+      ...current,
+      { title: '', videoUrl: '', pdfUrl: '', quizzes: [{ question: '', answer: '' }] },
+    ])
+  }
+
+  const removeDraftStep = (index: number) => {
+    setDraftSteps((current) => {
+      if (current.length === 1) {
+        return [{ title: '', videoUrl: '', pdfUrl: '', quizzes: [{ question: '', answer: '' }] }]
+      }
+      return current.filter((_, stepIndex) => stepIndex !== index)
+    })
   }
 
   return (
@@ -316,42 +590,63 @@ const CoursesPage = () => {
           <article className="brand-panel">
             <p className="muted">Laddar bibliotek...</p>
           </article>
+        ) : selectedLibraryFilter === 'all' ? (
+          <>
+            <div className="courses-library-grid">
+              {visibleLibraryCards.map((library) => (
+                <button
+                  key={library.id}
+                  type="button"
+                  className={`courses-library-card ${
+                    selectedLibraryFilter === library.id ? 'active' : ''
+                  }`}
+                  onClick={() => {
+                    setSelectedLibraryFilter(library.id)
+                    setSearchQuery('')
+                  }}
+                >
+                  {library.coverImageUrl ? (
+                    <img src={library.coverImageUrl} alt={library.name} className="courses-library-image" />
+                  ) : (
+                    <div className="courses-library-image courses-library-image-fallback" />
+                  )}
+                  <div className="courses-library-body">
+                    <div className="courses-catalog-meta-row">
+                      <span className="courses-catalog-pill">{library.name}</span>
+                      <span className="courses-catalog-date">
+                        {library.count > 0 ? formatCatalogTime(library.latestCreatedAt) : 'Tomt'}
+                      </span>
+                    </div>
+                    <h3>{library.name}</h3>
+                    <p>{library.count} kurs(er)</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+            {!loadingLibraries && !loadingCourses && visibleLibraryCards.length === 0 && (
+              <article className="brand-panel" style={{ marginTop: '12px' }}>
+                <p className="muted">Inga bibliotek matchar din sokning.</p>
+              </article>
+            )}
+          </>
         ) : (
-          <div className="courses-library-grid">
-            {visibleLibraryCards.map((library) => (
+          <article className="brand-panel">
+            <h3 style={{ marginBottom: '10px' }}>
+              Bibliotek:{' '}
+              {libraries.find((library) => library.id === selectedLibraryFilter)?.name ?? 'Valt bibliotek'}
+            </h3>
+            <div className="actions" style={{ marginTop: 0 }}>
               <button
-                key={library.id}
                 type="button"
-                className={`courses-library-card ${
-                  selectedLibraryFilter === library.id ? 'active' : ''
-                }`}
+                className="btn ghost"
                 onClick={() => {
-                  setSelectedLibraryFilter(library.id)
+                  setSelectedLibraryFilter('all')
                   setSearchQuery('')
                 }}
               >
-                {library.coverImageUrl ? (
-                  <img src={library.coverImageUrl} alt={library.name} className="courses-library-image" />
-                ) : (
-                  <div className="courses-library-image courses-library-image-fallback" />
-                )}
-                <div className="courses-library-body">
-                  <div className="courses-catalog-meta-row">
-                    <span className="courses-catalog-pill">{library.name}</span>
-                    <span className="courses-catalog-date">
-                      {library.count > 0 ? formatCatalogTime(library.latestCreatedAt) : 'Tomt'}
-                    </span>
-                  </div>
-                  <h3>{library.name}</h3>
-                  <p>{library.count} kurs(er)</p>
-                </div>
+                Tillbaka till alla bibliotek
               </button>
-            ))}
-          </div>
-        )}
-        {!loadingLibraries && !loadingCourses && visibleLibraryCards.length === 0 && (
-          <article className="brand-panel" style={{ marginTop: '12px' }}>
-            <p className="muted">Inga bibliotek matchar din sokning.</p>
+            </div>
           </article>
         )}
       </section>
@@ -366,6 +661,19 @@ const CoursesPage = () => {
           <div className="courses-catalog-grid">
             {visibleCatalogCourses.map((course) => {
               const embeddedUrl = course.videoUrl ? toYouTubeEmbed(course.videoUrl) : null
+              const steps = course.steps ?? []
+              const progress = progressByCourseId[course.id]
+              const completedSet = new Set(progress?.completedStepIndexes ?? [])
+              const owned = ownedCourseSet.has(course.id)
+              const canAccess = owned || isAdmin
+              const allowedByPlan = canAccessByAvailability(course.availability)
+              const canBuy = allowedByPlan && !owned && !isAdmin
+              const resumeStepIndex =
+                steps.length > 0
+                  ? steps.findIndex((_, index) => !completedSet.has(index))
+                  : -1
+              const nextStepIndex = resumeStepIndex >= 0 ? resumeStepIndex : Math.max(0, steps.length - 1)
+
               return (
                 <article key={course.id} className="courses-catalog-card">
                   {course.imageUrl ? (
@@ -385,6 +693,14 @@ const CoursesPage = () => {
                     </div>
                     <h3>{course.title}</h3>
                     <p>{course.description}</p>
+                    <p className="muted">Pris: {(course.price ?? 0).toFixed(0)} kr</p>
+                    <p className="muted">Tillgang: {availabilityLabel(course.availability)}</p>
+                    {isAdmin && (
+                      <p className="muted">Kop: {purchaseCountByCourseId[course.id] ?? 0}</p>
+                    )}
+                    {!allowedByPlan && (
+                      <p className="error">Din medlemsniva kan inte kopa den har kursen.</p>
+                    )}
                   </div>
 
                   {course.videoUrl && (
@@ -400,6 +716,149 @@ const CoursesPage = () => {
                         />
                       ) : (
                         <video controls src={course.videoUrl} className="courses-catalog-embed" />
+                      )}
+                    </div>
+                  )}
+
+                  <div className="courses-course-actions">
+                    {canBuy ? (
+                      <button
+                        type="button"
+                        className="btn primary"
+                        disabled={purchaseSubmittingId === course.id}
+                        onClick={() => handleBuyCourse(course)}
+                      >
+                        {purchaseSubmittingId === course.id ? 'Koper...' : 'Kop kurs'}
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="btn ghost"
+                        onClick={() =>
+                          setExpandedCourseId((current) => (current === course.id ? null : course.id))
+                        }
+                        disabled={!canAccess}
+                      >
+                        {canAccess ? 'Oppna kurs' : 'Kop for att lasa upp'}
+                      </button>
+                    )}
+
+                    {canAccess && steps.length > 0 && (
+                      <button
+                        type="button"
+                        className="btn ghost"
+                        onClick={() => handleCompleteStep(course, nextStepIndex)}
+                      >
+                        Fortsatt steg {nextStepIndex + 1}
+                      </button>
+                    )}
+                  </div>
+
+                  {expandedCourseId === course.id && canAccess && (
+                    <div className="courses-steps-panel">
+                      <h4>Kursinnehall</h4>
+                      {steps.length === 0 ? (
+                        <p className="muted">Inga steg upplagda an.</p>
+                      ) : (
+                        <div className="courses-step-list">
+                          {steps.map((step, index) => {
+                            const stepQuizzes =
+                              step.quizzes && step.quizzes.length > 0
+                                ? step.quizzes
+                                : step.quizQuestion && step.quizAnswer
+                                  ? [{ question: step.quizQuestion, answer: step.quizAnswer }]
+                                  : []
+                            const isDone = completedSet.has(index)
+                            return (
+                              <article key={`${course.id}-step-${index}`} className="courses-step-card">
+                                <div className="courses-step-header">
+                                  <strong>
+                                    Steg {index + 1}: {step.title}
+                                  </strong>
+                                  <span>{isDone ? 'Klar' : 'Ej klar'}</span>
+                                </div>
+
+                                {step.videoUrl && (
+                                  <div className="courses-catalog-video">
+                                    {toYouTubeEmbed(step.videoUrl) ? (
+                                      <iframe
+                                        src={toYouTubeEmbed(step.videoUrl) ?? ''}
+                                        title={`${course.title} steg ${index + 1}`}
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                        referrerPolicy="strict-origin-when-cross-origin"
+                                        allowFullScreen
+                                        className="courses-catalog-embed"
+                                      />
+                                    ) : (
+                                      <video controls src={step.videoUrl} className="courses-catalog-embed" />
+                                    )}
+                                  </div>
+                                )}
+
+                                {step.pdfUrl && (
+                                  <a href={step.pdfUrl} target="_blank" rel="noreferrer" className="courses-step-link">
+                                    Oppna PDF-material
+                                  </a>
+                                )}
+
+                                {stepQuizzes.length > 0 && (
+                                  <div className="courses-quiz-block">
+                                    {stepQuizzes.map((quiz, quizIndex) => {
+                                      const quizKey = `${course.id}-${index}-${quizIndex}`
+                                      return (
+                                        <div key={quizKey} className="courses-quiz-item">
+                                          <p>{quiz.question}</p>
+                                          <input
+                                            type="text"
+                                            value={quizAnswers[quizKey] ?? ''}
+                                            onChange={(event) =>
+                                              setQuizAnswers((current) => ({
+                                                ...current,
+                                                [quizKey]: event.target.value,
+                                              }))
+                                            }
+                                            placeholder="Skriv ditt svar"
+                                          />
+                                        </div>
+                                      )
+                                    })}
+                                    <button
+                                      type="button"
+                                      className="btn ghost"
+                                      onClick={() => {
+                                        const allCorrect = stepQuizzes.every((quiz, quizIndex) => {
+                                          const quizKey = `${course.id}-${index}-${quizIndex}`
+                                          const guess = (quizAnswers[quizKey] ?? '').trim().toLowerCase()
+                                          const expected = (quiz.answer ?? '').trim().toLowerCase()
+                                          return Boolean(guess) && guess === expected
+                                        })
+
+                                        if (!allCorrect) {
+                                          setError('Fel quizsvar. Forsok igen.')
+                                          return
+                                        }
+                                        setError(null)
+                                        handleCompleteStep(course, index)
+                                      }}
+                                    >
+                                      Godkann alla fragor
+                                    </button>
+                                  </div>
+                                )}
+
+                                {stepQuizzes.length === 0 && !isDone && (
+                                  <button
+                                    type="button"
+                                    className="btn ghost"
+                                    onClick={() => handleCompleteStep(course, index)}
+                                  >
+                                    Markera steg som klart
+                                  </button>
+                                )}
+                              </article>
+                            )
+                          })}
+                        </div>
                       )}
                     </div>
                   )}
@@ -579,6 +1038,119 @@ const CoursesPage = () => {
                       }}
                     />
                     {selectedVideoFile && <small className="muted">Vald fil: {selectedVideoFile.name}</small>}
+                  </label>
+
+                  <label className="field">
+                    <span>Pris i SEK</span>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={coursePrice}
+                      onChange={(event) => setCoursePrice(event.target.value)}
+                    />
+                  </label>
+
+                  <label className="field">
+                    <span>Tillganglighet</span>
+                    <select
+                      value={courseAvailability}
+                      onChange={(event) =>
+                        setCourseAvailability(
+                          event.target.value as 'all' | 'members' | 'initium' | 'ascensio' | 'dominus',
+                        )
+                      }
+                      style={{
+                        background: 'var(--panel-muted)',
+                        border: '1px solid var(--border)',
+                        borderRadius: '10px',
+                        padding: '10px 12px',
+                        color: 'var(--text)',
+                        font: 'inherit',
+                      }}
+                    >
+                      <option value="all">Alla</option>
+                      <option value="members">Medlemmar</option>
+                      <option value="initium">Initium+</option>
+                      <option value="ascensio">Ascensio+</option>
+                      <option value="dominus">Dominus</option>
+                    </select>
+                  </label>
+
+                  <label className="field">
+                    <span>Steg/Lektioner</span>
+                    <div className="courses-step-list">
+                      {draftSteps.map((step, index) => (
+                        <div key={`draft-step-${index}`} className="courses-step-card">
+                          <div className="courses-step-header">
+                            <strong>Steg {index + 1}</strong>
+                            <button
+                              type="button"
+                              className="btn ghost"
+                              onClick={() => removeDraftStep(index)}
+                            >
+                              Ta bort
+                            </button>
+                          </div>
+
+                          <input
+                            type="text"
+                            value={step.title ?? ''}
+                            onChange={(event) => updateDraftStep(index, 'title', event.target.value)}
+                            placeholder="Titel"
+                          />
+                          <input
+                            type="url"
+                            value={step.videoUrl ?? ''}
+                            onChange={(event) => updateDraftStep(index, 'videoUrl', event.target.value)}
+                            placeholder="Video-URL (valfritt)"
+                          />
+                          <input
+                            type="url"
+                            value={step.pdfUrl ?? ''}
+                            onChange={(event) => updateDraftStep(index, 'pdfUrl', event.target.value)}
+                            placeholder="PDF-URL (valfritt)"
+                          />
+                          <div className="courses-quiz-block">
+                            {(step.quizzes ?? [{ question: '', answer: '' }]).map((quiz, quizIndex) => (
+                              <div key={`draft-quiz-${index}-${quizIndex}`} className="courses-quiz-item">
+                                <input
+                                  type="text"
+                                  value={quiz.question}
+                                  onChange={(event) =>
+                                    updateDraftQuiz(index, quizIndex, 'question', event.target.value)
+                                  }
+                                  placeholder={`Fraga ${quizIndex + 1}`}
+                                />
+                                <input
+                                  type="text"
+                                  value={quiz.answer}
+                                  onChange={(event) =>
+                                    updateDraftQuiz(index, quizIndex, 'answer', event.target.value)
+                                  }
+                                  placeholder={`Svar ${quizIndex + 1}`}
+                                />
+                                <button
+                                  type="button"
+                                  className="btn ghost"
+                                  onClick={() => removeDraftQuiz(index, quizIndex)}
+                                >
+                                  Ta bort fraga
+                                </button>
+                              </div>
+                            ))}
+                            <button type="button" className="btn ghost" onClick={() => addDraftQuiz(index)}>
+                              + Lagg till fraga
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="actions" style={{ marginTop: '10px' }}>
+                      <button type="button" className="btn ghost" onClick={addDraftStep}>
+                        + Lagg till lektion
+                      </button>
+                    </div>
                   </label>
 
                   <p className="muted">
