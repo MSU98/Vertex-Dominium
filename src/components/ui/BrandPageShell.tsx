@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Link } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import useAuth from '../../hooks/useAuth'
 import { routes } from '../../routes/paths'
 import HeaderAccountMenu from './HeaderAccountMenu'
@@ -10,6 +10,9 @@ type BrandPageShellProps = {
   memberNav?: boolean
   children: ReactNode
 }
+
+const memberLinkClass = ({ isActive }: { isActive: boolean }) =>
+  isActive ? 'member-top-link active' : 'member-top-link'
 
 const BrandPageShell = ({ title, subtitle, memberNav = false, children }: BrandPageShellProps) => {
   const { currentUser, profile } = useAuth()
@@ -22,28 +25,56 @@ const BrandPageShell = ({ title, subtitle, memberNav = false, children }: BrandP
         <div className="landing-nav-left">
           <HeaderAccountMenu showMemberNav={showMemberNav} />
         </div>
-        <div className="landing-nav-logo">
+        <NavLink to={routes.hem} className="landing-nav-logo">
           <img src="/vertex-logo.png" alt="Vertex Dominium" />
-        </div>
+        </NavLink>
         <nav className="landing-nav-right membership-top-links">
           {showMemberNav ? (
             <>
-              <Link to={routes.hem}>HEM</Link>
-              <Link to={routes.dashboard}>ÖVERSIKT</Link>
-              <Link to={routes.membership}>MEDLEMSKAP</Link>
-              <Link to={routes.courses}>KURSER</Link>
-              <Link to={routes.feed}>FLÖDE</Link>
-              <Link to={routes.forum}>FORUM</Link>
-              <Link to={routes.profile}>PROFIL</Link>
-              {isAdmin && <Link to={routes.adminReviews}>GRANSKNINGAR</Link>}
+              <NavLink to={routes.hem} className={memberLinkClass}>
+                HEM
+              </NavLink>
+              <NavLink to={routes.dashboard} className={memberLinkClass}>
+                ÖVERSIKT
+              </NavLink>
+              <NavLink to={routes.membership} className={memberLinkClass}>
+                MEDLEMSKAP
+              </NavLink>
+              <NavLink to={routes.courses} className={memberLinkClass}>
+                KURSER
+              </NavLink>
+              <NavLink to={routes.feed} className={memberLinkClass}>
+                FLÖDE
+              </NavLink>
+              <NavLink to={routes.forum} className={memberLinkClass}>
+                FORUM
+              </NavLink>
+              <NavLink to={routes.profile} className={memberLinkClass}>
+                PROFIL
+              </NavLink>
+              {isAdmin && (
+                <NavLink to={routes.adminReviews} className={memberLinkClass}>
+                  GRANSKNINGAR
+                </NavLink>
+              )}
             </>
           ) : (
             <>
-              <Link to={routes.hem}>HEM</Link>
-              <Link to={routes.about}>OM OSS</Link>
-              <Link to={routes.membership}>MEDLEMSPORTAL</Link>
-              <Link to={routes.contact}>KONTAKT</Link>
-              <Link to={routes.login}>LOGGA IN</Link>
+              <NavLink to={routes.hem} className={memberLinkClass}>
+                HEM
+              </NavLink>
+              <NavLink to={routes.about} className={memberLinkClass}>
+                OM OSS
+              </NavLink>
+              <NavLink to={routes.membership} className={memberLinkClass}>
+                MEDLEMSPORTAL
+              </NavLink>
+              <NavLink to={routes.contact} className={memberLinkClass}>
+                KONTAKT
+              </NavLink>
+              <NavLink to={routes.login} className={memberLinkClass}>
+                LOGGA IN
+              </NavLink>
             </>
           )}
         </nav>

@@ -1,8 +1,9 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { NavLink, useNavigate } from 'react-router-dom'
+import HeaderAccountMenu from '../../components/ui/HeaderAccountMenu'
 import useAuth from '../../hooks/useAuth'
 import { routes } from '../../routes/paths'
 import type { MembershipPlan } from '../../types/User'
-import HeaderAccountMenu from '../../components/ui/HeaderAccountMenu'
 
 type SelectableMembershipPlan = Exclude<MembershipPlan, null>
 
@@ -54,28 +55,29 @@ const plans: MembershipTier[] = [
   },
 ]
 
+const memberLinkClass = ({ isActive }: { isActive: boolean }) =>
+  isActive ? 'member-top-link active' : 'member-top-link'
+
 const MembershipPage = () => {
-  const { profile } = useAuth()
+  const { currentUser, profile } = useAuth()
   const navigate = useNavigate()
+  const [guestError, setGuestError] = useState<string | null>(null)
+
+  const showMemberNav = Boolean(currentUser)
   const isAdmin = profile?.role === 'admin'
 
-  if (!profile) {
-    return (
-      <div className="membership-hero page-centered">
-        <div className="card" style={{ width: 'min(480px, 92vw)' }}>
-          <p className="eyebrow">Medlemskap</p>
-          <h2>Laddar...</h2>
-          <p className="muted">Logga in och kontrollera att Firebase är konfigurerat.</p>
-        </div>
-      </div>
-    )
-  }
-
   const handleSelect = (plan: SelectableMembershipPlan) => {
+    if (!currentUser || !profile) {
+      setGuestError('skapa ett konto för att kunna köpa medlemskap')
+      return
+    }
+
+    setGuestError(null)
+
     const target =
       plan === 'dominus'
         ? routes.onboardingDominus
-        : profile?.onboardingComplete
+        : profile.onboardingComplete
           ? `${routes.payment}?planId=${plan}`
           : plan === 'initium'
             ? routes.onboardingInitium
@@ -88,20 +90,60 @@ const MembershipPage = () => {
     <div className="membership-hero">
       <header className="landing-nav membership-nav">
         <div className="landing-nav-left">
-          <HeaderAccountMenu showMemberNav />
+          <HeaderAccountMenu showMemberNav={showMemberNav} />
         </div>
-        <div className="landing-nav-logo">
+        <NavLink to={routes.hem} className="landing-nav-logo">
           <img src="/vertex-logo.png" alt="Vertex Dominium" />
-        </div>
+        </NavLink>
         <nav className="landing-nav-right membership-top-links">
-          <Link to={routes.hem}>HEM</Link>
-          <Link to={routes.dashboard}>DASHBOARD</Link>
-          <Link to={routes.membership}>MEMBERSHIP</Link>
-          <Link to={routes.courses}>COURSES</Link>
-          <Link to={routes.feed}>FEED</Link>
-          <Link to={routes.forum}>FORUM</Link>
-          <Link to={routes.profile}>PROFILE</Link>
-          {isAdmin && <Link to={routes.adminReviews}>REVIEWS</Link>}
+          {showMemberNav ? (
+            <>
+              <NavLink to={routes.hem} className={memberLinkClass}>
+                HEM
+              </NavLink>
+              <NavLink to={routes.dashboard} className={memberLinkClass}>
+                ÖVERSIKT
+              </NavLink>
+              <NavLink to={routes.membership} className={memberLinkClass}>
+                MEDLEMSKAP
+              </NavLink>
+              <NavLink to={routes.courses} className={memberLinkClass}>
+                KURSER
+              </NavLink>
+              <NavLink to={routes.feed} className={memberLinkClass}>
+                FLÖDE
+              </NavLink>
+              <NavLink to={routes.forum} className={memberLinkClass}>
+                FORUM
+              </NavLink>
+              <NavLink to={routes.profile} className={memberLinkClass}>
+                PROFIL
+              </NavLink>
+              {isAdmin && (
+                <NavLink to={routes.adminReviews} className={memberLinkClass}>
+                  GRANSKNINGAR
+                </NavLink>
+              )}
+            </>
+          ) : (
+            <>
+              <NavLink to={routes.hem} className={memberLinkClass}>
+                HEM
+              </NavLink>
+              <NavLink to={routes.about} className={memberLinkClass}>
+                OM OSS
+              </NavLink>
+              <NavLink to={routes.membership} className={memberLinkClass}>
+                MEDLEMSPORTAL
+              </NavLink>
+              <NavLink to={routes.contact} className={memberLinkClass}>
+                KONTAKT
+              </NavLink>
+              <NavLink to={routes.login} className={memberLinkClass}>
+                LOGGA IN
+              </NavLink>
+            </>
+          )}
         </nav>
       </header>
 
@@ -124,9 +166,7 @@ const MembershipPage = () => {
             <button
               className="membership-select"
               onClick={() => handleSelect(plan.id)}
-              disabled={
-                profile?.membershipPlan === plan.id && profile?.membershipStatus === 'active'
-              }
+              disabled={profile?.membershipPlan === plan.id && profile?.membershipStatus === 'active'}
               style={
                 profile?.membershipPlan === plan.id && profile?.membershipStatus === 'active'
                   ? { opacity: 0.5, cursor: 'default' }
@@ -135,11 +175,13 @@ const MembershipPage = () => {
             >
               {profile?.membershipPlan === plan.id && profile?.membershipStatus === 'active'
                 ? 'DIN PLAN'
-                : 'VÄLJ NIVÅ'}{' '}
+                : 'VÄLJ NIVÅ'}
             </button>
           </article>
         ))}
       </section>
+
+      {guestError && <p className="membership-error">{guestError}</p>}
     </div>
   )
 }
