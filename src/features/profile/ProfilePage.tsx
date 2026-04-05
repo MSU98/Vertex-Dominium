@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react'
 import {
   collection,
   doc,
+  getDoc,
   getDocs,
   limit,
   query,
+  setDoc,
   updateDoc,
   serverTimestamp,
   where,
@@ -15,6 +17,7 @@ import useAuth from '../../hooks/useAuth'
 import { useModuleAccess } from '../../hooks/useModuleAccess'
 import { db } from '../../lib/firebase'
 import { upsertPublicProfile } from '../../lib/publicProfile'
+import { routes } from '../../routes/paths'
 import type { ForumPost } from '../../types/ForumPost'
 import type { UserProfile } from '../../types/User'
 import type { Subscription } from '../../types/Subscription'
@@ -31,6 +34,40 @@ type ProfileFormState = {
   currentBusiness: string
   developmentGoal: string
   strengths: string
+}
+
+const SHARE_FIELD_OPTIONS = [
+  { key: 'fullName', label: 'Namn' },
+  { key: 'professionalHeadline', label: 'Yrkesrubrik' },
+  { key: 'title', label: 'Titel' },
+  { key: 'company', label: 'Foretag' },
+  { key: 'city', label: 'Stad' },
+  { key: 'phone', label: 'Telefon' },
+  { key: 'linkedin', label: 'LinkedIn' },
+  { key: 'professionalDescription', label: 'Professionell beskrivning' },
+  { key: 'currentBusiness', label: 'Nuvarande verksamhet' },
+  { key: 'developmentGoal', label: 'Utvecklingsmal' },
+  { key: 'strengths', label: 'Styrkor' },
+  { key: 'avatarUrl', label: 'Profilbild' },
+  { key: 'companyLogoUrl', label: 'Foretagslogga' },
+] as const
+
+type ShareFieldKey = (typeof SHARE_FIELD_OPTIONS)[number]['key']
+
+const INITIAL_SHARE_VISIBILITY: Record<ShareFieldKey, boolean> = {
+  fullName: true,
+  professionalHeadline: true,
+  title: false,
+  company: true,
+  city: false,
+  phone: false,
+  linkedin: true,
+  professionalDescription: false,
+  currentBusiness: false,
+  developmentGoal: false,
+  strengths: false,
+  avatarUrl: true,
+  companyLogoUrl: false,
 }
 
 const ProfilePage = () => {
@@ -53,6 +90,10 @@ const ProfilePage = () => {
   const [loadingSub, setLoadingSub] = useState(true)
   const [profilePosts, setProfilePosts] = useState<ForumPost[]>([])
   const [loadingPosts, setLoadingPosts] = useState(true)
+  const [shareEnabled, setShareEnabled] = useState(false)
+  const [shareVisibility, setShareVisibility] =
+    useState<Record<ShareFieldKey, boolean>>(INITIAL_SHARE_VISIBILITY)
+  const [shareSaving, setShareSaving] = useState(false)
   const [form, setForm] = useState<ProfileFormState>({
     fullName: '',
     phone: '',
@@ -201,6 +242,35 @@ const ProfilePage = () => {
     }
 
     fetchProfilePosts()
+  }, [dbClient, profile?.uid])
+
+  useEffect(() => {
+    if (!profile?.uid || !dbClient) return
+
+    const loadShareSettings = async () => {
+      try {
+        const shareSnap = await getDoc(doc(dbClient, 'sharedProfiles', profile.uid))
+        if (!shareSnap.exists()) return
+
+        const data = shareSnap.data() as {
+          enabled?: boolean
+          visibleFields?: string[]
+        }
+
+        setShareEnabled(Boolean(data.enabled))
+        if (Array.isArray(data.visibleFields)) {
+          const nextVisibility = { ...INITIAL_SHARE_VISIBILITY }
+          SHARE_FIELD_OPTIONS.forEach((field) => {
+            nextVisibility[field.key] = data.visibleFields?.includes(field.key) ?? false
+          })
+          setShareVisibility(nextVisibility)
+        }
+      } catch (shareLoadError) {
+        console.error('Failed to load share settings', shareLoadError)
+      }
+    }
+
+    loadShareSettings()
   }, [dbClient, profile?.uid])
 
   const handleChange =
@@ -362,6 +432,135 @@ const ProfilePage = () => {
       setError('Det gick inte att spara profilen eller profilbilden. Försök igen.')
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleCopyProfileLink = async () => {
+    if (!profile?.uid) {
+      setError('Kunde inte skapa profillanken.')
+      return
+    }
+
+    const profileUrl = `${window.location.origin}${routes.profileView(profile.uid)}`
+
+    try {
+      await navigator.clipboard.writeText(profileUrl)
+      setMessage('Profillanken ar kopierad till urklipp.')
+      setError(null)
+      return
+    } catch (clipboardError) {
+      console.error('Clipboard API failed, trying fallback.', clipboardError)
+    }
+
+    try {
+      const textarea = document.createElement('textarea')
+      textarea.value = profileUrl
+      textarea.style.position = 'fixed'
+      textarea.style.left = '-9999px'
+      document.body.appendChild(textarea)
+      textarea.focus()
+      textarea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textarea)
+      setMessage('Profillanken ar kopierad till urklipp.')
+      setError(null)
+    } catch (fallbackError) {
+      console.error(fallbackError)
+      setError('Kunde inte kopiera profillanken.')
+    }
+  }
+
+  const handleShareToggle = (field: ShareFieldKey) => {
+    setShareVisibility((current) => ({ ...current, [field]: !current[field] }))
+  }
+
+  const buildShareData = () => {
+    const source: Record<ShareFieldKey, string> = {
+      fullName: form.fullName.trim(),
+      professionalHeadline: form.professionalHeadline.trim(),
+      title: form.title.trim(),
+      company: form.company.trim(),
+      city: form.city.trim(),
+      phone: form.phone.trim(),
+      linkedin: form.linkedin.trim(),
+      professionalDescription: form.professionalDescription.trim(),
+      currentBusiness: form.currentBusiness.trim(),
+      developmentGoal: form.developmentGoal.trim(),
+      strengths: form.strengths.trim(),
+      avatarUrl: avatarPreviewUrl || avatarUrl,
+      companyLogoUrl: companyLogoPreviewUrl || companyLogoUrl,
+    }
+
+    return SHARE_FIELD_OPTIONS.reduce<Record<string, string>>((accumulator, field) => {
+      if (!shareVisibility[field.key]) return accumulator
+      const value = source[field.key]?.trim()
+      if (!value) return accumulator
+      accumulator[field.key] = value
+      return accumulator
+    }, {})
+  }
+
+  const handleSaveShareSettings = async () => {
+    if (!profile?.uid || !dbClient || shareSaving) return
+    setShareSaving(true)
+    setError(null)
+    setMessage(null)
+
+    try {
+      const visibleFields = SHARE_FIELD_OPTIONS.filter((field) => shareVisibility[field.key]).map(
+        (field) => field.key,
+      )
+      const data = buildShareData()
+
+      await setDoc(
+        doc(dbClient, 'sharedProfiles', profile.uid),
+        {
+          ownerUid: profile.uid,
+          enabled: shareEnabled,
+          visibleFields,
+          data,
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      )
+
+      setMessage('Extern delningsprofil uppdaterad.')
+    } catch (shareSaveError) {
+      console.error(shareSaveError)
+      setError('Kunde inte spara delningsinställningarna.')
+    } finally {
+      setShareSaving(false)
+    }
+  }
+
+  const handleCopyExternalProfileLink = async () => {
+    if (!profile?.uid) return
+    const shareUrl = `${window.location.origin}${routes.publicShareProfileView(profile.uid)}`
+
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      setMessage('Extern profillank kopierad till urklipp.')
+      setError(null)
+      return
+    } catch (clipboardError) {
+      console.error('Clipboard API failed, trying fallback.', clipboardError)
+    }
+
+    try {
+      const textarea = document.createElement('textarea')
+      textarea.value = shareUrl
+      textarea.style.position = 'fixed'
+      textarea.style.left = '-9999px'
+      document.body.appendChild(textarea)
+      textarea.focus()
+      textarea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textarea)
+      setMessage('Extern profillank kopierad till urklipp.')
+      setError(null)
+    } catch (fallbackError) {
+      console.error(fallbackError)
+      setError('Kunde inte kopiera extern profillank.')
     }
   }
 
@@ -576,11 +775,54 @@ const ProfilePage = () => {
           <button className="btn primary" type="submit" disabled={saving}>
             {saving ? 'Sparar...' : 'Spara profil'}
           </button>
+          <button type="button" className="btn ghost" onClick={handleCopyProfileLink}>
+            Kopiera profil-lank
+          </button>
         </div>
 
         {message && <p className="muted">{message}</p>}
         {error && <p className="error">{error}</p>}
       </form>
+
+      <article className="brand-panel" style={{ marginTop: '16px' }}>
+        <h3>Extern delningsprofil</h3>
+        <p className="muted">
+          Välj exakt vilken information externa besökare (utan konto) får se via din delningslänk.
+        </p>
+
+        <label className="field" style={{ marginTop: '12px' }}>
+          <span>Aktivera extern profil</span>
+          <input
+            type="checkbox"
+            checked={shareEnabled}
+            onChange={(event) => setShareEnabled(event.target.checked)}
+            style={{ width: '18px', height: '18px' }}
+          />
+        </label>
+
+        <div className="brand-panel-grid" style={{ marginTop: '10px' }}>
+          {SHARE_FIELD_OPTIONS.map((field) => (
+            <label key={field.key} className="brand-panel-sub" style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <input
+                type="checkbox"
+                checked={shareVisibility[field.key]}
+                onChange={() => handleShareToggle(field.key)}
+                style={{ width: '16px', height: '16px' }}
+              />
+              <span>{field.label}</span>
+            </label>
+          ))}
+        </div>
+
+        <div className="actions">
+          <button type="button" className="btn primary" onClick={handleSaveShareSettings} disabled={shareSaving}>
+            {shareSaving ? 'Sparar...' : 'Spara delningsinställningar'}
+          </button>
+          <button type="button" className="btn ghost" onClick={handleCopyExternalProfileLink}>
+            Kopiera extern profil-lank
+          </button>
+        </div>
+      </article>
       <article className="brand-panel" style={{ marginTop: '16px' }}>
         <h3>Medlemskap</h3>
         {loadingSub ? (

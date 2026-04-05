@@ -1,13 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore'
-import { useParams } from 'react-router-dom'
+import { Navigate, useLocation, useParams } from 'react-router-dom'
 import ForumPostCard from '../../components/forum/ForumPostCard'
 import BrandPageShell from '../../components/ui/BrandPageShell'
+import useAuth from '../../hooks/useAuth'
 import { db } from '../../lib/firebase'
 import type { ForumPost } from '../../types/ForumPost'
 import type { UserProfile } from '../../types/User'
 
 const PublicProfilePage = () => {
+  const { currentUser, loading } = useAuth()
+  const location = useLocation()
   const { uid } = useParams<{ uid: string }>()
   const dbClient = db
   const [profile, setProfile] = useState<Partial<UserProfile> | null>(null)
@@ -118,6 +121,14 @@ const PublicProfilePage = () => {
       { label: 'Foretagsmail', value: profile.businessEmail ?? '' },
     ].filter((field) => field.value.trim().length > 0)
   }, [profile])
+
+  if (loading) {
+    return <div className="screen-center">Laddar...</div>
+  }
+
+  if (!currentUser) {
+    return <Navigate to="/login" replace state={{ from: location }} />
+  }
 
   return (
     <BrandPageShell title="PROFILVY" subtitle="Offentlig medlemsprofil." memberNav>
