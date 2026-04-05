@@ -27,6 +27,7 @@ import AdminDnApplicationsPage from '../features/admin/AdminDnApplicationsPage'
 import AdminDnApplications2Page from '../features/admin/AdminDnApplications2Page'
 import ProfilePage from '../features/profile/ProfilePage'
 import PublicProfilePage from '../features/profile/PublicProfilePage'
+import PublicSharedProfilePage from '../features/profile/PublicSharedProfilePage'
 import { routes } from '../routes/paths'
 
 const App = () => (
@@ -40,6 +41,7 @@ const App = () => (
         <Route path={routes.login} element={<LoginPage />} />
         <Route path={routes.register} element={<RegisterPage />} />
         <Route path={routes.membership} element={<MembershipPage />} />
+        <Route path={routes.publicShareProfile} element={<PublicSharedProfilePage />} />
 
         <Route element={<RequireAuth />}>
           <Route path={routes.splash} element={<SplashScreen />} /> {/* ← här */}
