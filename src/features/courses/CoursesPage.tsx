@@ -60,6 +60,12 @@ type CourseProgressItem = {
   completedStepIndexes?: number[]
 }
 
+type CourseBadgeItem = {
+  id: string
+  uid: string
+  courseId: string
+}
+
 const formatCatalogTime = (value?: Timestamp | null) => {
   if (!value) return 'Ny'
   return value.toDate().toLocaleTimeString('sv-SE', {
@@ -127,6 +133,7 @@ const CoursesPage = () => {
   const [expandedCourseId, setExpandedCourseId] = useState<string | null>(null)
   const [purchaseSubmittingId, setPurchaseSubmittingId] = useState<string | null>(null)
   const [progressByCourseId, setProgressByCourseId] = useState<Record<string, CourseProgressItem>>({})
+  const [earnedBadgeCourseIds, setEarnedBadgeCourseIds] = useState<string[]>([])
   const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({})
   const [purchaseCountByCourseId, setPurchaseCountByCourseId] = useState<Record<string, number>>({})
   const [loadingCourses, setLoadingCourses] = useState(true)
@@ -167,6 +174,7 @@ const CoursesPage = () => {
     if (!dbClient || !profile?.uid) {
       setOwnedCourseIds([])
       setProgressByCourseId({})
+      setEarnedBadgeCourseIds([])
       return
     }
 
@@ -199,9 +207,22 @@ const CoursesPage = () => {
       setProgressByCourseId(nextProgress)
     })
 
+    const badgesQuery = query(collection(dbClient, 'courseBadges'), where('uid', '==', profile.uid))
+    const unsubscribeBadges = onSnapshot(badgesQuery, (snapshot) => {
+      const nextBadges = snapshot.docs
+        .map((entry) => {
+          const data = entry.data() as Omit<CourseBadgeItem, 'id'>
+          return { id: entry.id, ...data }
+        })
+        .map((badge) => badge.courseId)
+        .filter(Boolean)
+      setEarnedBadgeCourseIds(nextBadges)
+    })
+
     return () => {
       unsubscribePurchases()
       unsubscribeProgress()
+      unsubscribeBadges()
     }
   }, [dbClient, profile?.uid])
 
@@ -287,6 +308,7 @@ const CoursesPage = () => {
   }, [courses, normalizedLibraryQuery, selectedLibraryFilter, visibleLibraryCards])
 
   const ownedCourseSet = useMemo(() => new Set(ownedCourseIds), [ownedCourseIds])
+  const earnedBadgeCourseSet = useMemo(() => new Set(earnedBadgeCourseIds), [earnedBadgeCourseIds])
 
   const hasMembership = Boolean(profile?.membershipPlan)
   const hasDominus = profile?.membershipPlan === 'dominus'
@@ -484,6 +506,8 @@ const CoursesPage = () => {
     completed.add(stepIndex)
     const completedStepIndexes = Array.from(completed).sort((a, b) => a - b)
     const lastStepIndex = Math.max(current?.lastStepIndex ?? -1, stepIndex)
+    const totalSteps = (course.steps ?? []).length
+    const isCourseCompleted = totalSteps > 0 && completedStepIndexes.length >= totalSteps
 
     try {
       await setDoc(
@@ -497,6 +521,20 @@ const CoursesPage = () => {
         },
         { merge: true },
       )
+
+      if (isCourseCompleted) {
+        await setDoc(
+          doc(dbClient, 'courseBadges', `${profile.uid}_${course.id}`),
+          {
+            uid: profile.uid,
+            courseId: course.id,
+            courseTitle: course.title,
+            earnedAt: serverTimestamp(),
+          },
+          { merge: true },
+        )
+        setMessage(`Badge upplast: ${course.title}`)
+      }
     } catch (progressError) {
       console.error('Failed to update course progress', progressError)
       setError('Det gick inte att spara progressionen. Forsok igen.')
@@ -664,6 +702,10 @@ const CoursesPage = () => {
               const steps = course.steps ?? []
               const progress = progressByCourseId[course.id]
               const completedSet = new Set(progress?.completedStepIndexes ?? [])
+              const progressPercent =
+                steps.length > 0
+                  ? Math.min(100, Math.round((completedSet.size / steps.length) * 100))
+                  : 0
               const owned = ownedCourseSet.has(course.id)
               const canAccess = owned || isAdmin
               const allowedByPlan = canAccessByAvailability(course.availability)
@@ -697,6 +739,20 @@ const CoursesPage = () => {
                     <p className="muted">Tillgang: {availabilityLabel(course.availability)}</p>
                     {isAdmin && (
                       <p className="muted">Kop: {purchaseCountByCourseId[course.id] ?? 0}</p>
+                    )}
+                    {canAccess && (
+                      <div className="courses-progress-wrap">
+                        <div className="courses-progress-meta">
+                          <span>Progress</span>
+                          <span>{progressPercent}%</span>
+                        </div>
+                        <div className="courses-progress-track">
+                          <span className="courses-progress-fill" style={{ width: `${progressPercent}%` }} />
+                        </div>
+                      </div>
+                    )}
+                    {earnedBadgeCourseSet.has(course.id) && (
+                      <span className="courses-badge-pill">Badge upplast</span>
                     )}
                     {!allowedByPlan && (
                       <p className="error">Din medlemsniva kan inte kopa den har kursen.</p>
