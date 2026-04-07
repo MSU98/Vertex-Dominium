@@ -323,6 +323,45 @@ const CoursesPage = () => {
     return true
   }
 
+  useEffect(() => {
+    if (!dbClient || !profile?.uid) return
+    if (courses.length === 0) return
+
+    const missingBadgeCourses = courses.filter((course) => {
+      const totalSteps = (course.steps ?? []).length
+      if (totalSteps === 0) return false
+      if (earnedBadgeCourseSet.has(course.id)) return false
+
+      const completed = new Set(progressByCourseId[course.id]?.completedStepIndexes ?? [])
+      return completed.size >= totalSteps
+    })
+
+    if (missingBadgeCourses.length === 0) return
+
+    const backfillBadges = async () => {
+      try {
+        await Promise.all(
+          missingBadgeCourses.map((course) =>
+            setDoc(
+              doc(dbClient, 'courseBadges', `${profile.uid}_${course.id}`),
+              {
+                uid: profile.uid,
+                courseId: course.id,
+                courseTitle: course.title,
+                earnedAt: serverTimestamp(),
+              },
+              { merge: true },
+            ),
+          ),
+        )
+      } catch (badgeBackfillError) {
+        console.error('Failed to backfill course badges', badgeBackfillError)
+      }
+    }
+
+    backfillBadges()
+  }, [courses, dbClient, earnedBadgeCourseSet, profile?.uid, progressByCourseId])
+
   const handleCreateLibrary = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!dbClient || !isAdmin || librarySubmitting) return
