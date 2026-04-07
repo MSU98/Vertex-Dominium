@@ -5,6 +5,7 @@ import {
   getDoc,
   getDocs,
   limit,
+  onSnapshot,
   query,
   setDoc,
   updateDoc,
@@ -21,6 +22,7 @@ import { routes } from '../../routes/paths'
 import type { ForumPost } from '../../types/ForumPost'
 import type { UserProfile } from '../../types/User'
 import type { Subscription } from '../../types/Subscription'
+import type { Timestamp } from 'firebase/firestore'
 
 type ProfileFormState = {
   fullName: string
@@ -34,6 +36,13 @@ type ProfileFormState = {
   currentBusiness: string
   developmentGoal: string
   strengths: string
+}
+
+type CourseBadge = {
+  id: string
+  courseId: string
+  courseTitle?: string
+  earnedAt?: Timestamp | null
 }
 
 const SHARE_FIELD_OPTIONS = [
@@ -90,6 +99,8 @@ const ProfilePage = () => {
   const [loadingSub, setLoadingSub] = useState(true)
   const [profilePosts, setProfilePosts] = useState<ForumPost[]>([])
   const [loadingPosts, setLoadingPosts] = useState(true)
+  const [courseBadges, setCourseBadges] = useState<CourseBadge[]>([])
+  const [loadingBadges, setLoadingBadges] = useState(true)
   const [shareEnabled, setShareEnabled] = useState(false)
   const [shareVisibility, setShareVisibility] =
     useState<Record<ShareFieldKey, boolean>>(INITIAL_SHARE_VISIBILITY)
@@ -242,6 +253,44 @@ const ProfilePage = () => {
     }
 
     fetchProfilePosts()
+  }, [dbClient, profile?.uid])
+
+  useEffect(() => {
+    if (!profile?.uid || !dbClient) {
+      setLoadingBadges(false)
+      setCourseBadges([])
+      return
+    }
+
+    setLoadingBadges(true)
+    const badgesQuery = query(collection(dbClient, 'courseBadges'), where('uid', '==', profile.uid))
+    const unsubscribe = onSnapshot(
+      badgesQuery,
+      (badgesSnapshot) => {
+        const nextBadges = badgesSnapshot.docs
+          .map((entry) => {
+            const data = entry.data() as Omit<CourseBadge, 'id'>
+            return {
+              id: entry.id,
+              ...data,
+            }
+          })
+          .sort((left, right) => {
+            const leftTime = left.earnedAt?.toMillis() ?? 0
+            const rightTime = right.earnedAt?.toMillis() ?? 0
+            return rightTime - leftTime
+          })
+
+        setCourseBadges(nextBadges)
+        setLoadingBadges(false)
+      },
+      (badgesError) => {
+        console.error('Failed to fetch course badges', badgesError)
+        setLoadingBadges(false)
+      },
+    )
+
+    return () => unsubscribe()
   }, [dbClient, profile?.uid])
 
   useEffect(() => {
@@ -867,6 +916,29 @@ const ProfilePage = () => {
           <p className="muted">Du har inget aktivt medlemskap.</p>
         )}
       </article>
+      <article className="brand-panel" style={{ marginTop: '16px' }}>
+        <h3>Kursbadges</h3>
+        {loadingBadges ? (
+          <p className="muted">Laddar badges...</p>
+        ) : courseBadges.length > 0 ? (
+          <div className="brand-panel-grid">
+            {courseBadges.map((badge) => (
+              <article key={badge.id} className="brand-panel-sub">
+                <p className="eyebrow">Badge</p>
+                <p>{badge.courseTitle ?? 'Kurs slutford'}</p>
+                <p className="muted">
+                  {badge.earnedAt
+                    ? `Upplast: ${badge.earnedAt.toDate().toLocaleDateString('sv-SE')}`
+                    : 'Upplast'}
+                </p>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className="muted">Inga badges upplasta an.</p>
+        )}
+      </article>
+
       <article className="brand-panel profile-feed-panel" style={{ marginTop: '16px' }}>
         <h3>Ditt forumflöde</h3>
         {loadingPosts ? (
