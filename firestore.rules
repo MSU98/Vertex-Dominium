@@ -115,5 +115,21 @@ service cloud.firestore {
       allow get, list: if isSignedIn() && (resource.data.uid == request.auth.uid || isAdmin());
       allow delete: if isAdmin();
     }
+
+    match /courseBadges/{badgeId} {
+      allow create, update: if isSignedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.courseId is string;
+      allow get, list: if isSignedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    match /sharedProfiles/{uid} {
+      allow get: if true;
+      allow create, update: if isSignedIn()
+        && request.auth.uid == uid
+        && request.resource.data.ownerUid == request.auth.uid;
+      allow delete: if isSignedIn() && (request.auth.uid == uid || isAdmin());
+    }
   }
 }
