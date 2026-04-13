@@ -1,14 +1,17 @@
 import { useEffect, useMemo, useState } from 'react'
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import ForumPostCard from '../../components/forum/ForumPostCard'
 import BrandPageShell from '../../components/ui/BrandPageShell'
+import useAuth from '../../hooks/useAuth'
 import { db } from '../../lib/firebase'
+import { routes } from '../../routes/paths'
 import type { ForumPost } from '../../types/ForumPost'
 import type { UserProfile } from '../../types/User'
 
 const PublicProfilePage = () => {
   const { uid } = useParams<{ uid: string }>()
+  const { currentUser } = useAuth()
   const dbClient = db
   const [profile, setProfile] = useState<Partial<UserProfile> | null>(null)
   const [profileLoading, setProfileLoading] = useState(true)
@@ -143,6 +146,13 @@ const PublicProfilePage = () => {
               <div>
                 <h3>{displayName}</h3>
                 {profile.professionalHeadline && <p>{profile.professionalHeadline}</p>}
+                {currentUser && uid && currentUser.uid !== uid && (
+                  <div className="public-profile-actions">
+                    <Link className="btn primary" to={routes.messagesWith(uid)}>
+                      Kontakta
+                    </Link>
+                  </div>
+                )}
               </div>
             </div>
             {profile.companyLogoUrl && (

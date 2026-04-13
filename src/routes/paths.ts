@@ -18,6 +18,7 @@ export const routes = {
   courses: '/courses',
   feed: '/feed',
   forum: '/forum',
+  messages: '/messages',
   profile: '/profile',
   publicProfile: '/profile/:uid',
   adminReviews: '/admin/reviews',
@@ -28,5 +29,6 @@ export const routes = {
   subscribe: '/subscribe',
   splash: '/splash',
   profileView: (uid: string) => `/profile/${uid}`,
+  messagesWith: (uid: string) => `/messages?with=${encodeURIComponent(uid)}`,
 }
 

@@ -216,8 +216,6 @@ const ForumPostCard = ({ post }: ForumPostCardProps) => {
         <button type="button" className={commentsOpen ? 'active' : ''} onClick={toggleComments}>
           {commentsOpen ? 'Dölj kommentarer' : 'Visa kommentarer'}
         </button>
-        <button type="button">Dela</button>
-        <button type="button">Skicka</button>
       </div>
 
       {commentsOpen && (

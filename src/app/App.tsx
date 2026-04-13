@@ -15,6 +15,7 @@ import DashboardPage from '../features/dashboard/DashboardPage'
 import CoursesPage from '../features/courses/CoursesPage'
 import FeedPage from '../features/feed/FeedPage'
 import ForumPage from '../features/forum/ForumPage'
+import MessagesPage from '../features/messages/MessagesPage'
 import MembershipPage from '../features/membership/MembershipPage'
 import PaymentPage from '../features/payment/PaymentPage'
 import InitiumOnboardingPage from '../features/onboarding/InitiumOnboardingPage'
@@ -57,6 +58,7 @@ const App = () => (
             <Route path={routes.courses} element={<CoursesPage />} />
             <Route path={routes.feed} element={<FeedPage />} />
             <Route path={routes.forum} element={<ForumPage />} />
+            <Route path={routes.messages} element={<MessagesPage />} />
             <Route path={routes.profile} element={<ProfilePage />} />
             <Route path={routes.publicProfile} element={<PublicProfilePage />} />
             <Route path={routes.adminReviews} element={<RequireRole allowedRoles={['admin']} />}>

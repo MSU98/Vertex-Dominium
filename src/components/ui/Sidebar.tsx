@@ -20,6 +20,7 @@ const navGroups = [
       { label: 'Kurser', to: routes.courses },
       { label: 'Flöde', to: routes.feed },
       { label: 'Forum', to: routes.forum },
+      { label: 'Meddelanden', to: routes.messages },
     ],
   },
 ]
