@@ -206,7 +206,6 @@ const ForumPostCard = ({ post }: ForumPostCardProps) => {
         <button type="button" className="forum-comments-toggle-link" onClick={toggleComments}>
           {commentCount} kommentarer
         </button>
-        <span>{post.repostCount} delningar</span>
       </div>
 
       <div className="forum-post-actions">
@@ -214,7 +213,7 @@ const ForumPostCard = ({ post }: ForumPostCardProps) => {
           {likedByMe ? 'Gillad' : 'Gilla'}
         </button>
         <button type="button" className={commentsOpen ? 'active' : ''} onClick={toggleComments}>
-          {commentsOpen ? 'Dölj kommentarer' : 'Visa kommentarer'}
+          {commentsOpen ? 'Dölj kommentarer' : 'Kommentarer'}
         </button>
       </div>
 
