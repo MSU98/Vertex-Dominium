@@ -49,6 +49,9 @@ const BrandPageShell = ({ title, subtitle, memberNav = false, children }: BrandP
               <NavLink to={routes.forum} className={memberLinkClass}>
                 FORUM
               </NavLink>
+              <NavLink to={routes.messages} className={memberLinkClass}>
+                MEDDELANDEN
+              </NavLink>
               <NavLink to={routes.profile} className={memberLinkClass}>
                 PROFIL
               </NavLink>
