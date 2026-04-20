@@ -55,7 +55,8 @@ service cloud.firestore {
 
     match /forumPosts/{postId} {
       allow get, list: if isSignedIn();
-      allow create, update, delete: if isAdmin();
+      allow create, update: if isAdmin();
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.authorUid == request.auth.uid);
     }
 
     match /forumPostLikes/{likeId} {

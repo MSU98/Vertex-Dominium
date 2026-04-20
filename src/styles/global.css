@@ -800,6 +800,63 @@ a {
   border-color: rgba(209, 173, 104, 0.2);
 }
 
+.forum-post-actions .forum-delete-confirm {
+  border-color: rgba(255, 123, 123, 0.38);
+  background: rgba(255, 123, 123, 0.14);
+  color: #ffd1d1;
+}
+
+.forum-delete-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(5, 5, 4, 0.6);
+  backdrop-filter: blur(4px);
+}
+
+.forum-delete-modal-card {
+  width: min(100%, 360px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(18, 16, 13, 0.98), rgba(10, 10, 9, 0.96));
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.34);
+  padding: 24px;
+  display: grid;
+  gap: 18px;
+}
+
+.forum-delete-modal-card p {
+  margin: 0;
+  text-align: center;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.forum-delete-modal-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.forum-delete-modal-actions button {
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted);
+  padding: 10px 12px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+}
+
+.forum-delete-modal-actions button:hover {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
 .forum-comments {
   margin-top: 12px;
   padding-top: 12px;
