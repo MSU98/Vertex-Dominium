@@ -1,5 +1,5 @@
 import SplashScreen from '../features/auth/SplashScreen'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import RequireAuth from '../auth/RequireAuth'
 import RequireRole from '../auth/RequireRole'
 import { AuthProvider } from '../auth/AuthContext'
@@ -35,7 +35,7 @@ const App = () => (
   <AuthProvider>
     <BrowserRouter>
       <Routes>
-        <Route path={routes.home} element={<HomePage />} />
+        <Route path={routes.home} element={<Navigate to={routes.hem} replace />} />
         <Route path={routes.hem} element={<HomePage />} />
         <Route path={routes.about} element={<AboutPage />} />
         <Route path={routes.contact} element={<ContactPage />} />
