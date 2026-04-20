@@ -183,6 +183,10 @@ const ForumPage = () => {
       .slice(0, 6)
   }, [directory, searchTerm])
 
+  const handlePostDeleted = (postId: string) => {
+    setPosts((currentPosts) => currentPosts.filter((post) => post.id !== postId))
+  }
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
@@ -391,7 +395,7 @@ const ForumPage = () => {
 
         <div className="forum-feed-list">
           {posts.map((post) => (
-            <ForumPostCard key={post.id} post={post} />
+            <ForumPostCard key={post.id} post={post} onDeleted={handlePostDeleted} />
           ))}
         </div>
       </main>

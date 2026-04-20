@@ -40,6 +40,10 @@ const FeedPage = () => {
     loadPosts()
   }, [dbClient])
 
+  const handlePostDeleted = (postId: string) => {
+    setPosts((currentPosts) => currentPosts.filter((post) => post.id !== postId))
+  }
+
   return (
     <BrandPageShell
       title="FLÖDE"
@@ -53,7 +57,7 @@ const FeedPage = () => {
       ) : posts.length > 0 ? (
         <section className="forum-feed-list">
           {posts.map((post) => (
-            <ForumPostCard key={post.id} post={post} />
+            <ForumPostCard key={post.id} post={post} onDeleted={handlePostDeleted} />
           ))}
         </section>
       ) : (

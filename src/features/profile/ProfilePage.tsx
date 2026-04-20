@@ -946,7 +946,13 @@ const ProfilePage = () => {
         ) : profilePosts.length > 0 ? (
           <div className="forum-feed-list profile-feed-list">
             {profilePosts.map((post) => (
-              <ForumPostCard key={post.id} post={post} />
+              <ForumPostCard
+                key={post.id}
+                post={post}
+                onDeleted={(postId) =>
+                  setProfilePosts((currentPosts) => currentPosts.filter((post) => post.id !== postId))
+                }
+              />
             ))}
           </div>
         ) : (

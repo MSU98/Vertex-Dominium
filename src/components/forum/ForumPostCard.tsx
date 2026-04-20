@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+﻿import { useEffect, useMemo, useState } from 'react'
 import {
   addDoc,
   collection,
@@ -19,6 +19,7 @@ import type { ForumPost } from '../../types/ForumPost'
 
 type ForumPostCardProps = {
   post: ForumPost
+  onDeleted?: (postId: string) => void
 }
 
 type PostComment = {
@@ -57,7 +58,7 @@ const formatRelativeDate = (value?: ForumPost['createdAt']) => {
   return `${diffDays} d`
 }
 
-const ForumPostCard = ({ post }: ForumPostCardProps) => {
+const ForumPostCard = ({ post, onDeleted }: ForumPostCardProps) => {
   const { currentUser, profile } = useAuth()
   const dbClient = db
   const [likeCount, setLikeCount] = useState(post.likeCount ?? 0)
@@ -68,6 +69,9 @@ const ForumPostCard = ({ post }: ForumPostCardProps) => {
   const [commentDraft, setCommentDraft] = useState('')
   const [commentSubmitting, setCommentSubmitting] = useState(false)
   const [commentError, setCommentError] = useState<string | null>(null)
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const [deleteSubmitting, setDeleteSubmitting] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   const likeDocId = useMemo(() => {
     if (!currentUser) return ''
@@ -78,6 +82,7 @@ const ForumPostCard = ({ post }: ForumPostCardProps) => {
     if (profile?.fullName?.trim()) return profile.fullName.trim()
     return profile?.email?.split('@')[0] ?? 'Medlem'
   }, [profile?.email, profile?.fullName])
+  const canDeletePost = currentUser?.uid === post.authorUid || profile?.role === 'admin'
 
   useEffect(() => {
     if (!dbClient || !post.id) return undefined
@@ -166,7 +171,7 @@ const ForumPostCard = ({ post }: ForumPostCardProps) => {
       setCommentDraft('')
     } catch (error) {
       console.error('Failed to add comment', error)
-      setCommentError('Det gick inte att publicera kommentaren. Försök igen.')
+      setCommentError('Det gick inte att publicera kommentaren. FÃ¶rsÃ¶k igen.')
     } finally {
       setCommentSubmitting(false)
     }
@@ -174,6 +179,23 @@ const ForumPostCard = ({ post }: ForumPostCardProps) => {
 
   const toggleComments = () => {
     setCommentsOpen((open) => !open)
+  }
+
+  const handleDeletePost = async () => {
+    if (!dbClient || !post.id || !canDeletePost || deleteSubmitting) return
+
+    setDeleteSubmitting(true)
+    setDeleteError(null)
+
+    try {
+      await deleteDoc(doc(dbClient, 'forumPosts', post.id))
+      onDeleted?.(post.id)
+    } catch (error) {
+      console.error('Failed to delete forum post', error)
+      setDeleteError('Det gick inte att radera inlÃ¤gget. FÃ¶rsÃ¶k igen.')
+    } finally {
+      setDeleteSubmitting(false)
+    }
   }
 
   return (
@@ -213,9 +235,51 @@ const ForumPostCard = ({ post }: ForumPostCardProps) => {
           {likedByMe ? 'Gillad' : 'Gilla'}
         </button>
         <button type="button" className={commentsOpen ? 'active' : ''} onClick={toggleComments}>
-          {commentsOpen ? 'Dölj kommentarer' : 'Kommentarer'}
+          {commentsOpen ? 'DÃ¶lj kommentarer' : 'Kommentarer'}
         </button>
+        {canDeletePost && (
+          <button
+            type="button"
+            onClick={() => {
+              setConfirmingDelete(true)
+              setDeleteError(null)
+            }}
+            disabled={deleteSubmitting}
+          >
+            Radera
+          </button>
+        )}
       </div>
+      {deleteError && <p className="error">{deleteError}</p>}
+
+      {confirmingDelete && (
+        <div className="forum-delete-modal" role="dialog" aria-modal="true">
+          <div className="forum-delete-modal-card">
+            <p>Vill du radera detta inlägg?</p>
+            <div className="forum-delete-modal-actions">
+              <button
+                type="button"
+                className="forum-delete-confirm"
+                onClick={handleDeletePost}
+                disabled={deleteSubmitting}
+              >
+                {deleteSubmitting ? 'Raderar...' : 'Ja'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (deleteSubmitting) return
+                  setConfirmingDelete(false)
+                  setDeleteError(null)
+                }}
+                disabled={deleteSubmitting}
+              >
+                Nej
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {commentsOpen && (
         <section className="forum-comments">
@@ -247,7 +311,7 @@ const ForumPostCard = ({ post }: ForumPostCardProps) => {
               ))}
             </div>
           ) : (
-            <p className="muted">Inga kommentarer än.</p>
+            <p className="muted">Inga kommentarer Ã¤n.</p>
           )}
         </section>
       )}
@@ -256,3 +320,5 @@ const ForumPostCard = ({ post }: ForumPostCardProps) => {
 }
 
 export default ForumPostCard
+
+
